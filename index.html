@@ -14,19 +14,14 @@
 <body>
 <script src="assets/js/art.js"></script>
 
-<!-- The cover: a painted save-the-date. Guests sign in with their phone number to open the book. -->
+<!-- The cover: a simple sign-in. Guests enter their phone number to open the book. -->
 <section class="cover" id="cover">
-  <svg class="cover-lemons" aria-hidden="true" focusable="false"><use href="#lemon-branch"/></svg>
-  <svg class="cover-olives" aria-hidden="true" focusable="false"><use href="#olive-branch"/></svg>
   <div class="cover-inner" id="cover-inner">
     <div class="cover-card">
       <div class="wreath-mark" aria-hidden="true"><svg><use href="#wreath"/></svg><span>M<i>&amp;</i>C</span></div>
       <p class="cover-eyebrow">Save the date</p>
-      <h1 class="cover-title">Meet us <span class="in">in</span> <span class="town">Sorrento</span></h1>
-      <p class="cover-date">October 1, 2027</p>
-      <p class="cover-family">The Queenans</p>
-      <p class="cover-couple">M<span class="lc">c</span>Kenna &amp; Chandler</p>
-      <p class="cover-place">Capo Santa Fortunata · Sorrento, Italy</p>
+      <h1 class="cover-names">McKenna <span class="amp">&amp;</span> Chandler</h1>
+      <p class="cover-date">October 1, 2027 · Sorrento, Italy</p>
 
       <form class="cover-form" id="signin-form" novalidate>
         <div id="phone-mode">
@@ -65,40 +60,40 @@
       <p class="hint preview-note" id="preview-note" hidden>Preview: any number or email works, and sign-ins stay in this browser.</p>
     </div>
   </div>
-  <div class="cover-scene" aria-hidden="true">
-    <img src="assets/img/cover-bay.webp" alt="" width="1400" height="747">
-    <svg class="lace"><rect width="100%" height="100%" fill="url(#laceP)"/></svg>
-  </div>
 </section>
 
 <div class="book" id="book" hidden>
   <header id="site-header" class="site-header"></header>
 
   <main>
-    <section class="page page-hero">
-      <div class="wrap hero">
-        <div class="hero-text">
-          <p class="eyebrow">Save the date</p>
-          <h1><em data-w="coupleA">McKenna</em><span class="amp">&amp;</span><em data-w="coupleB">Chandler</em></h1>
-          <p class="big-date">October 1, 2027</p>
-          <p class="soft"><span data-w="venue">Capo Santa Fortunata</span> · <span data-w="town">Sorrento</span>, Italia</p>
-          <p class="countdown" id="countdown"></p>
-          <div class="actions">
-            <a class="button" href="#reply">Share your gut feeling</a>
-            <a class="button ghost" href="travel.html">Getting to Sorrento</a>
-          </div>
-        </div>
-        <div class="arch-wrap">
-          <figure class="arch">
-            <img src="assets/img/us-dancing.jpg" alt="McKenna and Chandler dancing barefoot on the beach beneath a cliff" width="1067" height="1600">
-          </figure>
-          <svg class="sprig arch-sprig" aria-hidden="true" focusable="false"><use href="#sprig"/></svg>
-        </div>
+    <!-- The title page: a watercolor of the view from Capo Santa Fortunata. -->
+    <section class="page-hero" id="top">
+      <svg class="hero-lemons" aria-hidden="true" focusable="false"><use href="#lemon-branch"/></svg>
+      <svg class="hero-olives" aria-hidden="true" focusable="false"><use href="#olive-branch"/></svg>
+      <div class="hero-text">
+        <div class="wreath-mark" aria-hidden="true"><svg><use href="#wreath"/></svg><span>M<i>&amp;</i>C</span></div>
+        <p class="hero-eyebrow">Save the date</p>
+        <h1 class="hero-title">Meet us <span class="in">in</span> <span class="town">Sorrento</span></h1>
+        <p class="hero-date">October 1, 2027</p>
+        <p class="hero-family">The Queenans</p>
+        <p class="hero-couple">M<span class="lc">c</span>Kenna &amp; Chandler</p>
+        <p class="hero-place"><span data-w="venue">Capo Santa Fortunata</span> · <span data-w="town">Sorrento</span>, Italy</p>
+        <p class="countdown" id="countdown"></p>
+      </div>
+      <div class="hero-scene" aria-hidden="true">
+        <img src="assets/img/hero-bay.webp" alt="" width="1400" height="992">
+        <a class="scroll-cue" href="#story" tabindex="-1">Scroll</a>
       </div>
     </section>
 
-    <section class="page page-story flip">
+    <section class="page page-story flip" id="story">
       <div class="wrap story">
+        <div class="arch-wrap">
+          <figure class="arch">
+            <img src="assets/img/us-dancing.jpg" alt="McKenna and Chandler dancing barefoot on the beach beneath a cliff" width="1067" height="1600" loading="lazy">
+          </figure>
+          <svg class="sprig arch-sprig" aria-hidden="true" focusable="false"><use href="#sprig"/></svg>
+        </div>
         <p class="script">Sì, lo voglio</p>
         <p class="story-lead">We're getting married on the cliffs of Sorrento, and we would love for you to be there.</p>
         <div class="dates">

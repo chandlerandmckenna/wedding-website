@@ -55,7 +55,6 @@
     '  </pattern>' +
     '<symbol id="plane" viewBox="0 0 64 40"><g filter="url(#wc)"><path d="M4 20C10 12 40 12 52 16L60 20L52 24C40 28 10 28 4 20Z" fill="#2a55a6"/><path d="M22 5H40L36 35H20Z" fill="#f2c94c"/><path d="M0 12L8 16L8 24L0 28Z" fill="#2a55a6"/><circle cx="47" cy="19" r="2.5" fill="#cfe1f3"/><path d="M60 13V27" stroke="#5a4130" stroke-width="1.6" stroke-linecap="round"/></g></symbol>' +
     '<symbol id="swash" viewBox="0 0 200 30"><g filter="url(#wc)"><path d="M6 20C40 10 90 8 130 12C160 14 182 18 194 14" fill="none" stroke="#f2c94c" stroke-width="9" stroke-linecap="round"/></g></symbol>' +
-    '<pattern id="laceP" width="22" height="16" patternUnits="userSpaceOnUse"><path d="M0 4H22M0 4A11 11 0 0 0 22 4" fill="none" stroke="#22489a" stroke-opacity=".45" stroke-width="1"/><circle cx="11" cy="10" r="1.6" fill="#f2c94c"/></pattern>' +
     botanicals() +
     "</defs></svg>";
   document.body.insertAdjacentHTML("afterbegin", svg);

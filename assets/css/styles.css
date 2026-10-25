@@ -133,20 +133,16 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   background: inherit;
   background-color: var(--ivory);
   display: grid;
-  grid-template-rows: 1fr auto;
   padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   transform-origin: 50% 0;
 }
-/* lemons hang in from the top left, olives from the grove at the top right */
-.cover-lemons, .cover-olives { position: absolute; top: 0; pointer-events: none; overflow: visible; }
-.cover-lemons { left: 0; width: clamp(150px, 25vw, 330px); aspect-ratio: 340 / 460; }
-.cover-olives { right: 0; width: clamp(130px, 24vw, 320px); aspect-ratio: 340 / 460; }
 .cover-inner {
   position: relative;
   z-index: 1;
   display: grid;
   place-items: center;
-  padding-block: 24px 0;
+  padding-block: 40px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
@@ -162,49 +158,11 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 .wreath-mark svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .wreath-mark span { font-family: var(--display); font-size: 0.9rem; letter-spacing: 0.04em; color: var(--cobalt); }
 .wreath-mark i { font-family: var(--script); font-style: normal; color: var(--lemon-deep); font-size: 1.2em; margin-inline: 1px; }
-.cover-eyebrow { font-size: 0.78rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--olive); }
-.cover-title {
-  display: grid;
-  font-size: clamp(2.5rem, min(10.5vw, 8.4vh), 3.9rem);
-  line-height: 1.02;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--cobalt);
-  margin-block: 6px 4px;
-}
-.cover-title .in { font-style: italic; text-transform: none; letter-spacing: 0; font-size: 0.5em; color: var(--lemon-deep); line-height: 1.2; }
-.cover-title .town { font-size: 1.12em; letter-spacing: 0.1em; }
-.cover-date {
-  font-family: var(--display);
-  font-size: clamp(1.45rem, 5.6vw, 2.15rem);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink);
-  padding-block: 8px 2px;
-}
-.cover-date::before, .cover-date::after { content: ""; display: inline-block; width: 28px; border-top: 1px solid var(--lemon-deep); vertical-align: middle; margin: 0 14px 0.2em; opacity: 0.7; }
-.cover-family { font-family: var(--script); font-size: clamp(2.6rem, 10vw, 3.4rem); line-height: 1; color: var(--lemon-deep); margin-top: 10px; }
-.cover-couple { font-family: var(--display); font-size: 0.95rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--cobalt); }
-.cover-couple .lc { text-transform: none; letter-spacing: 0.12em; }
-.cover-place { color: var(--ink-soft); font-size: var(--step--1); letter-spacing: 0.08em; margin-top: 2px; }
+.cover-eyebrow, .hero-eyebrow { font-size: 0.78rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--olive); }
+.cover-names { font-size: clamp(2.3rem, 9vw, 3.2rem); font-style: italic; color: var(--cobalt); margin-top: 4px; }
+.cover-names .amp { font-family: var(--script); font-style: normal; color: var(--lemon-deep); font-size: 0.9em; }
+.cover-date { font-family: var(--display); font-size: var(--step-1); color: var(--ink); }
 .cover-card .cover-form { width: min(100%, 420px); margin-top: 12px; }
-.hero h1 .amp { font-family: var(--script); font-style: normal; color: var(--lemon-deep); font-size: 0.85em; line-height: 0.9; }
-/* the view from the villa's garden, across the bay to the Sorrento cliffs */
-.cover-scene { position: relative; margin-top: -56px; pointer-events: none; }
-.cover-scene img {
-  display: block;
-  width: min(100%, 1100px);
-  height: clamp(180px, 30vh, 320px);
-  margin-inline: auto;
-  object-fit: cover;
-  object-position: 50% 15%;
-  /* keep the painted edges soft however the view is cropped */
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28%), linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to bottom, transparent, #000 28%), linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
-  mask-composite: intersect;
-}
-.lace { display: block; width: 100%; height: 16px; margin-bottom: env(safe-area-inset-bottom, 0px); }
 .cover-form { display: grid; gap: 12px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--line); text-align: left; }
 .cover-form .script, .cover-form .hint { text-align: center; }
 .inline-field { display: flex; gap: 8px; }
@@ -309,23 +267,75 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   100% { transform: none; opacity: 1; }
 }
 
-/* Hero */
-.page-hero { padding-block: clamp(24px, 5vw, 72px) clamp(64px, 9vw, 112px); }
-.hero {
+/* Title page: lemons hang in from the top left, olives from the grove at the
+   top right, and the bay below is painted from the venue's garden. */
+.page-hero {
+  position: relative;
+  overflow: hidden;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: clamp(32px, 6vw, 80px);
-  align-items: center;
+  align-content: start;
+  min-height: calc(100svh - 96px);
+  padding-block: clamp(28px, 5vh, 56px) clamp(170px, 30vh, 340px);
 }
-.hero-text { display: grid; gap: 14px; min-width: 0; justify-items: start; }
-.hero h1 { font-size: var(--step-4); display: grid; line-height: 1.02; }
-.hero h1 em { font-style: italic; color: var(--cobalt); }
-.hero h1 .amp { padding-left: 0.6em; }
-.big-date { font-family: var(--display); font-size: var(--step-3); line-height: 1.1; }
-.countdown { color: var(--ink-soft); }
+.hero-lemons, .hero-olives { position: absolute; top: 0; pointer-events: none; overflow: visible; aspect-ratio: 340 / 460; }
+.hero-lemons { left: 0; width: clamp(150px, 25vw, 330px); }
+.hero-olives { right: 0; width: clamp(130px, 24vw, 320px); }
+.hero-text {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-align: center;
+  padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+}
+.hero-title {
+  display: grid;
+  font-size: clamp(2.6rem, min(11vw, 9vh), 4.6rem);
+  line-height: 1.02;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cobalt);
+  margin-block: 6px 4px;
+}
+.hero-title .in { font-style: italic; text-transform: none; letter-spacing: 0; font-size: 0.5em; color: var(--lemon-deep); line-height: 1.2; }
+.hero-title .town { font-size: 1.12em; letter-spacing: 0.1em; }
+.hero-date {
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 5.8vw, 2.4rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding-block: 8px 2px;
+}
+.hero-date::before, .hero-date::after { content: ""; display: inline-block; width: 28px; border-top: 1px solid var(--lemon-deep); vertical-align: middle; margin: 0 14px 0.2em; opacity: 0.7; }
+.hero-family { font-family: var(--script); font-size: clamp(2.7rem, 10vw, 3.6rem); line-height: 1; color: var(--lemon-deep); margin-top: 10px; }
+.hero-couple { font-family: var(--display); font-size: 0.95rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--cobalt); }
+.hero-couple .lc { text-transform: none; letter-spacing: 0.12em; }
+.hero-place { color: var(--ink-soft); font-size: var(--step--1); letter-spacing: 0.08em; margin-top: 2px; }
+/* the painted bay is a backdrop: its hazy sky sits behind the lower lines of text */
+.hero-scene { position: absolute; inset: auto 0 0; height: min(64%, 640px); pointer-events: none; }
+.hero-scene img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  /* keep the painted edges soft however the view is cropped */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 34%, #000 82%, transparent), linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, #000 34%, #000 82%, transparent), linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-composite: intersect;
+}
+.scroll-cue {
+  pointer-events: auto;
+  position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
+  font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; color: var(--cobalt);
+  display: grid; justify-items: center; gap: 6px;
+}
+.scroll-cue::after { content: ""; width: 1px; height: 32px; background: var(--cobalt); opacity: 0.6; }
+.countdown { color: var(--ink-soft); margin-top: 6px; }
 .count-num { font-family: var(--display); font-size: var(--step-2); color: var(--cobalt); margin-right: 4px; font-variant-numeric: tabular-nums; }
-.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
-.arch-wrap { position: relative; justify-self: center; width: min(100%, 420px); }
+.arch-wrap { position: relative; justify-self: center; width: min(78%, 340px); margin-bottom: 20px; }
 .arch {
   position: relative;
   aspect-ratio: 2 / 3;
@@ -474,10 +484,9 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 .footer-names { font-family: var(--display); font-style: italic; font-size: var(--step-2); color: var(--cobalt); }
 
 @media (max-width: 760px) {
-  .hero { grid-template-columns: minmax(0, 1fr); }
-  .arch-wrap { width: min(86%, 320px); margin-top: 12px; }
+  .page-hero { padding-top: 92px; }
+  .hero-date::before, .hero-date::after { display: none; }
   .arch-sprig { width: 150px; height: 106px; left: -50px; bottom: -30px; }
-  .cover-inner { padding-top: 92px; }
   .gallery { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .gallery .g-main { grid-column: 1 / -1; grid-row: auto; }
   .gallery .g-main img { aspect-ratio: 4 / 3; }
@@ -492,3 +501,5 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 }
 .inline-field .phone-field input:first-child { padding-left: 14px; }
 .inline-field .phone-field input:focus { box-shadow: none; }
+/* a soft halo keeps the lines over the painted bay easy to read */
+.hero-family, .hero-couple, .hero-place, .hero-date, .countdown { text-shadow: 0 0 14px #fbf8f1, 0 0 6px #fbf8f1, 0 0 2px #fbf8f1; }
