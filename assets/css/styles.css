@@ -254,7 +254,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 
 /* Pages: as you scroll, each section settles into place and the one before
    fades out while the next fades in (see setupPageFades in site.js). */
-html.paged { scroll-snap-type: y proximity; }
+html.paged { scroll-snap-type: y mandatory; } /* past halfway, it settles on the next page */
 html.paged .page, html.paged .page-hero { scroll-snap-align: start; min-height: calc(100svh - var(--head, 96px)); }
 html.paged .page { display: grid; align-content: center; padding-block: clamp(40px, 7vh, 80px); }
 html.paged .page-hero { align-content: start; }
@@ -363,22 +363,20 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .date-rule { width: 1px; height: 120px; background: var(--line); }
 
 /* Venue */
-/* three wide photos in a row, breaking out of the text column so each one is
-   big; the middle one shows first and the other two drift out from behind it */
+/* three portrait photos in a row, sized so the row fits on one screen; the
+   middle one shows first and the other two drift out from behind it */
 .gallery {
+  --gw: min(96vw, calc(117vh + 32px), 1200px);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
-  width: min(96vw, 1500px);
-  margin-inline: calc(50% - min(48vw, 750px));
+  width: var(--gw);
+  margin-inline: calc(50% - var(--gw) / 2);
 }
 .page-venue { overflow-x: clip; }
 .gallery figure { position: relative; min-width: 0; }
 .gallery .g-main { z-index: 1; }
-.gallery img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; display: block; }
-.gallery figure:first-child img { object-position: 50% 55%; }
-.gallery .g-main img { object-position: 50% 58%; }
-.gallery figure:last-child img { object-position: 50% 45%; }
+.gallery img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; display: block; }
 html.paged .gallery figure:not(.g-main) { transition: transform 1.8s cubic-bezier(0.25, 0.6, 0.2, 1) 0.6s, opacity 1.6s ease 0.6s; }
 html.paged .page-venue:not(.shown) .gallery figure:first-child { transform: translateX(calc(100% + 16px)); opacity: 0; }
 html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: translateX(calc(-100% - 16px)); opacity: 0; }
@@ -503,11 +501,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
   .hero-bg { object-position: 72% 40%; }
   .page-hero { padding-top: clamp(120px, 20vh, 170px); }
   .arch-sprig { width: 150px; height: 106px; left: -50px; bottom: -30px; }
-  /* on phones the middle photo leads, full width, and the other two slide in below it */
-  .gallery { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; width: auto; margin-inline: 0; }
-  .gallery .g-main { grid-column: 1 / -1; order: -1; }
-  html.paged .page-venue:not(.shown) .gallery figure:first-child { transform: translateX(-40%); }
-  html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: translateX(40%); }
+  /* on phones the three portraits stay in a row, a little closer together */
+  .gallery { gap: 8px; width: auto; margin-inline: 0; }
   .date-rule { display: none; }
   .reply-sprig { width: 110px; height: 78px; right: -10px; top: -50px; }
 }
