@@ -268,7 +268,28 @@ window.PAGES = [
       entries.forEach(function (en) { en.target.classList.toggle("shown", en.isIntersecting); });
     }, { rootMargin: "-45% 0px -45% 0px" });
     (root || document).querySelectorAll(".fade").forEach(function (el) { io.observe(el); });
+    floatHeroText(root);
   };
+
+  // On the title page the words hang in place while the painting scrolls
+  // up beneath them, fading out by the time the page is half gone.
+  function floatHeroText(root) {
+    var hero = (root || document).querySelector(".page-hero");
+    var text = hero && hero.querySelector(".hero-text");
+    if (!text) return;
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var y = Math.max(0, -hero.getBoundingClientRect().top);
+      var t = Math.min(1, y / (hero.offsetHeight * 0.55));
+      text.style.transform = y ? "translate3d(0," + (y * 0.85).toFixed(1) + "px,0)" : "";
+      text.style.opacity = (1 - t).toFixed(3);
+    }
+    window.addEventListener("scroll", function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    update();
+  }
 
   // Every page except the cover needs a signed-in guest.
   var isHome = currentPage() === homeHref();

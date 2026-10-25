@@ -296,6 +296,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .hero-lemons-right { left: auto; right: -8px; transform: scaleX(-1); }
 .hero-text {
   position: relative;
+  will-change: transform, opacity;
   z-index: 2;
   display: grid;
   justify-items: center;
