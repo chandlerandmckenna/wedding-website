@@ -67,27 +67,33 @@ window.PAGES = [
     try { localStorage.removeItem(key); } catch (e) { /* storage blocked */ }
   }
 
-  // Normalise to digits with a country code. 10 digits = US/Canada.
-  function normalizePhone(raw) {
-    var digits = String(raw || "").replace(/\D/g, "");
-    if (/^\+/.test(String(raw).trim()) || digits.length > 10) return digits.replace(/^00/, "");
-    if (digits.length === 10) return "1" + digits;
-    return digits;
-  }
-
   var memory = null; // session fallback when storage is blocked
 
   window.Guest = {
-    normalizePhone: normalizePhone,
     current: function () { return read(SESSION_KEY) || memory; },
     save: function (guest) { memory = guest; write(SESSION_KEY, guest); },
     signOut: function () { memory = null; remove(SESSION_KEY); }
   };
 
+  // Guests are found by phone (digits with country code, e.g. 19259636950)
+  // or by email (lower case). id is { phone } or { email }.
+  function keysFor(g) {
+    var keys = [];
+    if (g.phone) keys.push("p:" + g.phone);
+    if (g.email) keys.push("e:" + String(g.email).toLowerCase());
+    return keys;
+  }
+
   // Preview mode keeps a small guest book in this browser only.
   var demo = {
     all: function () { return read(DEMO_KEY) || {}; },
-    put: function (g) { var all = demo.all(); all[g.phone] = g; write(DEMO_KEY, all); return g; }
+    find: function (id) { return demo.all()[keysFor(id)[0]] || null; },
+    put: function (g) {
+      var all = demo.all();
+      keysFor(g).forEach(function (k) { all[k] = g; });
+      write(DEMO_KEY, all);
+      return g;
+    }
   };
 
   function call(action, payload) {
@@ -105,18 +111,17 @@ window.PAGES = [
 
   window.GuestAPI = {
     preview: !W.apiEndpoint,
-    // Resolves to the guest record, or null if this number isn't known yet.
-    lookup: function (phone) {
-      return call("lookup", { phone: phone }) ||
-        Promise.resolve(demo.all()[phone] || null);
+    // Resolves to the guest record, or null if we don't know them yet.
+    lookup: function (id) {
+      return call("lookup", id) || Promise.resolve(demo.find(id));
     },
     register: function (guest) {
       return call("register", guest) || Promise.resolve(demo.put(guest));
     },
-    reply: function (phone, feeling) {
-      var p = call("reply", { phone: phone, feeling: feeling });
+    reply: function (guest, feeling) {
+      var p = call("reply", { phone: guest.phone, email: guest.email, feeling: feeling });
       if (p) return p;
-      var g = demo.all()[phone];
+      var g = demo.find(guest);
       if (g) { g.feeling = feeling; demo.put(g); }
       return Promise.resolve({ ok: true });
     }
@@ -152,7 +157,7 @@ window.PAGES = [
       return '<a href="' + p.href + '"' + cur + ">" + p.label + "</a>";
     }).join("");
     el.innerHTML =
-      '<svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>' +
+      '<div class="stripe-band" aria-hidden="true"></div>' +
       '<div class="header-inner">' +
       '<a class="monogram" href="' + homeHref() + '">' + W.monogram + "</a>" +
       '<nav class="site-nav" aria-label="Main">' + links + "</nav>" +
@@ -171,11 +176,11 @@ window.PAGES = [
     if (!el) return;
     el.innerHTML =
       '<div class="footer-inner">' +
-      '<p class="script">Ci vediamo a Sorrento!</p>' +
+      '<p class="lettering">Ci vediamo a Sorrento!</p>' +
       '<p class="footer-names">' + W.coupleA + " &amp; " + W.coupleB + "</p>" +
       "<p>" + W.dateLabel + " · " + W.venue + ", " + W.town + "</p>" +
       "</div>" +
-      '<svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>';
+      '<div class="stripe-band" aria-hidden="true"></div>';
   }
 
   function fillDetails() {

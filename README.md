@@ -11,7 +11,7 @@ Static site for our wedding in Sorrento, Italy, 1 October 2027. Plain HTML, CSS 
 - To add a page, copy an existing page, then add one line to `PAGES` in `assets/js/site.js`.
 
 ## Guest sign-in and answers
-Guests sign in with their phone number. A known number opens the site straight away; a new number asks once for name and email. The signed-in guest is remembered on their device, so the later RSVP can be pre-filled.
+Guests sign in with their US phone number (formatted as they type), or with their email if the number does not work. A known guest opens the site straight away; anyone new is asked once for name and email. The signed-in guest is remembered on their device, so the later RSVP can be pre-filled.
 
 The guest list and answers live in a Google Sheet behind a Google Apps Script web app: see `backend/apps-script.gs` for the sheet layout and deploy steps, then set `apiEndpoint` in `assets/js/site.js`. With no endpoint the site runs in preview mode: any number works and everything stays in that browser.
 

@@ -4,7 +4,8 @@
  *
  * Sheet "Guests" (row 1 is headers):
  *   Phone | Name | Email | Group | Feeling | Updated
- *   Phone is digits only with country code, e.g. 15551234567.
+ *   Phone is digits only with country code, e.g. 19259636950.
+ *   Guests can sign in with either their phone or their email.
  *   Group is optional, e.g. "party" for the wedding party and families.
  *
  * Sheet "Private events" (row 1 is headers):
@@ -21,15 +22,18 @@ var FEELINGS = { yes: true, maybe: true, no: true };
 
 function doPost(e) {
   var req = JSON.parse(e.postData.contents || "{}");
-  var phone = String(req.phone || "").replace(/\D/g, "");
-  if (!phone) return json({ error: "phone required" });
+  var id = {
+    phone: String(req.phone || "").replace(/\D/g, ""),
+    email: String(req.email || "").trim().toLowerCase()
+  };
+  if (!id.phone && !id.email) return json({ error: "phone or email required" });
 
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    if (req.action === "lookup") return json(lookup(phone));
-    if (req.action === "register") return json(register(phone, req));
-    if (req.action === "reply") return json(reply(phone, req.feeling));
+    if (req.action === "lookup") return json(lookup(id));
+    if (req.action === "register") return json(register(id, req));
+    if (req.action === "reply") return json(reply(id, req.feeling));
     return json({ error: "unknown action" });
   } finally {
     lock.releaseLock();
@@ -40,20 +44,22 @@ function guests() {
   return SpreadsheetApp.getActive().getSheetByName("Guests");
 }
 
-function findRow(phone) {
+function findRow(id) {
   var rows = guests().getDataRange().getValues();
   for (var i = 1; i < rows.length; i++) {
-    if (String(rows[i][COLS.phone]).replace(/\D/g, "") === phone) return { index: i + 1, row: rows[i] };
+    var phone = String(rows[i][COLS.phone]).replace(/\D/g, "");
+    var email = String(rows[i][COLS.email]).trim().toLowerCase();
+    if ((id.phone && phone === id.phone) || (id.email && email === id.email)) return { index: i + 1, row: rows[i] };
   }
   return null;
 }
 
-function lookup(phone) {
-  var hit = findRow(phone);
+function lookup(id) {
+  var hit = findRow(id);
   if (!hit) return null;
   var r = hit.row;
   return {
-    phone: phone,
+    phone: String(r[COLS.phone]).replace(/\D/g, ""),
     name: r[COLS.name],
     email: r[COLS.email],
     feeling: r[COLS.feeling] || "",
@@ -70,16 +76,15 @@ function privateEvents(group) {
     .map(function (r) { return { date: r[1], time: r[2], title: r[3], place: r[4] }; });
 }
 
-function register(phone, req) {
-  var hit = findRow(phone);
-  if (hit) return lookup(phone);
-  guests().appendRow([phone, String(req.name || "").slice(0, 200), String(req.email || "").slice(0, 200), "", "", new Date()]);
-  return lookup(phone);
+function register(id, req) {
+  if (findRow(id)) return lookup(id);
+  guests().appendRow([id.phone, String(req.name || "").slice(0, 200), id.email || String(req.email || "").slice(0, 200), "", "", new Date()]);
+  return lookup(id);
 }
 
-function reply(phone, feeling) {
+function reply(id, feeling) {
   if (!FEELINGS[feeling]) return { error: "unknown feeling" };
-  var hit = findRow(phone);
+  var hit = findRow(id);
   if (!hit) return { error: "not found" };
   guests().getRange(hit.index, COLS.feeling + 1, 1, 2).setValues([[feeling, new Date()]]);
   return { ok: true };

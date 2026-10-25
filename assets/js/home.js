@@ -1,12 +1,16 @@
-/* Home page: phone sign-in on the cover, the cover opening like a book,
-   and the "Have a gut feeling?" buttons. */
+/* Home page: sign-in on the cover (phone, or email as a fallback), the
+   cover lifting away, and the "Have a gut feeling?" answer. */
 (function () {
   var cover = document.getElementById("cover");
   var book = document.getElementById("book");
-  var phoneForm = document.getElementById("phone-form");
+  var signinForm = document.getElementById("signin-form");
   var nameForm = document.getElementById("name-form");
   var errorEl = document.getElementById("cover-error");
-  var pendingPhone = null;
+  var phoneMode = document.getElementById("phone-mode");
+  var emailMode = document.getElementById("email-mode");
+  var switchBtn = document.getElementById("switch-mode");
+  var mode = "phone";
+  var pendingId = null;
 
   document.getElementById("preview-note").hidden = !window.GuestAPI.preview;
 
@@ -20,6 +24,8 @@
     btn.disabled = on;
     btn.textContent = on ? "One moment…" : label;
   }
+
+  function isEmail(v) { return /^\S+@\S+\.\S+$/.test(v); }
 
   /* ---------- US phone formatting: 9259636950 shows as (925) 963-6950 ---------- */
   var phoneInput = document.getElementById("phone");
@@ -61,21 +67,41 @@
     try { el.setSelectionRange(pos, pos); } catch (err) { /* not focused */ }
   });
 
-  phoneForm.addEventListener("submit", function (e) {
+  /* ---------- Phone or email ---------- */
+  function setMode(next) {
+    mode = next;
+    phoneMode.hidden = mode !== "phone";
+    emailMode.hidden = mode !== "email";
+    switchBtn.textContent = mode === "phone"
+      ? "Number not working? Use your email instead"
+      : "Use your phone number instead";
+    errorEl.hidden = true;
+    (mode === "phone" ? phoneInput : document.getElementById("signin-email")).focus();
+  }
+  switchBtn.addEventListener("click", function () { setMode(mode === "phone" ? "email" : "phone"); });
+
+  signinForm.addEventListener("submit", function (e) {
     e.preventDefault();
     errorEl.hidden = true;
-    var input = document.getElementById("phone");
-    var digits = usDigits(input.value);
-    if (digits.length !== 10) {
-      return showError("Please enter your 10-digit phone number, area code first.", input);
+    var id, btn;
+    if (mode === "phone") {
+      var digits = usDigits(phoneInput.value);
+      if (digits.length !== 10) return showError("Please enter your 10-digit phone number, area code first.", phoneInput);
+      id = { phone: "1" + digits };
+      btn = document.getElementById("phone-submit");
+    } else {
+      var emailInput = document.getElementById("signin-email");
+      var email = emailInput.value.trim().toLowerCase();
+      if (!isEmail(email)) return showError("Please enter a valid email address.", emailInput);
+      id = { email: email };
+      btn = document.getElementById("email-submit");
     }
-    var phone = "1" + digits;
-    var btn = document.getElementById("phone-submit");
     busy(btn, true);
-    window.GuestAPI.lookup(phone).then(function (guest) {
+    window.GuestAPI.lookup(id).then(function (guest) {
       if (guest) return signedIn(guest);
-      pendingPhone = phone;
-      phoneForm.hidden = true;
+      pendingId = id;
+      document.getElementById("guest-email-field").hidden = !!id.email;
+      signinForm.hidden = true;
       nameForm.hidden = false;
       document.getElementById("guest-name").focus();
     }).catch(function () {
@@ -87,10 +113,11 @@
     e.preventDefault();
     errorEl.hidden = true;
     var name = document.getElementById("guest-name");
-    var email = document.getElementById("guest-email");
+    var emailField = document.getElementById("guest-email");
+    var email = pendingId.email || emailField.value.trim().toLowerCase();
     if (!name.value.trim()) return showError("Please add your name.", name);
-    if (!/^\S+@\S+\.\S+$/.test(email.value.trim())) return showError("Please add an email so we can send your invitation.", email);
-    var guest = { phone: pendingPhone, name: name.value.trim(), email: email.value.trim(), feeling: "" };
+    if (!isEmail(email)) return showError("Please add an email so we can send your invitation.", emailField);
+    var guest = { phone: pendingId.phone || "", email: email, name: name.value.trim(), feeling: "" };
     var btn = document.getElementById("name-submit");
     busy(btn, true);
     window.GuestAPI.register(guest).then(function () {
@@ -100,11 +127,10 @@
     }).then(function () { busy(btn, false, "Continue"); });
   });
 
-  document.getElementById("change-number").addEventListener("click", function () {
+  document.getElementById("start-over").addEventListener("click", function () {
     nameForm.hidden = true;
-    phoneForm.hidden = false;
-    errorEl.hidden = true;
-    document.getElementById("phone").focus();
+    signinForm.hidden = false;
+    setMode(mode);
   });
 
   function signedIn(guest) {
@@ -112,7 +138,7 @@
     openBook(true);
   }
 
-  // The cover swings open from its left edge, then the book underneath shows.
+  // The cover lifts away from its top edge, then the book underneath shows.
   function openBook(animate) {
     var guest = window.Guest.current();
     window.renderHeader();
@@ -134,19 +160,16 @@
     }, 1100);
   }
 
-  /* ---------- Gut feeling ---------- */
+  /* ---------- Gut feeling: pick one, then send ---------- */
   var MESSAGES = {
     yes: "Evviva! We can't wait to celebrate with you.",
     maybe: "Of course, take your time. You can change your answer here whenever you like.",
     no: "We'll miss you, and we'll raise a glass to you in Sorrento."
   };
-
-  function setupFeelings(guest) {
-    var first = guest.name.split(/[ &]/)[0];
-    document.getElementById("feel-hello").textContent = "Ciao, " + first + "!";
-    mark(guest.feeling);
-    if (guest.feeling) document.getElementById("feel-status").textContent = MESSAGES[guest.feeling];
-  }
+  var sendBtn = document.getElementById("feel-send");
+  var statusEl = document.getElementById("feel-status");
+  var selected = "";
+  var saved = "";
 
   function mark(value) {
     document.querySelectorAll(".feel").forEach(function (b) {
@@ -155,23 +178,52 @@
     document.querySelector(".feel-options").classList.toggle("has-choice", !!value);
   }
 
+  function refreshSend() {
+    if (!selected) {
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Send my answer";
+    } else if (selected === saved) {
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Answer sent";
+    } else {
+      sendBtn.disabled = false;
+      sendBtn.textContent = saved ? "Update my answer" : "Send my answer";
+    }
+  }
+
+  function setupFeelings(guest) {
+    var first = guest.name.split(/[ &]/)[0];
+    document.getElementById("feel-hello").textContent = "Ciao, " + first + "!";
+    saved = selected = guest.feeling || "";
+    mark(selected);
+    statusEl.textContent = saved ? MESSAGES[saved] : "";
+    refreshSend();
+  }
+
   document.querySelectorAll(".feel").forEach(function (btn) {
     btn.addEventListener("click", function () {
-      var guest = window.Guest.current();
-      if (!guest) return;
-      var value = btn.getAttribute("data-feeling");
-      var previous = guest.feeling;
-      var status = document.getElementById("feel-status");
-      mark(value);
-      status.textContent = "Saving…";
-      window.GuestAPI.reply(guest.phone, value).then(function () {
-        guest.feeling = value;
-        window.Guest.save(guest);
-        status.textContent = MESSAGES[value];
-      }).catch(function () {
-        mark(previous);
-        status.textContent = "We couldn't save that. Please try again.";
-      });
+      selected = btn.getAttribute("data-feeling");
+      mark(selected);
+      statusEl.textContent = "";
+      refreshSend();
+    });
+  });
+
+  sendBtn.addEventListener("click", function () {
+    var guest = window.Guest.current();
+    if (!guest || !selected) return;
+    var value = selected;
+    sendBtn.disabled = true;
+    sendBtn.textContent = "Sending…";
+    window.GuestAPI.reply(guest, value).then(function () {
+      guest.feeling = value;
+      window.Guest.save(guest);
+      saved = value;
+      statusEl.textContent = MESSAGES[value];
+      refreshSend();
+    }).catch(function () {
+      statusEl.textContent = "We couldn't send that. Please try again.";
+      refreshSend();
     });
   });
 
