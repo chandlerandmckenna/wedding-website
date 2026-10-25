@@ -1,5 +1,5 @@
-/* Watercolor art shared by every page: paint filters, a lemon sprig, a
-   hand-painted majolica tile, a little biplane and a lemon brushstroke.
+/* Watercolor art shared by every page: paint filters, a lemon sprig and a
+   lemon branch, a hand-painted majolica tile and a lemon brushstroke.
    Injected once so pages can <use> them. */
 (function () {
   var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
@@ -53,8 +53,58 @@
     '    </g>' +
     '    <g fill="#f2c94c"><circle cx="24" cy="24" r="3.2"/><circle cx="24" cy="2" r="1.6"/><circle cx="24" cy="46" r="1.6"/><circle cx="2" cy="24" r="1.6"/><circle cx="46" cy="24" r="1.6"/></g>' +
     '  </pattern>' +
-    '<symbol id="plane" viewBox="0 0 64 40"><g filter="url(#wc)"><path d="M4 20C10 12 40 12 52 16L60 20L52 24C40 28 10 28 4 20Z" fill="#2a55a6"/><path d="M22 5H40L36 35H20Z" fill="#f2c94c"/><path d="M0 12L8 16L8 24L0 28Z" fill="#2a55a6"/><circle cx="47" cy="19" r="2.5" fill="#cfe1f3"/><path d="M60 13V27" stroke="#5a4130" stroke-width="1.6" stroke-linecap="round"/></g></symbol>' +
     '<symbol id="swash" viewBox="0 0 200 30"><g filter="url(#wc)"><path d="M6 20C40 10 90 8 130 12C160 14 182 18 194 14" fill="none" stroke="#f2c94c" stroke-width="9" stroke-linecap="round"/></g></symbol>' +
+    lemonBranch() +
     "</defs></svg>";
   document.body.insertAdjacentHTML("afterbegin", svg);
+
+  /* A lemon branch in blossom that hangs into the title page's corners. */
+  function lemonBranch() {
+    // a leaf of length l and half-width w, laid at (x, y) pointing along angle a
+    function leaf(x, y, l, w, a, fill, vein) {
+      return '<g transform="translate(' + x + ' ' + y + ') rotate(' + a + ')">' +
+        '<path d="M0 0C' + l * 0.25 + ' ' + -w * 1.1 + ' ' + l * 0.7 + ' ' + -w + ' ' + l + ' 0C' + l * 0.7 + ' ' + w * 0.9 + ' ' + l * 0.25 + ' ' + w + ' 0 0Z" fill="' + fill + '"/>' +
+        (vein ? '<path d="M2 0Q' + l * 0.5 + ' ' + -w * 0.12 + ' ' + l * 0.94 + ' 0" stroke="' + vein + '" stroke-width="1" fill="none" opacity=".55"/>' : "") +
+        "</g>";
+    }
+    function lemon(x, y, s, a) {
+      return '<g transform="translate(' + x + ' ' + y + ') rotate(' + a + ') scale(' + s + ')">' +
+        '<path d="M-44 0L-37 -5C-33 -26 -16 -36 2 -35C20 -36 36 -26 39 -6L46 0L39 6C36 26 20 36 2 35C-16 36 -33 26 -37 5Z" fill="url(#lemonG)"/>' +
+        '<ellipse cx="-6" cy="-14" rx="14" ry="6" fill="#fffbe0" opacity=".55" transform="rotate(-12)"/>' +
+        '<path d="M-40 4C-30 22 -6 32 18 28" stroke="#c99a18" stroke-width="2" fill="none" opacity=".45"/>' +
+        "</g>";
+    }
+    function blossom(x, y, r, a) {
+      var g = '<g transform="translate(' + x + ' ' + y + ') rotate(' + (a || 0) + ')">';
+      for (var i = 0; i < 5; i++) {
+        g += '<ellipse cx="0" cy="' + -r * 0.62 + '" rx="' + r * 0.38 + '" ry="' + r * 0.62 + '" transform="rotate(' + i * 72 + ')" fill="#fffdf6" stroke="#c9c6ad" stroke-width=".8"/>';
+      }
+      g += '<circle r="' + r * 0.22 + '" fill="#e9c24a"/>';
+      for (var j = 0; j < 7; j++) {
+        var t = j * 51 * Math.PI / 180;
+        g += '<circle cx="' + (Math.cos(t) * r * 0.32).toFixed(1) + '" cy="' + (Math.sin(t) * r * 0.32).toFixed(1) + '" r="1.1" fill="#b8860b"/>';
+      }
+      return g + "</g>";
+    }
+    function bud(x, y, s, a) {
+      return '<g transform="translate(' + x + ' ' + y + ') rotate(' + a + ') scale(' + s + ')"><path d="M0 0C-5 -6 -5 -15 0 -20C5 -15 5 -6 0 0Z" fill="#fbf6e6" stroke="#cfc8a6" stroke-width=".8"/><path d="M0 0C-3 -3 -4 -6 -3 -8M0 0C3 -3 4 -6 3 -8" stroke="#8fa36b" stroke-width="1.4" fill="none"/></g>';
+    }
+    var L1 = "url(#leafG)", L2 = "url(#leafG2)", V = "#e7eccb";
+
+    var lemons = '<symbol id="lemon-branch" viewBox="0 0 340 460"><g filter="url(#wc)">' +
+      '<path d="M-6 18C70 30 130 62 162 122C184 164 190 214 182 268" stroke="#6d5a3a" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M60 34C40 90 34 150 50 214M120 70C170 80 220 70 262 44M182 268C178 300 168 320 150 336M50 214C56 250 70 280 92 300" stroke="#6d5a3a" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+      leaf(14, 22, 88, 20, 62, L2, V) + leaf(30, 26, 82, 18, -22, L1, V) + leaf(70, 40, 92, 22, 104, L1, V) +
+      leaf(96, 50, 96, 22, 18, L2, V) + leaf(150, 76, 86, 20, -18, L1, V) + leaf(214, 66, 74, 16, -40, L2, V) +
+      leaf(258, 46, 70, 15, -12, L1, V) + leaf(128, 92, 84, 20, 70, L2, V) + leaf(170, 150, 90, 21, 8, L1, V) +
+      leaf(176, 196, 82, 19, 132, L2, V) + leaf(48, 130, 80, 18, 168, L1, V) + leaf(44, 170, 84, 20, 30, L2, V) +
+      leaf(186, 240, 74, 17, 26, L1, V) + leaf(56, 220, 76, 18, 140, L2, V) +
+      lemon(150, 372, 1.25, 78) + lemon(92, 330, 1.05, 104) + lemon(232, 200, 0.95, 62) +
+      leaf(150, 336, 60, 14, -30, L1, V) + leaf(92, 300, 56, 13, 210, L2, V) +
+      blossom(118, 52, 15, 10) + blossom(222, 112, 13, 40) + blossom(30, 96, 12, 20) + blossom(206, 278, 12, 0) +
+      bud(140, 40, 0.9, -20) + bud(250, 98, 0.8, 30) + bud(18, 150, 0.8, -60) +
+      "</g></symbol>";
+
+    return lemons;
+  }
 })();
