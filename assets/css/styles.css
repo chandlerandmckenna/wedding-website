@@ -299,7 +299,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   z-index: 2;
   display: grid;
   justify-items: center;
-  gap: 8px;
+  gap: 6px;
   text-align: center;
   max-width: 100%;
   padding: 28px clamp(8px, 4vw, 56px) 32px;
@@ -309,34 +309,42 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   content: ""; position: absolute; inset: -18% -14%; z-index: -1;
   background: radial-gradient(closest-side, rgba(251, 248, 241, 0.82), rgba(251, 248, 241, 0.6) 55%, rgba(251, 248, 241, 0));
 }
+/* One tight lock-up: title, place, date, countdown, family name. */
 .hero-title {
   font-family: var(--display);
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(2.6rem, 9.5vw, 5.8rem);
-  line-height: 1.05;
+  font-size: clamp(3rem, 12vw, 7rem);
+  line-height: 1;
   white-space: nowrap;
   color: var(--cobalt);
 }
-.hero-date {
-  font-family: var(--display); font-weight: 700;
-  font-size: clamp(2rem, 7vw, 3.6rem);
-  line-height: 1.05;
-  letter-spacing: 0.01em;
-  color: var(--ink);
-}
 .hero-place {
-  margin-top: 14px;
-  display: flex; align-items: center; gap: 14px;
-  font-size: clamp(0.95rem, 2.6vw, 1.15rem); font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 600;
   letter-spacing: 0.3em; text-transform: uppercase;
+  line-height: 1.3;
   color: var(--cobalt);
   padding-left: 0.3em; /* balances the trailing letter-spacing */
 }
 .hero-place::before, .hero-place::after { content: ""; width: 34px; height: 2px; background: var(--lemon); border-radius: 2px; }
-.hero-family { font-family: var(--display); font-style: italic; font-weight: 500; font-size: clamp(1.6rem, 4.4vw, 2.1rem); line-height: 1.2; color: var(--cobalt); margin-top: 18px; }
-.countdown { color: var(--ink); margin-top: 6px; }
-.count-num { font-family: var(--display); font-size: var(--step-2); color: var(--cobalt); margin-right: 4px; font-variant-numeric: tabular-nums; }
+.hero-title + .hero-place { margin-top: 10px; }
+.hero-date {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(2.2rem, 7.5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: var(--cobalt);
+}
+.countdown { font-variant-numeric: tabular-nums; }
+.hero-family {
+  margin-top: 14px;
+  font-family: "Playfair Display SC", var(--display); font-weight: 700;
+  font-size: clamp(1.5rem, 4.8vw, 2.5rem);
+  letter-spacing: 0.12em; padding-left: 0.12em;
+  line-height: 1.1;
+  color: var(--cobalt);
+}
 .arch-wrap { position: relative; justify-self: center; width: min(78%, 340px); margin-bottom: 20px; }
 .arch {
   position: relative;
