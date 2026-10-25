@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <title>McKenna &amp; Chandler</title>
-<meta name="description" content="McKenna and Chandler are getting married in Sorrento, Italy, on 1 October 2027.">
+<meta name="description" content="Save the date: McKenna and Chandler are getting married in Sorrento, Italy, on 1 October 2027.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&family=Jost:wght@400;500&display=swap">
@@ -17,115 +17,114 @@
 <main>
   <section class="wrap hero">
     <div class="hero-text">
-      <p class="eyebrow">Sorrento · Costiera Amalfitana</p>
+      <p class="eyebrow">Save the date</p>
       <h1><em data-w="coupleA">McKenna</em><span class="amp">&amp;</span><em data-w="coupleB">Chandler</em></h1>
       <div class="hero-meta">
-        <p data-w="dateLabel">Friday, 1 October 2027</p>
-        <p class="soft">Celebrations from <span data-w="weekendLabel">29 September – 2 October 2027</span></p>
+        <p class="big-date">1 October 2027</p>
+        <p class="soft"><span data-w="venue">Capo Santa Fortunata</span> · <span data-w="town">Sorrento</span>, Italia</p>
       </div>
       <p class="countdown" id="countdown"></p>
       <div class="actions">
-        <a class="button" href="rsvp.html">RSVP</a>
-        <a class="button ghost" href="travel.html">Plan your trip</a>
+        <a class="button" href="#reply">Share your gut feeling</a>
+        <a class="button ghost" href="travel.html">Getting to Sorrento</a>
       </div>
     </div>
-    <div class="arch" role="img" aria-label="Illustration of the Bay of Naples at sunset, with Vesuvius across the water and Sorrento's cliffs lit up">
-      <div class="sun"></div>
-      <div class="vesuvius"></div>
-      <div class="sea"></div>
-      <div class="cliff"></div>
-      <div class="lights"></div>
-    </div>
+    <figure class="arch">
+      <img src="assets/img/us-dancing.jpg" alt="McKenna and Chandler dancing barefoot on the beach beneath a cliff" width="1067" height="1600">
+    </figure>
   </section>
 
   <section class="section">
-    <div class="wrap stack">
-      <div class="prose lead">
-        <p>Benvenuti! We're getting married on the cliffs of Sorrento, looking across the bay to Vesuvius, and we would love for you to be there.</p>
-      </div>
+    <div class="wrap intro">
+      <p class="prose lead">We're getting married on the cliffs of Sorrento, and we would love for you to be there.</p>
       <div class="prose">
-        <p>We know Italy is a long way to come, so we've planned a few days of celebrating rather than a single evening. Come for the wedding, stay for the lemons, the boats and the long dinners. Everything you need to plan the trip is on the <a href="travel.html">Travel</a> page, and you can reply on the <a href="rsvp.html">RSVP</a> page.</p>
-        <p>With love, <span data-w="coupleA">McKenna</span> &amp; <span data-w="coupleB">Chandler</span> <span data-w="surname">Queenan</span></p>
+        <p>Celebrations begin on <strong>Wednesday, 29 September</strong> and end with our wedding on <strong>Friday, 1 October 2027</strong>. We know Italy is a long way to come, so we're telling you early. Formal invitation to follow.</p>
+        <p>Con amore, <span data-w="coupleA">McKenna</span> &amp; <span data-w="coupleB">Chandler</span></p>
       </div>
-      <dl class="details">
-        <div><dt>Wedding day</dt><dd data-w="dateLabel">Friday, 1 October 2027</dd></div>
-        <div><dt>Where</dt><dd><span data-w="town">Sorrento</span>, Italy</dd></div>
-        <div><dt>Venue</dt><dd data-w="venue">Venue to be announced</dd></div>
-        <div><dt>Please reply by</dt><dd data-w="rsvpBy">RSVP deadline</dd></div>
-      </dl>
     </div>
   </section>
 
-  <section class="section" id="schedule">
+  <section class="section" id="venue">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">The venue</p>
+        <h2>Capo Santa Fortunata</h2>
+        <p>A pink villa in an old olive grove on the cliffs just outside Sorrento, looking out over the Bay of Naples to Vesuvius.</p>
+      </div>
+      <div class="gallery">
+        <figure class="g-main"><img src="assets/img/venue-garden.jpg" alt="Dinner tables set among olive trees at sunset, with the Sorrento coastline and the sea behind" width="1200" height="1598" loading="lazy"></figure>
+        <figure><img src="assets/img/venue-villa.jpg" alt="The villa's pink façade covered in bougainvillea" width="480" height="638" loading="lazy"></figure>
+        <figure><img src="assets/img/venue-aerial.jpg" alt="Aerial view of the villa among pine trees above the sea" width="480" height="638" loading="lazy"></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="schedule" hidden>
     <div class="wrap">
       <div class="section-head">
         <p class="eyebrow">Il programma</p>
         <h2>Schedule</h2>
-        <p>Four days on the Sorrento coast. Times and places below are a first sketch and will be updated as plans are confirmed.</p>
       </div>
-      <div class="days">
-        <article class="day">
-          <div class="day-head"><span class="dow">Wednesday</span><span class="date">29 September</span></div>
-          <div class="event">
-            <time>All day</time>
-            <h3>Arrivals</h3>
-            <p>Settle in, find a gelato and walk Corso Italia at sunset.</p>
+      <div class="days" id="schedule-days"></div>
+    </div>
+  </section>
+
+  <section class="section" id="reply">
+    <div class="wrap reply-layout">
+      <figure class="reply-photo">
+        <img src="assets/img/us-kiss.jpg" alt="Black and white photo of McKenna and Chandler kissing on the beach" width="1067" height="1600" loading="lazy">
+      </figure>
+      <div class="reply-body">
+        <div class="section-head">
+          <p class="eyebrow">No pressure, just planning</p>
+          <h2>Have a gut feeling?</h2>
+          <p>This isn't your RSVP. It just helps us plan while it's still early. You'll get a formal invitation later.</p>
+        </div>
+
+        <form class="rsvp" id="reply-form" novalidate>
+          <div class="field-row">
+            <div class="field">
+              <label for="name">Your name(s)</label>
+              <input type="text" id="name" name="name" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" autocomplete="email" required>
+            </div>
           </div>
-          <div class="event">
-            <time>7:00 pm</time>
-            <h3>Welcome aperitivo</h3>
-            <p><span class="tbd">Location to be announced</span>. Spritz, limoncello and a first hello for everyone who has arrived.</p>
-            <p class="dress"><b>Dress:</b> summer cocktail</p>
+
+          <fieldset>
+            <legend class="sr-only">Your gut feeling</legend>
+            <div class="choices stacked">
+              <label class="choice"><input type="radio" id="feel-yes" name="feeling" value="yes" required><span>Absolutely, count me in!</span></label>
+              <label class="choice"><input type="radio" id="feel-maybe" name="feeling" value="maybe"><span>I still need some time to think.</span></label>
+              <label class="choice"><input type="radio" id="feel-no" name="feeling" value="no"><span>Likely not, count me out.</span></label>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="message">A note for McKenna &amp; Chandler <span class="hint">(optional)</span></label>
+            <textarea id="message" name="message"></textarea>
           </div>
-        </article>
-        <article class="day">
-          <div class="day-head"><span class="dow">Thursday</span><span class="date">30 September</span></div>
-          <div class="event">
-            <time>10:00 am</time>
-            <h3>Day on the water</h3>
-            <p><span class="tbd">Optional, details to come</span>. A boat out along the coast toward Capri, or a free day to explore.</p>
-            <p class="dress"><b>Bring:</b> swimsuit, sunscreen, flat shoes</p>
-          </div>
-          <div class="event">
-            <time>7:30 pm</time>
-            <h3>Rehearsal dinner</h3>
-            <p>For the wedding party and family. Invitations to follow.</p>
-          </div>
-        </article>
-        <article class="day main">
-          <div class="day-head"><span class="dow">Friday · The wedding</span><span class="date">1 October</span></div>
-          <div class="event">
-            <time>4:00 pm</time>
-            <h3>Ceremony</h3>
-            <p><span data-w="venue">Venue to be announced</span>. Please arrive 20 minutes early.</p>
-            <p class="dress"><b>Dress:</b> black tie optional</p>
-          </div>
-          <div class="event">
-            <time>5:00 pm</time>
-            <h3>Aperitivo on the terrace</h3>
-            <p>Drinks and small bites as the sun goes down over the bay.</p>
-          </div>
-          <div class="event">
-            <time>7:30 pm</time>
-            <h3>Dinner &amp; dancing</h3>
-            <p>A long Italian dinner, then dancing late into the night.</p>
-          </div>
-        </article>
-        <article class="day">
-          <div class="day-head"><span class="dow">Saturday</span><span class="date">2 October</span></div>
-          <div class="event">
-            <time>11:00 am</time>
-            <h3>Farewell brunch</h3>
-            <p><span class="tbd">Location to be announced</span>. Come as you are and say arrivederci.</p>
-          </div>
-        </article>
+
+          <p class="error" id="form-error" role="alert" hidden></p>
+          <div><button class="button" type="submit" id="submit">Send</button></div>
+        </form>
+
+        <div class="confirm" id="confirm" hidden tabindex="-1">
+          <p class="eyebrow">Grazie</p>
+          <h2 id="confirm-title">Thank you!</h2>
+          <p id="confirm-text"></p>
+          <p class="hint" id="confirm-draft" hidden>This is a preview, so your answer wasn't saved anywhere.</p>
+          <div><button class="button ghost" type="button" id="edit-reply">Change my answer</button></div>
+        </div>
       </div>
-      <p class="note">Events marked in grey are placeholders. We'll email everyone when the schedule is final.</p>
     </div>
   </section>
 </main>
 
 <footer id="site-footer" class="site-footer"></footer>
 <script src="assets/js/site.js"></script>
+<script src="assets/js/reply.js"></script>
 </body>
 </html>

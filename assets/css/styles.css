@@ -170,48 +170,20 @@ p { margin: 0; }
 .button:hover { filter: brightness(1.08); }
 .button.ghost { background: transparent; color: var(--cobalt); }
 
-/* The arch: a window onto the Bay of Naples at golden hour. */
+/* The arch: an arched window framing the hero photo. */
 .arch {
-  position: relative;
-  aspect-ratio: 3 / 4;
+  margin: 0;
+  aspect-ratio: 2 / 3;
   max-width: 100%;
-  width: min(100%, 420px);
+  width: min(100%, 440px);
   justify-self: center;
   border-radius: 999px 999px 0 0;
   overflow: hidden;
   border: 10px solid var(--plaster-2);
   outline: 1px solid var(--line);
-  background: linear-gradient(var(--sky-top), var(--sky-low) 58%);
+  background: var(--plaster-2);
 }
-.arch .sun {
-  position: absolute; left: 58%; top: 40%;
-  width: 22%; aspect-ratio: 1; border-radius: 50%;
-  background: var(--lemon);
-  box-shadow: 0 0 60px 20px color-mix(in srgb, var(--lemon) 45%, transparent);
-}
-.arch .vesuvius {
-  position: absolute; left: -10%; right: 30%; bottom: 36%; height: 16%;
-  background: color-mix(in srgb, var(--sea-deep) 55%, var(--sky-low));
-  clip-path: polygon(0 100%, 30% 35%, 44% 10%, 52% 12%, 62% 0, 100% 100%);
-  opacity: 0.8;
-}
-.arch .sea {
-  position: absolute; inset: 62% 0 0 0;
-  background:
-    repeating-linear-gradient(180deg, transparent 0 10px, color-mix(in srgb, var(--plaster) 18%, transparent) 10px 11px),
-    linear-gradient(var(--sea), var(--sea-deep));
-}
-.arch .cliff {
-  position: absolute; right: -2%; bottom: 0; width: 46%; height: 52%;
-  background: color-mix(in srgb, var(--sea-deep) 70%, #000);
-  clip-path: polygon(0 100%, 6% 40%, 20% 30%, 34% 12%, 60% 4%, 100% 0, 100% 100%);
-}
-.arch .lights {
-  position: absolute; right: 6%; bottom: 20%; width: 30%; height: 20%;
-  background-image: radial-gradient(circle, var(--lemon) 1.2px, transparent 2px);
-  background-size: 14px 12px;
-  opacity: 0.9;
-}
+.arch img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; display: block; }
 
 /* Sections */
 .section { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--line); }
@@ -349,10 +321,6 @@ textarea { min-height: 96px; resize: vertical; }
   .arch { width: min(100%, 300px); }
   .details > div + div { border-left: 0; border-top: 1px solid var(--line); }
 }
-@media (prefers-reduced-motion: no-preference) {
-  .arch .sun { animation: rise 2.4s ease-out both; }
-  @keyframes rise { from { transform: translateY(18px); } to { transform: none; } }
-}
 
 /* Page intros and simple stacks */
 .page-intro { padding-block: clamp(40px, 7vw, 80px); }
@@ -361,3 +329,33 @@ textarea { min-height: 96px; resize: vertical; }
 .stack { display: grid; gap: 40px; }
 .stack-sm { display: grid; gap: 16px; }
 .field.narrow { max-width: 240px; }
+
+/* Save the date */
+.big-date { font-family: var(--display); font-size: var(--step-3); line-height: 1.1; }
+.intro { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 64px); align-items: start; }
+.intro .lead { font-size: var(--step-2); line-height: 1.35; }
+.gallery {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: 12px;
+}
+.gallery figure { margin: 0; overflow: hidden; border-radius: var(--radius); background: var(--plaster-2); }
+.gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gallery .g-main { grid-row: span 2; aspect-ratio: 3 / 4; }
+.gallery figure:not(.g-main) { aspect-ratio: auto; min-height: 0; }
+.reply-layout { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(24px, 5vw, 64px); align-items: start; }
+.reply-photo { margin: 0; border-radius: var(--radius); overflow: hidden; aspect-ratio: 2 / 3; max-width: 100%; }
+.reply-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.reply-body { display: grid; gap: 8px; min-width: 0; }
+.reply-body .section-head { margin-bottom: 20px; }
+.choices.stacked { grid-template-columns: minmax(0, 1fr); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .intro, .reply-layout { grid-template-columns: minmax(0, 1fr); }
+  .reply-photo { max-height: 420px; aspect-ratio: 4 / 5; }
+  .gallery { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .gallery .g-main { grid-column: 1 / -1; grid-row: auto; aspect-ratio: 4 / 5; }
+  .gallery figure:not(.g-main) { aspect-ratio: 3 / 4; }
+}
