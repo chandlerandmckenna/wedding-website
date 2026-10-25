@@ -277,9 +277,9 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   position: absolute; inset: 0;
   width: 100%; height: 100%; max-width: none;
   object-fit: cover;
-  object-position: 55% 35%;
-  -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent);
-  mask-image: linear-gradient(to bottom, #000 80%, transparent);
+  object-position: 55% 44%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 86%, transparent);
+  mask-image: linear-gradient(to bottom, #000 86%, transparent);
 }
 .hero-lemons {
   position: absolute; top: -10px; left: -8px; z-index: 1;
@@ -498,7 +498,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 .footer-names { font-family: var(--display); font-style: italic; font-size: var(--step-2); color: var(--cobalt); }
 
 @media (max-width: 760px) {
-  .hero-bg { object-position: 72% 40%; }
+  .hero-bg { object-position: 86% 40%; }
   .page-hero { padding-top: clamp(120px, 20vh, 170px); }
   .arch-sprig { width: 150px; height: 106px; left: -50px; bottom: -30px; }
   /* on phones the three portraits stay in a row, a little closer together */

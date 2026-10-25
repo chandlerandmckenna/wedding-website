@@ -1,54 +1,94 @@
 """Paint a venue photo as a sunny, painterly view (lemon branches are added by the page).
 
-    python3 tools/paint-venue.py <photo> <out.jpg> <top> <bottom> [seed] [extras]
+    python3 tools/paint-venue.py <photo> <out.jpg> <top> <bottom> [options]
 
-extras: none, or villa:<photo>:<x>,<y>,<w>,<h>:<cx>,<cy>,<width>, which lifts
-that box out of another photo (a villa in its trees) and blends it into the
-view, centred at cx,cy (fractions of the view) and scaled to width px.
+    --cut A,B        drop photo rows A..B (a calm band of sea) so more of the
+                     garden fits below the view
+    --villa SPEC     lift a villa out of another photo and blend it in:
+                     <photo>:<x>,<y>,<w>,<h>:<cx>,<cy>,<width>[:cream]
+                     box in that photo, centred at cx,cy (fractions of the
+                     view), scaled to width px; "cream" repaints the walls
+                     cream, otherwise its real colours (pink, bougainvillea) stay
+    --vivid F        extra colour saturation at the end (1 = none)
+    --town-soft F    blur of the pastel town on the far cliffs
+    --seed N
 
 Needs opencv-python-headless and numpy.
 """
-import sys
+import argparse
 import cv2
 import numpy as np
 
-src, out, y0, y1 = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
-rng = np.random.default_rng(int(sys.argv[5]) if len(sys.argv) > 5 else 4)
-extras = sys.argv[6] if len(sys.argv) > 6 else "none"
-VIVID = float(sys.argv[8]) if len(sys.argv) > 8 else 1.0   # extra colour saturation
-TOWN_SOFT = float(sys.argv[7]) if len(sys.argv) > 7 else 1.2   # blur of the pastel town; higher is softer
+ap = argparse.ArgumentParser()
+ap.add_argument("src"); ap.add_argument("out"); ap.add_argument("top", type=int); ap.add_argument("bottom", type=int)
+ap.add_argument("--cut"); ap.add_argument("--villa")
+ap.add_argument("--vivid", type=float, default=1.0); ap.add_argument("--town-soft", type=float, default=1.2)
+ap.add_argument("--seed", type=int, default=4)
+ap.add_argument("--boats", default="0.1,0.6,1.4;0.27,0.5,1.0;0.45,0.46,0.75;0.6,0.55,1.1", help="x,y,size;... as fractions of the view")
+args = ap.parse_args()
+rng = np.random.default_rng(args.seed)
+VIVID, TOWN_SOFT = args.vivid, args.town_soft
+BOATS = [tuple(map(float, b.split(","))) for b in args.boats.split(";") if b]
 
-img = cv2.imread(src)[y0:y1]
+img = cv2.imread(args.src)
+if args.cut:
+    c0, c1 = map(int, args.cut.split(","))
+    seam = 40   # cross-fade the sea either side of the cut
+    above, below = img[:c0 + seam].astype(np.float32), img[c1:].astype(np.float32)
+    t = np.linspace(0, 1, seam)[:, None, None]
+    mixed = above[-seam:] * (1 - t) + below[:seam] * t
+    img = np.vstack([above[:-seam], mixed, below[seam:]]).astype(np.uint8)
+    args.bottom -= c1 - c0
+img = img[args.top:args.bottom]
 W = 1800
 img = cv2.resize(img, (W, int(img.shape[0] * W / img.shape[1])), interpolation=cv2.INTER_CUBIC)
 H = img.shape[0]
 
-if extras.startswith("villa:"):
-    _, vsrc, box, at = extras.split(":")
+
+def paste_villa(dst, spec, tex):
+    parts = spec.split(":")
+    vsrc, box, at = parts[0], parts[1], parts[2]
+    cream = len(parts) > 3 and parts[3] == "cream"
     bx, by, bw, bh = map(int, box.split(","))
     cx, cy, vw = map(float, at.split(","))
     patch = cv2.imread(vsrc)[by:by + bh, bx:bx + bw]
     vh = int(bh * vw / bw); vw = int(vw)
-    patch = cv2.resize(patch, (vw, vh), interpolation=cv2.INTER_CUBIC).astype(np.float32)
-    m = np.zeros((vh, vw), np.float32)
-    cv2.ellipse(m, (vw // 2, vh // 2), (int(vw * 0.42), int(vh * 0.4)), 0, 0, 360, 1, -1)
-    m = cv2.GaussianBlur(m, (0, 0), vw * 0.06)[..., None]
+    patch = cv2.resize(patch, (vw, vh), interpolation=cv2.INTER_AREA)
+    fx = np.clip(np.minimum(np.arange(vw), vw - 1 - np.arange(vw)) / (vw * 0.12), 0, 1)
+    fy = np.clip(np.minimum(np.arange(vh) / 0.6, vh - 1 - np.arange(vh)) / (vh * 0.12), 0, 1)   # sky does the top edge
+    m = (np.minimum(fy[:, None], fx[None, :]) ** 1.5).astype(np.float32)   # soft edges all round
+    ph = cv2.cvtColor(patch, cv2.COLOR_BGR2HSV).astype(np.float32)
+    skyp = (((ph[..., 0] > 88) & (ph[..., 0] < 128) & (ph[..., 2] > 140)) | ((ph[..., 1] < 18) & (ph[..., 2] > 200))).astype(np.float32)
+    skyp[int(vh * 0.75):] = 0                        # only the sky and clouds above the trees
+    skyp = cv2.dilate(skyp, np.ones((5, 5), np.uint8))
+    m *= 1 - skyp
+    m = cv2.GaussianBlur(m, (0, 0), vw * 0.012)[..., None]
+    pv = patch.astype(np.float32)
     x0, y0 = int(W * cx - vw / 2), int(H * cy - vh / 2)
     xs, ys = max(0, x0), max(0, y0)
     xe, ye = min(W, x0 + vw), min(H, y0 + vh)
-    pv, mv = patch[ys - y0:ye - y0, xs - x0:xe - x0], m[ys - y0:ye - y0, xs - x0:xe - x0]
-    roi = img[ys:ye, xs:xe].astype(np.float32)
-    pv = pv * (roi.mean((0, 1)) / pv.mean((0, 1))) ** 0.5   # match the light of the view
-    # warm the walls to sunlit cream and the roofs to terracotta (never pink)
-    ph = cv2.cvtColor(np.clip(pv, 0, 255).astype(np.uint8), cv2.COLOR_BGR2HSV).astype(np.float32)
-    wall = (ph[..., 2] > 95) & (ph[..., 1] < 80)
-    lilac = (ph[..., 0] > 115) | (ph[..., 0] < 8)
-    ph[..., 0][lilac] = 16
-    ph[..., 0][wall] = 21; ph[..., 1][wall] = 70; ph[..., 2][wall] = np.clip(ph[..., 2][wall] * 1.06, 0, 255)
-    roof = (ph[..., 2] > 120) & ((ph[..., 0] < 22) | (ph[..., 0] > 160)) & (ph[..., 1] >= 40)
-    ph[..., 0][roof] = 11; ph[..., 1][roof] = np.clip(ph[..., 1][roof] * 1.5, 0, 200)
-    pv = cv2.cvtColor(ph.astype(np.uint8), cv2.COLOR_HSV2BGR).astype(np.float32)
-    img[ys:ye, xs:xe] = np.clip(roi * (1 - mv) + pv * mv, 0, 255).astype(np.uint8)
+    pv, mv = pv[ys - y0:ye - y0, xs - x0:xe - x0], m[ys - y0:ye - y0, xs - x0:xe - x0]
+    roi = dst[ys:ye, xs:xe].astype(np.float32)
+    ph = cv2.cvtColor(pv.astype(np.uint8), cv2.COLOR_BGR2HSV).astype(np.float32)
+    if cream:   # sunlit cream walls and terracotta roofs
+        wall = (ph[..., 2] > 95) & (ph[..., 1] < 80)
+        lilac = (ph[..., 0] > 115) | (ph[..., 0] < 8)
+        ph[..., 0][lilac] = 16
+        ph[..., 0][wall] = 21; ph[..., 1][wall] = 70
+    else:       # keep the real pink walls; make the bougainvillea sing
+        flower = (ph[..., 0] > 138) & (ph[..., 0] < 171) & (ph[..., 1] > 55)
+        ph[..., 1][flower] = np.clip(ph[..., 1][flower] * 1.7 + 20, 0, 255)
+        ph[..., 0][flower] = 164
+        green = (ph[..., 0] > 25) & (ph[..., 0] < 85)
+        ph[..., 1][green] = np.clip(ph[..., 1][green] * 1.2, 0, 255)
+    ph[..., 2] = np.clip(255 * (ph[..., 2] / 255) ** 0.85 + 6, 0, 255)   # same lifted shadows as the view
+    pv = cv2.cvtColor(ph.astype(np.uint8), cv2.COLOR_HSV2BGR)
+    # a lighter version of the paint pass, so the villa stays crisp up front
+    pv = cv2.pyrMeanShiftFiltering(pv, 8, 22)
+    pv = cv2.edgePreservingFilter(pv, flags=1, sigma_s=10, sigma_r=0.25)
+    pv = cv2.GaussianBlur(pv, (0, 0), 0.9).astype(np.float32) * tex[ys:ye, xs:xe, None]
+    dst[ys:ye, xs:xe] = np.clip(roi * (1 - mv) + pv * mv, 0, 255).astype(np.uint8)
+
 
 # ---- colour: golden afternoon, no pink in the sky, bluer sea, richer greens
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.float32)
@@ -103,7 +143,7 @@ def sailboat(x, y, s):
     cv2.fillPoly(boats, [np.array([[x, y - 3], [x, y - 58 * s], [x + 22 * s, y - 4]], np.int32)], (250, 252, 253), cv2.LINE_AA)
     cv2.fillPoly(boats, [np.array([[x - 3, y - 4], [x - 3, y - 46 * s], [x - 18 * s, y - 4]], np.int32)], (232, 238, 244), cv2.LINE_AA)
     cv2.line(boats, (int(x), int(y)), (int(x), int(y - 60 * s)), (120, 125, 135), 2, cv2.LINE_AA)
-for (fx, fy, s) in [(0.1, 0.6, 1.4), (0.27, 0.5, 1.0), (0.45, 0.46, 0.75), (0.6, 0.55, 1.1)]:
+for (fx, fy, s) in BOATS:
     sailboat(W * fx, H * fy, s)
 img = cv2.GaussianBlur(boats, (0, 0), 0.9)
 
@@ -118,9 +158,15 @@ strokes = cv2.resize(strokes, (W, H))
 strokes = cv2.filter2D(strokes, -1, np.ones((1, 9), np.float32) / 9)  # horizontal brush drag
 tex = 0.95 + 0.05 * grain + 0.06 * (strokes - 0.5)
 p = np.clip(p.astype(np.float32) * tex[..., None], 0, 255).astype(np.uint8)
+if args.villa:
+    paste_villa(p, args.villa, tex)
 if VIVID != 1.0:
     q = cv2.cvtColor(p, cv2.COLOR_BGR2HSV).astype(np.float32)
     q[..., 1] = np.clip(q[..., 1] * VIVID, 0, 255)
     p = cv2.cvtColor(q.astype(np.uint8), cv2.COLOR_HSV2BGR)
-cv2.imwrite(out, p, [cv2.IMWRITE_JPEG_QUALITY, 84])
+cv2.imwrite(args.out, p, [cv2.IMWRITE_JPEG_QUALITY, 84])
 print(W, H)
+# Current title page backdrop:
+#   python3 tools/paint-venue.py assets/img/venue-garden.jpg assets/img/hero-venue.jpg 235 1300 --cut 680,800 \
+#     --villa "tools/src/villa-front.jpg:250,118,620,482:0.8,0.61,520" --town-soft 3 --vivid 1.45 \
+#     --boats "0.1,0.5,1.4;0.27,0.43,1.0;0.45,0.4,0.75;0.6,0.47,1.1"
