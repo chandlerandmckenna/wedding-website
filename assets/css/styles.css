@@ -2,7 +2,9 @@
    throughout; colour arrives as watercolor: a painted view of the bay,
    majolica tile bands and lemon sprigs. Each section fades into the next
    as you scroll, like turning to the next page.
-   Deliberately a single light look, like a printed invitation. */
+   Deliberately a single light look, like a printed invitation.
+   v2 theme: a postcard on blue-striped linen, ripe tomatoes on the vine and
+   tomato-red handwritten touches. */
 :root {
   color-scheme: light;
   --ivory: #fbf8f1;
@@ -19,6 +21,8 @@
   --olive: #6b7d4f;
   --terracotta: #b8623f;
   --terracotta-soft: #f5e3da;
+  --tomato: #d23a26;
+  --tomato-soft: #fbe3dc;
 
   --display: "Playfair Display", "Didot", Georgia, serif;
   --body: "Jost", "Futura", "Avenir Next", system-ui, sans-serif;
@@ -70,7 +74,7 @@ p, figure { margin: 0; }
   color: var(--cobalt);
   font-weight: 500;
 }
-.script { font-family: var(--script); font-style: italic; font-weight: 500; font-size: clamp(1.6rem, 4vw, 2.1rem); line-height: 1.15; color: var(--lemon-deep); }
+.script { font-family: var(--script); font-style: italic; font-weight: 500; font-size: clamp(1.6rem, 4vw, 2.1rem); line-height: 1.15; color: var(--tomato); }
 .hint { font-size: var(--step--1); color: var(--ink-soft); }
 .soft { color: var(--ink-soft); }
 .error { color: #a4312a; font-size: var(--step--1); font-weight: 500; }
@@ -78,10 +82,10 @@ p, figure { margin: 0; }
 /* ---------- Watercolor pieces ---------- */
 .tile-band {
   display: block; width: 100%; height: 64px;
-  background: url("../img/tiles.svg") repeat-x 0 0 / auto 100%;
-  box-shadow: inset 0 -1px 0 rgba(28, 41, 69, 0.08);
+  background: url("../img/stripes.svg") repeat-x 0 0 / auto 112px;
+  box-shadow: inset 0 -3px 0 var(--tomato);
 }
-.cover > .tile-band { height: clamp(56px, 8vh, 84px); }
+.cover > .tile-band { height: clamp(24px, 5vh, 56px); }
 .sprig { position: absolute; pointer-events: none; overflow: visible; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -135,8 +139,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   z-index: 30;
   overflow-x: hidden;
   overflow-y: auto;
-  background: inherit;
-  background-color: var(--ivory);
+  background: #f8f3e8 url("../img/stripes.svg") repeat 0 0 / 112px 112px;
   display: grid;
   grid-template-rows: auto 1fr auto;
   padding-top: env(safe-area-inset-top, 0px);
@@ -153,24 +156,31 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .cover-card {
-  width: min(100%, 520px);
+  width: min(100%, 560px);
   display: grid;
   justify-items: center;
   gap: 6px;
   text-align: center;
+  /* a postcard laid on the striped cloth */
+  background: var(--ivory);
+  padding: clamp(28px, 6vw, 48px) clamp(20px, 5vw, 44px);
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(28, 41, 69, 0.12), 0 18px 40px rgba(28, 41, 69, 0.22);
+  transform: rotate(-1.2deg);
 }
+.cover > .tile-band { visibility: hidden; }
 .cover-card > * { width: 100%; }
 .cover-eyebrow {
   display: flex; align-items: center; justify-content: center; gap: 14px;
-  font-family: var(--display); font-style: italic; font-size: clamp(1.3rem, 4vw, 1.6rem); color: var(--lemon-deep);
+  font-family: var(--display); font-style: italic; font-size: clamp(1.3rem, 4vw, 1.6rem); color: var(--tomato);
 }
 .cover-eyebrow::before, .cover-eyebrow::after { content: ""; width: 40px; height: 1px; background: currentColor; opacity: 0.6; }
 .cover-names { font-family: var(--display); font-weight: 600; font-size: clamp(2.5rem, 10vw, 3.8rem); line-height: 1.05; color: var(--cobalt); margin-top: 6px; }
-.cover-names .amp { font-style: italic; font-weight: 400; color: var(--lemon-deep); }
+.cover-names .amp { font-style: italic; font-weight: 400; color: var(--tomato); }
 .cover-date { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 8px; font-family: var(--display); font-weight: 600; font-size: clamp(1.4rem, 5vw, 1.8rem); letter-spacing: 0.06em; color: var(--ink); font-variant-numeric: lining-nums; }
-.cover-date i { font-style: normal; color: var(--lemon-deep); font-size: 1.3em; line-height: 1; }
+.cover-date i { font-style: normal; color: var(--tomato); font-size: 1.3em; line-height: 1; }
 /* lemons hang into the corners of the sign-in page */
-.cover-lemons { position: absolute; top: calc(clamp(56px, 8vh, 84px) - 14px); left: -8px; width: clamp(120px, 20vw, 260px); aspect-ratio: 340 / 460; overflow: visible; pointer-events: none; }
+.cover-lemons { position: absolute; z-index: 2; top: -6px; filter: drop-shadow(0 6px 10px rgba(28, 41, 69, 0.3)); left: -8px; width: clamp(120px, 20vw, 260px); aspect-ratio: 340 / 460; overflow: visible; pointer-events: none; }
 .cover-lemons-right { left: auto; right: -8px; transform: scaleX(-1); }
 .cover-card .cover-form { width: min(100%, 420px); margin-top: 12px; }
 .cover-form { display: grid; gap: 12px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--line); text-align: left; }
@@ -209,7 +219,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   background-color: var(--ivory);
   box-shadow: 0 1px 0 var(--line), 0 6px 18px rgba(28, 41, 69, 0.06);
 }
-.site-header .tile-band { height: 34px; }
+.site-header .tile-band { height: 26px; box-shadow: inset 0 -2px 0 var(--tomato); }
 .book::before {
   content: "";
   position: fixed; inset: 0 0 auto;
@@ -291,7 +301,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   position: absolute; top: -10px; left: -8px; z-index: 1;
   width: clamp(140px, 20vw, 300px); aspect-ratio: 340 / 460;
   overflow: visible; pointer-events: none;
-  filter: drop-shadow(0 6px 10px rgba(28, 41, 69, 0.18));
+  filter: drop-shadow(0 6px 10px rgba(28, 41, 69, 0.22));
 }
 .hero-lemons-right { left: auto; right: -8px; transform: scaleX(-1); }
 .hero-text {
@@ -343,7 +353,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   font-size: clamp(1.6rem, 5vw, 2.5rem);
   letter-spacing: 0.14em; padding-left: 0.14em;
   line-height: 1.1;
-  color: var(--lemon-deep);   /* same gold as "Sì, lo voglio" */
+  color: var(--tomato);   /* same red as "Sì, lo voglio" */
 }
 .arch-wrap { position: relative; justify-self: center; width: min(78%, 340px); margin-bottom: 20px; }
 .arch {

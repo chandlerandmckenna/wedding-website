@@ -33,7 +33,8 @@
     '  <radialGradient id="lemonG" cx="38%" cy="35%" r="70%"><stop offset="0" stop-color="#fff2a8"/><stop offset=".45" stop-color="#f4d04a"/><stop offset="1" stop-color="#d9a21b"/></radialGradient>' +
     '  <linearGradient id="leafG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9fb07a"/><stop offset="1" stop-color="#55703f"/></linearGradient>' +
     '  <linearGradient id="leafG2" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#7f9862"/><stop offset="1" stop-color="#46603a"/></linearGradient>' +
-    '  <symbol id="sprig" viewBox="0 0 240 170">' +
+    '  <radialGradient id="tomG" cx="36%" cy="32%" r="72%"><stop offset="0" stop-color="#ff8a66"/><stop offset=".45" stop-color="#e2412a"/><stop offset="1" stop-color="#a8231a"/></radialGradient>' +
+    '  <symbol id="sprig-lemon" viewBox="0 0 240 170">' +
     '    <g filter="url(#wc)">' +
     '      <path d="M8 30 C60 40 110 52 150 78 C170 92 186 110 196 128" fill="none" stroke="#6d5a3a" stroke-width="3.2" stroke-linecap="round"/>' +
     '      <path d="M58 40 C70 8 104 0 128 6 C112 22 92 38 58 40Z" fill="url(#leafG)"/>' +
@@ -45,9 +46,67 @@
     '    </g>' +
     '  </symbol>' +
     '<symbol id="swash" viewBox="0 0 200 30"><g filter="url(#wc)"><path d="M6 20C40 10 90 8 130 12C160 14 182 18 194 14" fill="none" stroke="#f2c94c" stroke-width="9" stroke-linecap="round"/></g></symbol>' +
-    lemonBranch() +
+    lemonBranch() + tomatoes() +
     "</defs></svg>";
   document.body.insertAdjacentHTML("afterbegin", svg);
+
+  /* Tomatoes on the vine: a long vine for the corners (#tomato-vine) and a
+     small cluster (#sprig) for the photo and reply panels. */
+  function tomatoes() {
+    function leaf(x, y, l, w, a, fill) {
+      // a tomato leaflet: a pointed leaf with a toothed edge
+      var d = "M0 0", n = 5, i;
+      for (i = 1; i <= n; i++) d += "L" + (l * i / (n + 1)).toFixed(1) + " " + (-w * Math.sin(Math.PI * i / (n + 1)) * (i % 2 ? 1 : 0.72)).toFixed(1);
+      d += "L" + l + " 0";
+      for (i = n; i >= 1; i--) d += "L" + (l * i / (n + 1)).toFixed(1) + " " + (w * Math.sin(Math.PI * i / (n + 1)) * (i % 2 ? 1 : 0.72)).toFixed(1);
+      return '<g transform="translate(' + x + ' ' + y + ') rotate(' + a + ')"><path d="' + d + 'Z" fill="' + fill + '"/>' +
+        '<path d="M2 0L' + (l * 0.9) + ' 0" stroke="#e7eccb" stroke-width="1" opacity=".5"/></g>';
+    }
+    function frond(x, y, a, s) {
+      // a compound leaf: leaflets in pairs along a stem
+      var g = '<g transform="translate(' + x + ' ' + y + ') rotate(' + a + ') scale(' + s + ')">' +
+        '<path d="M0 0L96 0" stroke="#5c7a3a" stroke-width="2.4" stroke-linecap="round"/>';
+      g += leaf(28, 0, 34, 10, -58, "url(#leafG)") + leaf(28, 0, 34, 10, 58, "url(#leafG2)");
+      g += leaf(58, 0, 30, 9, -52, "url(#leafG2)") + leaf(58, 0, 30, 9, 52, "url(#leafG)");
+      g += leaf(92, 0, 38, 12, 0, "url(#leafG)");
+      return g + "</g>";
+    }
+    function tomato(x, y, r, a) {
+      var g = '<g transform="translate(' + x + ' ' + y + ') rotate(' + (a || 0) + ')">' +
+        '<path d="M0 ' + (-r * 0.86) + 'C' + (r * 0.62) + ' ' + (-r * 0.98) + ' ' + (r * 1.04) + ' ' + (-r * 0.5) + ' ' + (r * 1.02) + ' 0C' + r + ' ' + (r * 0.62) + ' ' + (r * 0.55) + ' ' + (r * 0.92) + ' 0 ' + (r * 0.9) +
+        'C' + (-r * 0.55) + ' ' + (r * 0.92) + ' ' + (-r) + ' ' + (r * 0.62) + ' ' + (-r * 1.02) + ' 0C' + (-r * 1.04) + ' ' + (-r * 0.5) + ' ' + (-r * 0.62) + ' ' + (-r * 0.98) + ' 0 ' + (-r * 0.86) + 'Z" fill="url(#tomG)"/>' +
+        '<path d="M' + (-r * 0.35) + ' ' + (-r * 0.7) + 'C' + (-r * 0.5) + ' ' + (-r * 0.1) + ' ' + (-r * 0.4) + ' ' + (r * 0.5) + ' ' + (-r * 0.1) + ' ' + (r * 0.85) + '" stroke="#b42a1d" stroke-width="1.6" fill="none" opacity=".45"/>' +
+        '<path d="M' + (r * 0.35) + ' ' + (-r * 0.7) + 'C' + (r * 0.5) + ' ' + (-r * 0.1) + ' ' + (r * 0.4) + ' ' + (r * 0.5) + ' ' + (r * 0.1) + ' ' + (r * 0.85) + '" stroke="#b42a1d" stroke-width="1.6" fill="none" opacity=".45"/>' +
+        '<ellipse cx="' + (-r * 0.38) + '" cy="' + (-r * 0.42) + '" rx="' + (r * 0.26) + '" ry="' + (r * 0.14) + '" fill="#fff3e6" opacity=".55" transform="rotate(-30 ' + (-r * 0.38) + ' ' + (-r * 0.42) + ')"/>';
+      // the green star of a calyx
+      var c = "";
+      for (var i = 0; i < 5; i++) {
+        c += '<path d="M0 0C' + (r * 0.12) + ' ' + (-r * 0.08) + ' ' + (r * 0.36) + ' ' + (-r * 0.05) + ' ' + (r * 0.48) + ' ' + (r * 0.06) + 'C' + (r * 0.3) + ' ' + (r * 0.08) + ' ' + (r * 0.12) + ' ' + (r * 0.08) + ' 0 0Z" fill="#4f7a34" transform="rotate(' + (i * 72 - 90) + ')"/>';
+      }
+      g += '<g transform="translate(0 ' + (-r * 0.84) + ')">' + c + '<path d="M0 0L0 ' + (-r * 0.26) + '" stroke="#4f7a34" stroke-width="3" stroke-linecap="round"/></g>';
+      return g + "</g>";
+    }
+    function flower(x, y, r) {
+      var g = '<g transform="translate(' + x + ' ' + y + ')">';
+      for (var i = 0; i < 5; i++) g += '<path d="M0 0L' + (r * 0.32) + ' ' + (-r * 0.5) + 'L0 ' + (-r) + 'L' + (-r * 0.32) + ' ' + (-r * 0.5) + 'Z" fill="#f2c94c" transform="rotate(' + i * 72 + ')"/>';
+      return g + '<circle r="' + r * 0.22 + '" fill="#d9a21b"/></g>';
+    }
+    var vine = '<symbol id="tomato-vine" viewBox="0 0 340 460"><g filter="url(#wc)">' +
+      '<path d="M-6 16C70 28 132 60 162 118C182 160 186 206 176 262" stroke="#5c7a3a" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+      '<path d="M70 34C52 90 48 150 62 208M124 72C170 82 218 72 258 46M176 262C170 292 160 312 146 326M62 208C68 236 80 262 98 282M150 104C168 140 210 170 236 190" stroke="#5c7a3a" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+      frond(10, 18, 58, 1.0) + frond(40, 26, -18, 0.9) + frond(96, 50, 24, 1.05) + frond(150, 82, -22, 0.9) +
+      frond(214, 64, -34, 0.8) + frond(132, 96, 78, 0.95) + frond(170, 160, 6, 0.95) + frond(52, 138, 160, 0.9) +
+      frond(176, 210, 140, 0.85) + frond(62, 176, 34, 0.85) +
+      tomato(146, 360, 44, 6) + tomato(98, 318, 36, -10) + tomato(236, 212, 32, 12) + tomato(192, 330, 26, 18) +
+      flower(116, 54, 11) + flower(236, 104, 10) + flower(30, 100, 9) + flower(250, 54, 8) +
+      "</g></symbol>";
+    var sprig = '<symbol id="sprig" viewBox="0 0 240 170"><g filter="url(#wc)">' +
+      '<path d="M8 30C60 40 110 52 150 78C170 92 182 104 190 118M150 78C140 96 132 108 120 116" fill="none" stroke="#5c7a3a" stroke-width="3.2" stroke-linecap="round"/>' +
+      frond(20, 32, -12, 0.75) + frond(80, 46, -40, 0.7) + frond(110, 58, 40, 0.6) +
+      tomato(190, 138, 26, 8) + tomato(124, 136, 20, -8) + flower(64, 30, 8) +
+      "</g></symbol>";
+    return vine + sprig;
+  }
 
   /* A lemon branch in blossom that hangs into the title page's corners. */
   function lemonBranch() {
