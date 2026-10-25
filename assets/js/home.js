@@ -21,14 +21,55 @@
     btn.textContent = on ? "One moment…" : label;
   }
 
+  /* ---------- US phone formatting: 9259636950 shows as (925) 963-6950 ---------- */
+  var phoneInput = document.getElementById("phone");
+
+  // Digits only, dropping a leading US country code from pasted numbers.
+  function usDigits(value) {
+    var d = String(value).replace(/\D/g, "");
+    if (d.length === 11 && d.charAt(0) === "1") d = d.slice(1);
+    return d.slice(0, 10);
+  }
+
+  function formatUS(d) {
+    if (!d) return "";
+    if (d.length < 4) return "(" + d;
+    if (d.length < 7) return "(" + d.slice(0, 3) + ") " + d.slice(3);
+    return "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6);
+  }
+
+  var lastDigits = "";
+  phoneInput.addEventListener("input", function (e) {
+    var el = phoneInput;
+    var caret = el.selectionStart == null ? el.value.length : el.selectionStart;
+    var before = el.value.slice(0, caret).replace(/\D/g, "").length;
+    var d = usDigits(el.value);
+    // Backspacing over "(", ")", " " or "-" removes the digit before it.
+    if (e.inputType === "deleteContentBackward" && d === lastDigits && before > 0) {
+      d = d.slice(0, before - 1) + d.slice(before);
+      before -= 1;
+    }
+    lastDigits = d;
+    el.value = formatUS(d);
+    // Put the caret back after the same number of digits.
+    var pos = 0, seen = 0;
+    while (pos < el.value.length && seen < before) {
+      if (/\d/.test(el.value.charAt(pos))) seen++;
+      pos++;
+    }
+    if (seen === d.length && pos < el.value.length && !/\d/.test(el.value.charAt(pos))) pos = el.value.length;
+    try { el.setSelectionRange(pos, pos); } catch (err) { /* not focused */ }
+  });
+
   phoneForm.addEventListener("submit", function (e) {
     e.preventDefault();
     errorEl.hidden = true;
     var input = document.getElementById("phone");
-    var phone = window.Guest.normalizePhone(input.value);
-    if (phone.length < 8 || phone.length > 15) {
-      return showError("Please enter your full phone number, including the country code if you're outside the US.", input);
+    var digits = usDigits(input.value);
+    if (digits.length !== 10) {
+      return showError("Please enter your 10-digit phone number, area code first.", input);
     }
+    var phone = "1" + digits;
     var btn = document.getElementById("phone-submit");
     busy(btn, true);
     window.GuestAPI.lookup(phone).then(function (guest) {
@@ -39,7 +80,7 @@
       document.getElementById("guest-name").focus();
     }).catch(function () {
       showError("We couldn't reach the guest list. Please check your connection and try again.");
-    }).then(function () { busy(btn, false, "Open"); });
+    }).then(function () { busy(btn, false, "Enter"); });
   });
 
   nameForm.addEventListener("submit", function (e) {

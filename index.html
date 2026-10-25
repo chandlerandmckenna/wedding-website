@@ -19,8 +19,8 @@
   <svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>
   <div class="cover-inner" id="cover-inner">
     <div class="cover-card">
-      <svg class="wash cover-wash" viewBox="0 0 400 260" aria-hidden="true" focusable="false"><ellipse cx="200" cy="130" rx="150" ry="78" class="wash-blue" filter="url(#wash)"/></svg>
-      <svg class="sprig cover-sprig" aria-hidden="true" focusable="false"><use href="#sprig"/></svg>
+            <svg class="sprig cover-sprig" aria-hidden="true" focusable="false"><use href="#sprig"/></svg>
+      <svg class="rosette cover-rosette" aria-hidden="true" focusable="false"><use href="#rosette"/></svg>
       <p class="eyebrow">Save the date</p>
       <h1 class="cover-names"><span>McKenna</span><span class="amp">&amp;</span><span>Chandler</span></h1>
       <p class="cover-date">1 · 10 · 2027</p>
@@ -29,10 +29,10 @@
       <form class="cover-form" id="phone-form" novalidate>
         <label for="phone">Sign in with your phone number</label>
         <div class="inline-field">
-          <input type="tel" id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="+1 555 123 4567" required>
+          <span class="phone-field"><span class="phone-prefix" aria-hidden="true">+1</span><input type="tel" id="phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="(555) 123-4567" maxlength="14" aria-describedby="phone-hint" required></span>
           <button class="button" type="submit" id="phone-submit">Enter</button>
         </div>
-        <p class="hint">We use it to find your invitation, so you never type your details twice.</p>
+        <p class="hint" id="phone-hint">US numbers. We use it to find your invitation, so you never type your details twice.</p>
       </form>
 
       <form class="cover-form" id="name-form" hidden novalidate>
@@ -75,7 +75,6 @@
           </div>
         </div>
         <div class="arch-wrap">
-          <svg class="wash arch-wash" viewBox="0 0 400 260" aria-hidden="true" focusable="false"><ellipse cx="200" cy="130" rx="150" ry="80" class="wash-blue" filter="url(#wash)"/></svg>
           <figure class="arch">
             <img src="assets/img/us-dancing.jpg" alt="McKenna and Chandler dancing barefoot on the beach beneath a cliff" width="1067" height="1600">
           </figure>
@@ -90,13 +89,13 @@
         <p class="story-lead">We're getting married on the cliffs of Sorrento, and we would love for you to be there.</p>
         <div class="dates">
           <div class="date">
-            <span class="date-num"><svg class="wash" viewBox="0 0 400 260" aria-hidden="true" focusable="false"><ellipse cx="200" cy="130" rx="150" ry="80" class="wash-lemon" filter="url(#wash)"/></svg><b>29</b></span>
+            <span class="date-num"><svg class="numtile" aria-hidden="true" focusable="false"><use href="#numtile"/></svg><b>29</b></span>
             <span class="date-it">Mercoledì · Settembre</span>
             <span class="date-en">The celebrations begin</span>
           </div>
           <span class="date-rule" aria-hidden="true"></span>
           <div class="date">
-            <span class="date-num"><svg class="wash" viewBox="0 0 400 260" aria-hidden="true" focusable="false"><ellipse cx="200" cy="130" rx="150" ry="80" class="wash-blue" filter="url(#wash)"/></svg><b>1</b></span>
+            <span class="date-num"><svg class="numtile" aria-hidden="true" focusable="false"><use href="#numtile"/></svg><b>1</b></span>
             <span class="date-it">Venerdì · Ottobre</span>
             <span class="date-en">We say "sì"</span>
           </div>
@@ -108,6 +107,7 @@
     <section class="page page-venue flip" id="venue">
       <div class="wrap">
         <div class="section-head center">
+          <svg class="rosette section-rosette" aria-hidden="true" focusable="false"><use href="#rosette"/></svg>
           <p class="eyebrow">The venue</p>
           <h2>Capo Santa Fortunata</h2>
           <p>A pink villa in an old olive grove on the cliffs just outside Sorrento, looking out over the Bay of Naples to Vesuvius.</p>

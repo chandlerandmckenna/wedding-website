@@ -1,7 +1,7 @@
 /* Layout: a hand-painted wedding book on ivory paper. One background
    throughout; colour arrives as watercolor: painted majolica tile bands,
-   soft blue and lemon washes, a lemon sprig. Each section folds down from
-   its top edge as you scroll, like flipping to the next page.
+   rosettes, ceramic number tiles and lemon sprigs. Each section folds down
+   from its top edge as you scroll, like flipping to the next page.
    Deliberately a single light look, like a printed invitation. */
 :root {
   color-scheme: light;
@@ -36,7 +36,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 120px; }
 body {
   margin: 0;
   background-color: var(--ivory);
@@ -77,10 +77,10 @@ p, figure { margin: 0; }
 
 /* ---------- Watercolor pieces ---------- */
 .tile-band { display: block; width: 100%; height: 30px; }
-.wash { position: absolute; pointer-events: none; overflow: visible; }
-.wash-blue { fill: #7da2d6; fill-opacity: 0.5; }
-.wash-lemon { fill: #f2c94c; fill-opacity: 0.6; }
 .sprig { position: absolute; pointer-events: none; overflow: visible; }
+.rosette { display: block; justify-self: center; overflow: visible; }
+.cover-rosette { width: 76px; height: 76px; margin-bottom: 4px; }
+.section-rosette { width: 58px; height: 58px; margin-bottom: 6px; }
 
 /* ---------- Buttons and fields ---------- */
 .button {
@@ -156,8 +156,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   outline-offset: 6px;
   background: rgba(255, 253, 248, 0.6);
 }
-.cover-card > :not(.wash):not(.sprig) { position: relative; z-index: 1; }
-.cover-wash { width: 360px; height: 230px; left: 50%; top: 46px; margin-left: -180px; opacity: 0.75; }
+.cover-card > :not(.sprig) { position: relative; z-index: 1; }
 .cover-sprig { width: 170px; height: 120px; right: -48px; top: -46px; z-index: 2; }
 .cover-names { font-size: clamp(2.7rem, 10vw, 3.7rem); font-style: italic; color: var(--cobalt); display: grid; line-height: 1.02; }
 .cover-names .amp, .hero h1 .amp { font-family: var(--script); font-style: normal; color: var(--lemon-deep); font-size: 0.85em; line-height: 0.9; }
@@ -166,7 +165,21 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 .cover-form { display: grid; gap: 12px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--line); text-align: left; }
 .cover-form .script, .cover-form .hint { text-align: center; }
 .inline-field { display: flex; gap: 8px; }
-.inline-field input { flex: 1; min-width: 0; }
+.phone-field {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center;
+  background: #fffdf8;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+}
+.phone-field:focus-within { border-color: var(--cobalt); box-shadow: 0 0 0 3px var(--cobalt-soft); }
+.phone-prefix { padding-left: 14px; color: var(--ink-soft); font-size: var(--step-0); }
+.inline-field .phone-field input {
+  flex: 1; min-width: 0;
+  border: 0; background: transparent; box-shadow: none;
+  padding-left: 8px;
+  font-variant-numeric: tabular-nums; letter-spacing: 0.03em;
+}
 .preview-note { font-style: italic; }
 
 /* the cover lifts away from its top edge, like turning up a page */
@@ -177,7 +190,22 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   100% { transform: perspective(2000px) rotateX(88deg); opacity: 0; }
 }
 
-/* ---------- Header ---------- */
+/* ---------- Header: stays pinned while the pages scroll under it ---------- */
+.site-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background-color: var(--ivory);
+  box-shadow: 0 1px 0 var(--line), 0 6px 18px rgba(28, 41, 69, 0.06);
+}
+.site-header .tile-band { height: 22px; }
+.book::before {
+  content: "";
+  position: fixed; inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 21;
+  background: var(--ivory);
+}
 .header-inner {
   max-width: 66rem;
   margin: 0 auto;
@@ -185,7 +213,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   align-items: center;
   gap: 8px 24px;
   flex-wrap: wrap;
-  padding-block: 14px;
+  padding-block: 10px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
@@ -255,7 +283,6 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 .count-num { font-family: var(--display); font-size: var(--step-2); color: var(--cobalt); margin-right: 4px; font-variant-numeric: tabular-nums; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
 .arch-wrap { position: relative; justify-self: center; width: min(100%, 420px); }
-.arch-wash { width: 150%; height: 80%; left: -42%; top: 32%; }
 .arch {
   position: relative;
   aspect-ratio: 2 / 3;
@@ -280,9 +307,9 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 .story-note { max-width: 46ch; color: var(--ink-soft); }
 .dates { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px 48px; margin-block: 12px; }
 .date { display: grid; justify-items: center; gap: 4px; }
-.date-num { position: relative; display: grid; place-items: center; width: 140px; height: 110px; }
-.date-num .wash { width: 150px; height: 100px; left: -5px; top: 5px; }
-.date-num b { position: relative; font-family: var(--display); font-weight: 400; font-size: 4.4rem; line-height: 1; font-variant-numeric: lining-nums; }
+.date-num { position: relative; display: grid; place-items: center; width: 132px; height: 132px; margin-bottom: 10px; }
+.numtile { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.date-num b { position: relative; font-family: var(--display); font-style: italic; font-weight: 400; font-size: 3.8rem; line-height: 1; color: var(--cobalt); font-variant-numeric: lining-nums; }
 .date-it { font-size: 0.8125rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cobalt); font-weight: 500; }
 .date-en { font-family: var(--display); font-style: italic; color: var(--ink-soft); }
 .date-rule { width: 1px; height: 120px; background: var(--line); }
