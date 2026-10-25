@@ -309,41 +309,40 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   content: ""; position: absolute; inset: -18% -14%; z-index: -1;
   background: radial-gradient(closest-side, rgba(251, 248, 241, 0.82), rgba(251, 248, 241, 0.6) 55%, rgba(251, 248, 241, 0));
 }
-/* One tight lock-up: title, place, date, countdown, family name. */
+/* The title lock-up borrows the story dates' rhythm: a big italic line, a
+   small spaced-capital label, a lemon-underlined italic date, a soft italic
+   note, then the family name. */
 .hero-title {
   font-family: var(--display);
   font-style: italic;
-  font-weight: 500;
+  font-weight: 400;
   font-size: clamp(3rem, 12vw, 7rem);
   line-height: 1;
   white-space: nowrap;
   color: var(--cobalt);
 }
 .hero-place {
-  display: flex; align-items: center; justify-content: center; gap: 14px;
-  font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 600;
-  letter-spacing: 0.3em; text-transform: uppercase;
-  line-height: 1.3;
-  color: var(--cobalt);
-  padding-left: 0.3em; /* balances the trailing letter-spacing */
-}
-.hero-place::before, .hero-place::after { content: ""; width: 34px; height: 2px; background: var(--lemon); border-radius: 2px; }
-.hero-title + .hero-place { margin-top: 10px; }
-.hero-date {
-  font-family: var(--display); font-weight: 700;
-  font-size: clamp(2.2rem, 7.5vw, 4rem);
-  line-height: 1.05;
-  letter-spacing: 0.01em;
+  margin-top: 12px;
+  font-size: clamp(0.85rem, 2.4vw, 1.05rem); font-weight: 500;
+  letter-spacing: 0.24em; padding-left: 0.24em; text-transform: uppercase;
   color: var(--cobalt);
 }
-.countdown { font-variant-numeric: tabular-nums; }
+.hero-date { position: relative; display: grid; place-items: center; padding-bottom: 16px; margin-top: 10px; }
+.hero-date b {
+  position: relative; z-index: 1;
+  font-family: var(--display); font-style: italic; font-weight: 400;
+  font-size: clamp(2.4rem, 8vw, 4.4rem); line-height: 1;
+  color: var(--cobalt); font-variant-numeric: lining-nums;
+}
+.hero-date .swash { width: 88%; height: 20px; left: 6%; margin-left: 0; bottom: 0; }
+.hero-note { font-family: var(--display); font-style: italic; font-size: clamp(1.05rem, 3vw, 1.3rem); color: var(--ink-soft); font-variant-numeric: lining-nums; }
 .hero-family {
-  margin-top: 14px;
+  margin-top: 18px;
   font-family: "Playfair Display SC", var(--display); font-weight: 700;
-  font-size: clamp(1.5rem, 4.8vw, 2.5rem);
-  letter-spacing: 0.12em; padding-left: 0.12em;
+  font-size: clamp(1.3rem, 4vw, 2rem);
+  letter-spacing: 0.14em; padding-left: 0.14em;
   line-height: 1.1;
-  color: var(--cobalt);
+  color: var(--ink);
 }
 .arch-wrap { position: relative; justify-self: center; width: min(78%, 340px); margin-bottom: 20px; }
 .arch {
