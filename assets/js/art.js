@@ -1,5 +1,5 @@
 /* Watercolor art shared by every page: paint filters, a lemon sprig and a
-   lemon branch, a hand-painted majolica tile and a lemon brushstroke.
+   lemon branch and a lemon brushstroke (the tile bands are assets/img/tiles.svg).
    Injected once so pages can <use> them. */
 (function () {
   var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
@@ -44,15 +44,6 @@
     '      <path d="M122 136 L128 132 C130 118 142 110 154 111 C166 110 176 118 178 130 L184 134 L178 138 C176 150 166 158 154 157 C142 158 132 151 128 140 Z" fill="url(#lemonG)" opacity=".92"/>' +
     '    </g>' +
     '  </symbol>' +
-    '  <pattern id="tileP" width="48" height="48" patternUnits="userSpaceOnUse">' +
-    '    <rect width="48" height="48" fill="#fbf8f1"/>' +
-    '    <g fill="#2a55a6" fill-opacity=".85">' +
-    '      <path d="M24 6C29 12 29 18 24 24C19 18 19 12 24 6Z"/><path d="M24 6C29 12 29 18 24 24C19 18 19 12 24 6Z" transform="rotate(90 24 24)"/>' +
-    '      <path d="M24 6C29 12 29 18 24 24C19 18 19 12 24 6Z" transform="rotate(180 24 24)"/><path d="M24 6C29 12 29 18 24 24C19 18 19 12 24 6Z" transform="rotate(270 24 24)"/>' +
-    '      <path d="M0 0H12A12 12 0 0 1 0 12Z"/><path d="M48 0V12A12 12 0 0 1 36 0Z"/><path d="M0 48V36A12 12 0 0 1 12 48Z"/><path d="M48 48H36A12 12 0 0 1 48 36Z"/>' +
-    '    </g>' +
-    '    <g fill="#f2c94c"><circle cx="24" cy="24" r="3.2"/><circle cx="24" cy="2" r="1.6"/><circle cx="24" cy="46" r="1.6"/><circle cx="2" cy="24" r="1.6"/><circle cx="46" cy="24" r="1.6"/></g>' +
-    '  </pattern>' +
     '<symbol id="swash" viewBox="0 0 200 30"><g filter="url(#wc)"><path d="M6 20C40 10 90 8 130 12C160 14 182 18 194 14" fill="none" stroke="#f2c94c" stroke-width="9" stroke-linecap="round"/></g></symbol>' +
     lemonBranch() +
     "</defs></svg>";

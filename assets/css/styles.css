@@ -76,7 +76,12 @@ p, figure { margin: 0; }
 .error { color: #a4312a; font-size: var(--step--1); font-weight: 500; }
 
 /* ---------- Watercolor pieces ---------- */
-.tile-band { display: block; width: 100%; height: 30px; }
+.tile-band {
+  display: block; width: 100%; height: 64px;
+  background: url("../img/tiles.svg") repeat-x 0 0 / auto 100%;
+  box-shadow: inset 0 -1px 0 rgba(28, 41, 69, 0.08);
+}
+.cover > .tile-band { height: clamp(56px, 8vh, 84px); }
 .sprig { position: absolute; pointer-events: none; overflow: visible; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -165,7 +170,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 .cover-date { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 8px; font-family: var(--display); font-weight: 600; font-size: clamp(1.4rem, 5vw, 1.8rem); letter-spacing: 0.06em; color: var(--ink); font-variant-numeric: lining-nums; }
 .cover-date i { font-style: normal; color: var(--lemon-deep); font-size: 1.3em; line-height: 1; }
 /* lemons hang into the corners of the sign-in page */
-.cover-lemons { position: absolute; top: 22px; left: -8px; width: clamp(120px, 20vw, 260px); aspect-ratio: 340 / 460; overflow: visible; pointer-events: none; }
+.cover-lemons { position: absolute; top: calc(clamp(56px, 8vh, 84px) - 14px); left: -8px; width: clamp(120px, 20vw, 260px); aspect-ratio: 340 / 460; overflow: visible; pointer-events: none; }
 .cover-lemons-right { left: auto; right: -8px; transform: scaleX(-1); }
 .cover-card .cover-form { width: min(100%, 420px); margin-top: 12px; }
 .cover-form { display: grid; gap: 12px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--line); text-align: left; }
@@ -204,7 +209,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   background-color: var(--ivory);
   box-shadow: 0 1px 0 var(--line), 0 6px 18px rgba(28, 41, 69, 0.06);
 }
-.site-header .tile-band { height: 22px; }
+.site-header .tile-band { height: 34px; }
 .book::before {
   content: "";
   position: fixed; inset: 0 0 auto;

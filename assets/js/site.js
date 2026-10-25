@@ -165,7 +165,7 @@ window.PAGES = [
       return '<a href="' + p.href + '"' + cur + ">" + p.label + "</a>";
     }).join("");
     el.innerHTML =
-      '<svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>' +
+      '<div class="tile-band" aria-hidden="true"></div>' +
       '<div class="header-inner">' +
       '<a class="monogram" href="' + homeHref() + '">' + W.monogram + "</a>" +
       '<nav class="site-nav" aria-label="Main">' + links + "</nav>" +
@@ -188,7 +188,7 @@ window.PAGES = [
       '<p class="footer-names">' + W.coupleA + " &amp; " + W.coupleB + "</p>" +
       "<p>" + W.dateLabel + " · " + W.venue + ", " + W.town + "</p>" +
       "</div>" +
-      '<svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>';
+      '<div class="tile-band" aria-hidden="true"></div>';
   }
 
   function fillDetails() {
