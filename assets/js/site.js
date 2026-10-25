@@ -157,7 +157,7 @@ window.PAGES = [
       return '<a href="' + p.href + '"' + cur + ">" + p.label + "</a>";
     }).join("");
     el.innerHTML =
-      '<div class="stripe-band" aria-hidden="true"></div>' +
+      '<svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>' +
       '<div class="header-inner">' +
       '<a class="monogram" href="' + homeHref() + '">' + W.monogram + "</a>" +
       '<nav class="site-nav" aria-label="Main">' + links + "</nav>" +
@@ -176,11 +176,11 @@ window.PAGES = [
     if (!el) return;
     el.innerHTML =
       '<div class="footer-inner">' +
-      '<p class="lettering">Ci vediamo a Sorrento!</p>' +
+      '<p class="script">Ci vediamo a Sorrento!</p>' +
       '<p class="footer-names">' + W.coupleA + " &amp; " + W.coupleB + "</p>" +
       "<p>" + W.dateLabel + " · " + W.venue + ", " + W.town + "</p>" +
       "</div>" +
-      '<div class="stripe-band" aria-hidden="true"></div>';
+      '<svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>';
   }
 
   function fillDetails() {

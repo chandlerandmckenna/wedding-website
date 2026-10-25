@@ -8,48 +8,45 @@
 <meta name="description" content="Save the date: McKenna and Chandler are getting married in Sorrento, Italy, on 1 October 2027.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&family=Caveat+Brush&family=Jost:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&family=Italianno&family=Jost:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
 <script src="assets/js/art.js"></script>
 
-<!-- The cover: a postcard on a striped tablecloth. Guests sign in to open it. -->
+<!-- The cover: guests sign in with their phone number to open the book. -->
 <section class="cover" id="cover">
-  <div class="postcard cover-card">
-    <div class="scene" aria-hidden="true">
-      <svg class="scene-art" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid slice"><use href="#scene"/></svg>
-      <div class="plane-banner"><svg class="plane"><use href="#plane"/></svg><span class="banner">save the date</span></div>
-      <svg class="car"><use href="#car"/></svg>
-      <p class="scene-lettering">Meet us in<br>Sorrento!</p>
-    </div>
-    <div class="cover-body">
-      <h1 class="cover-names">McKenna <span class="amp">&amp;</span> Chandler</h1>
-      <p class="cover-date">1 October 2027 · Capo Santa Fortunata, Sorrento</p>
+  <svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>
+  <div class="cover-inner" id="cover-inner">
+    <div class="cover-card">
+      <svg class="sprig cover-sprig" aria-hidden="true" focusable="false"><use href="#sprig"/></svg>
+      <div class="plane-banner" aria-hidden="true"><span class="banner">save the date</span><svg class="plane"><use href="#plane"/></svg></div>
+      <p class="sr-only">Save the date</p>
+      <h1 class="cover-names"><span>McKenna</span><span class="amp">&amp;</span><span>Chandler</span></h1>
+      <p class="cover-date">1 · 10 · 2027</p>
+      <p class="cover-place">Capo Santa Fortunata · Sorrento, Italia</p>
 
       <form class="cover-form" id="signin-form" novalidate>
         <div id="phone-mode">
           <label for="phone">Sign in with your phone number</label>
           <div class="inline-field">
-            <span class="input-shell"><span class="phone-prefix" aria-hidden="true">+1</span><input type="tel" id="phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="(555) 123-4567" maxlength="14"></span>
+            <span class="phone-field"><span class="phone-prefix" aria-hidden="true">+1</span><input type="tel" id="phone" name="phone" inputmode="numeric" autocomplete="tel-national" placeholder="(555) 123-4567" maxlength="14"></span>
             <button class="button" type="submit" id="phone-submit">Enter</button>
           </div>
         </div>
         <div id="email-mode" hidden>
           <label for="signin-email">Sign in with your email</label>
           <div class="inline-field">
-            <span class="input-shell"><input type="email" id="signin-email" name="email" autocomplete="email" placeholder="you@example.com"></span>
+            <span class="phone-field"><input type="email" id="signin-email" name="email" autocomplete="email" placeholder="you@example.com"></span>
             <button class="button" type="submit" id="email-submit">Enter</button>
           </div>
         </div>
-        <p class="hint">
-          <button class="link-button" type="button" id="switch-mode">Number not working? Use your email instead</button>
-        </p>
+        <p class="hint switch"><button class="link-button" type="button" id="switch-mode">Number not working? Use your email instead</button></p>
       </form>
 
       <form class="cover-form" id="name-form" hidden novalidate>
-        <p class="lettering">Benvenuti!</p>
-        <p class="hint" id="name-intro">We don't have you on our list yet. Tell us who you are and we'll remember you.</p>
+        <p class="script">Benvenuti</p>
+        <p class="hint">We don't have you on our list yet. Tell us who you are and we'll remember you.</p>
         <div class="field">
           <label for="guest-name">Your name(s)</label>
           <input type="text" id="guest-name" name="name" autocomplete="name" placeholder="e.g. Sofia &amp; Marco Rossi">
@@ -66,6 +63,7 @@
       <p class="hint preview-note" id="preview-note" hidden>Preview: any number or email works, and sign-ins stay in this browser.</p>
     </div>
   </div>
+  <svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>
 </section>
 
 <div class="book" id="book" hidden>
@@ -75,8 +73,8 @@
     <section class="page page-hero">
       <div class="wrap hero">
         <div class="hero-text">
-          <p class="lettering hero-lettering">Meet us in Sorrento!</p>
-          <h1><span data-w="coupleA">McKenna</span> <span class="amp">&amp;</span> <span data-w="coupleB">Chandler</span></h1>
+          <p class="eyebrow">Save the date</p>
+          <h1><em data-w="coupleA">McKenna</em><span class="amp">&amp;</span><em data-w="coupleB">Chandler</em></h1>
           <p class="big-date">1 October 2027</p>
           <p class="soft"><span data-w="venue">Capo Santa Fortunata</span> · <span data-w="town">Sorrento</span>, Italia</p>
           <p class="countdown" id="countdown"></p>
@@ -85,42 +83,47 @@
             <a class="button ghost" href="travel.html">Getting to Sorrento</a>
           </div>
         </div>
-        <figure class="print hero-print">
-          <img src="assets/img/us-dancing.jpg" alt="McKenna and Chandler dancing barefoot on the beach beneath a cliff" width="1067" height="1600">
-        </figure>
+        <div class="arch-wrap">
+          <figure class="arch">
+            <img src="assets/img/us-dancing.jpg" alt="McKenna and Chandler dancing barefoot on the beach beneath a cliff" width="1067" height="1600">
+          </figure>
+          <svg class="sprig arch-sprig" aria-hidden="true" focusable="false"><use href="#sprig"/></svg>
+        </div>
       </div>
     </section>
 
     <section class="page page-story flip">
-      <div class="wrap">
-        <div class="postcard story-card">
-          <div class="scene scene-wide" aria-hidden="true">
-            <svg class="scene-art" viewBox="0 0 800 440" preserveAspectRatio="xMidYMid slice"><use href="#scene"/></svg>
-            <svg class="car car-drive"><use href="#car"/></svg>
+      <div class="wrap story">
+        <p class="script">Sì, lo voglio</p>
+        <p class="story-lead">We're getting married on the cliffs of Sorrento, and we would love for you to be there.</p>
+        <div class="dates">
+          <div class="date">
+            <span class="date-num"><b>29</b><svg class="swash" aria-hidden="true" focusable="false"><use href="#swash"/></svg></span>
+            <span class="date-it">Mercoledì · Settembre</span>
+            <span class="date-en">The celebrations begin</span>
           </div>
-          <div class="story">
-            <p class="story-lead">We're getting married on the cliffs of Sorrento, and we would love for you to be there.</p>
-            <div class="dates">
-              <div class="date"><span class="date-num">29.09</span><span class="date-it">Mercoledì</span><span class="date-en">The celebrations begin</span></div>
-              <div class="date"><span class="date-num">01.10</span><span class="date-it">Venerdì</span><span class="date-en">We say "sì"</span></div>
-            </div>
-            <p class="story-note">We know Italy is a long way to come, so we're telling you early. Formal invitation to follow.</p>
+          <span class="date-rule" aria-hidden="true"></span>
+          <div class="date">
+            <span class="date-num"><b>1</b><svg class="swash" aria-hidden="true" focusable="false"><use href="#swash"/></svg></span>
+            <span class="date-it">Venerdì · Ottobre</span>
+            <span class="date-en">We say "sì"</span>
           </div>
         </div>
+        <p class="story-note">We know Italy is a long way to come, so we're telling you early. Formal invitation to follow.</p>
       </div>
     </section>
 
     <section class="page page-venue flip" id="venue">
       <div class="wrap">
         <div class="section-head center">
-          <p class="lettering">The venue</p>
+          <p class="eyebrow">The venue</p>
           <h2>Capo Santa Fortunata</h2>
           <p>A pink villa in an old olive grove on the cliffs just outside Sorrento, looking out over the Bay of Naples to Vesuvius.</p>
         </div>
         <div class="gallery">
-          <figure class="print g-main"><img src="assets/img/venue-garden.jpg" alt="Dinner tables set among olive trees at sunset, with the Sorrento coastline and the sea behind" width="1200" height="1598" loading="lazy"><figcaption>Dinner under the olive trees</figcaption></figure>
-          <figure class="print g-2"><img src="assets/img/venue-aerial.jpg" alt="Aerial view of the villa among pine trees above the sea" width="480" height="638" loading="lazy"><figcaption>Above the bay</figcaption></figure>
-          <figure class="print g-3"><img src="assets/img/venue-villa.jpg" alt="The villa's façade covered in bougainvillea" width="480" height="638" loading="lazy"><figcaption>La villa</figcaption></figure>
+          <figure class="g-main"><img src="assets/img/venue-garden.jpg" alt="Dinner tables set among olive trees at sunset, with the Sorrento coastline and the sea behind" width="1200" height="1598" loading="lazy"><figcaption>Dinner under the olive trees</figcaption></figure>
+          <figure><img src="assets/img/venue-aerial.jpg" alt="Aerial view of the villa among pine trees above the sea" width="480" height="638" loading="lazy"><figcaption>Above the bay</figcaption></figure>
+          <figure><img src="assets/img/venue-villa.jpg" alt="The villa's façade covered in bougainvillea" width="480" height="638" loading="lazy"><figcaption>La villa</figcaption></figure>
         </div>
       </div>
     </section>
@@ -128,7 +131,7 @@
     <section class="page flip" id="schedule" hidden>
       <div class="wrap">
         <div class="section-head center">
-          <p class="lettering">Il programma</p>
+          <p class="eyebrow">Il programma</p>
           <h2>Schedule</h2>
         </div>
         <div class="days" id="schedule-days"></div>
@@ -137,8 +140,9 @@
 
     <section class="page page-reply flip" id="reply">
       <div class="wrap">
-        <div class="postcard feel-card">
-          <p class="lettering" id="feel-hello">Ciao!</p>
+        <div class="feel-panel">
+          <svg class="sprig reply-sprig" aria-hidden="true" focusable="false"><use href="#sprig"/></svg>
+          <p class="script" id="feel-hello">Ciao!</p>
           <h2>Have a gut feeling?</h2>
           <p class="feel-sub">This isn't your RSVP. It just helps us plan.</p>
           <div class="feel-options" role="radiogroup" aria-label="Your gut feeling">
