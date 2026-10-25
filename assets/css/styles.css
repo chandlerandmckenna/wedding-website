@@ -504,10 +504,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 .footer-names { font-family: var(--display); font-style: italic; font-size: var(--step-2); color: var(--cobalt); }
 
 @media (max-width: 760px) {
-  /* the painting is nearly square: on a tall phone a shorter title page
-     shows more of the bay and cliffs across the width */
+  /* the title page fills the phone screen; the next section fades in below */
   .hero-bg { object-position: 62% 50%; }
-  html.paged .page-hero, .page-hero { min-height: min(calc(100svh - var(--head, 96px)), 600px); padding-bottom: 60px; }
   .page-hero { padding-top: clamp(120px, 20vh, 170px); }
   .arch-sprig { width: 150px; height: 106px; left: -50px; bottom: -30px; }
   /* on phones the three portraits stay in a row, a little closer together */
