@@ -8,123 +8,154 @@
 <meta name="description" content="Save the date: McKenna and Chandler are getting married in Sorrento, Italy, on 1 October 2027.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&family=Jost:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&family=Italianno&family=Jost:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-<header id="site-header" class="site-header"></header>
 
-<main>
-  <section class="wrap hero">
-    <div class="hero-text">
-      <p class="eyebrow">Save the date</p>
-      <h1><em data-w="coupleA">McKenna</em><span class="amp">&amp;</span><em data-w="coupleB">Chandler</em></h1>
-      <div class="hero-meta">
-        <p class="big-date">1 October 2027</p>
-        <p class="soft"><span data-w="venue">Capo Santa Fortunata</span> · <span data-w="town">Sorrento</span>, Italia</p>
-      </div>
-      <p class="countdown" id="countdown"></p>
-      <div class="actions">
-        <a class="button" href="#reply">Share your gut feeling</a>
-        <a class="button ghost" href="travel.html">Getting to Sorrento</a>
-      </div>
-    </div>
-    <figure class="arch">
-      <img src="assets/img/us-dancing.jpg" alt="McKenna and Chandler dancing barefoot on the beach beneath a cliff" width="1067" height="1600">
-    </figure>
-  </section>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="lemon" viewBox="0 0 120 90">
+      <path d="M58 30 C70 6 98 2 116 10 C100 14 86 24 76 36 Z" fill="var(--leaf)"/>
+      <path d="M52 32 C40 10 14 8 2 20 C18 22 32 30 42 40 Z" fill="var(--leaf-2)"/>
+      <path d="M22 58 C22 40 40 30 58 32 C76 30 96 40 96 58 C96 76 76 86 58 84 C40 86 22 76 22 58 Z" fill="var(--lemon)"/>
+      <ellipse cx="18" cy="58" rx="6" ry="4" fill="var(--lemon)"/>
+      <ellipse cx="100" cy="58" rx="6" ry="4" fill="var(--lemon)"/>
+      <path d="M40 50 C46 42 56 40 64 42" stroke="var(--lemon-light)" stroke-width="5" stroke-linecap="round" fill="none"/>
+    </symbol>
+  </defs>
+</svg>
 
-  <section class="section">
-    <div class="wrap intro">
-      <p class="prose lead">We're getting married on the cliffs of Sorrento, and we would love for you to be there.</p>
-      <div class="prose">
-        <p>Celebrations begin on <strong>Wednesday, 29 September</strong> and end with our wedding on <strong>Friday, 1 October 2027</strong>. We know Italy is a long way to come, so we're telling you early. Formal invitation to follow.</p>
-        <p>Con amore, <span data-w="coupleA">McKenna</span> &amp; <span data-w="coupleB">Chandler</span></p>
-      </div>
-    </div>
-  </section>
+<!-- The cover: guests sign in with their phone number to open the book. -->
+<section class="cover" id="cover">
+  <div class="cover-book" id="cover-book">
+    <svg class="cover-lemon" aria-hidden="true"><use href="#lemon"/></svg>
+    <p class="eyebrow">Save the date</p>
+    <h1 class="cover-names"><span>McKenna</span><span class="amp">&amp;</span><span>Chandler</span></h1>
+    <p class="cover-date">1 · 10 · 2027</p>
+    <p class="cover-place">Capo Santa Fortunata · Sorrento, Italia</p>
 
-  <section class="section" id="venue">
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">The venue</p>
-        <h2>Capo Santa Fortunata</h2>
-        <p>A pink villa in an old olive grove on the cliffs just outside Sorrento, looking out over the Bay of Naples to Vesuvius.</p>
+    <form class="cover-form" id="phone-form" novalidate>
+      <label for="phone">Sign in with your phone number</label>
+      <div class="inline-field">
+        <input type="tel" id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="+1 555 123 4567" required>
+        <button class="button" type="submit" id="phone-submit">Open</button>
       </div>
-      <div class="gallery">
-        <figure class="g-main"><img src="assets/img/venue-garden.jpg" alt="Dinner tables set among olive trees at sunset, with the Sorrento coastline and the sea behind" width="1200" height="1598" loading="lazy"></figure>
-        <figure><img src="assets/img/venue-villa.jpg" alt="The villa's pink façade covered in bougainvillea" width="480" height="638" loading="lazy"></figure>
-        <figure><img src="assets/img/venue-aerial.jpg" alt="Aerial view of the villa among pine trees above the sea" width="480" height="638" loading="lazy"></figure>
-      </div>
-    </div>
-  </section>
+      <p class="hint">We use it to find your invitation, so you never have to type your details twice.</p>
+    </form>
 
-  <section class="section" id="schedule" hidden>
-    <div class="wrap">
-      <div class="section-head">
-        <p class="eyebrow">Il programma</p>
-        <h2>Schedule</h2>
+    <form class="cover-form" id="name-form" hidden novalidate>
+      <p class="script">Benvenuti!</p>
+      <p class="hint">We don't have this number yet. Tell us who you are and we'll remember you.</p>
+      <div class="field">
+        <label for="guest-name">Your name(s)</label>
+        <input type="text" id="guest-name" name="name" autocomplete="name" placeholder="e.g. Sofia &amp; Marco Rossi" required>
       </div>
-      <div class="days" id="schedule-days"></div>
-    </div>
-  </section>
+      <div class="field">
+        <label for="guest-email">Email</label>
+        <input type="email" id="guest-email" name="email" autocomplete="email" required>
+      </div>
+      <button class="button wide" type="submit" id="name-submit">Continue</button>
+      <button class="link-button" type="button" id="change-number">Use a different number</button>
+    </form>
 
-  <section class="section" id="reply">
-    <div class="wrap reply-layout">
-      <figure class="reply-photo">
-        <img src="assets/img/us-kiss.jpg" alt="Black and white photo of McKenna and Chandler kissing on the beach" width="1067" height="1600" loading="lazy">
-      </figure>
-      <div class="reply-body">
+    <p class="error" id="cover-error" role="alert" hidden></p>
+    <p class="hint preview-note" id="preview-note" hidden>Preview: any number works, and sign-ins stay in this browser.</p>
+  </div>
+</section>
+
+<div class="book" id="book" hidden>
+  <header id="site-header" class="site-header"></header>
+
+  <main>
+    <section class="page page-hero">
+      <div class="wrap hero">
+        <div class="hero-text turn">
+          <p class="eyebrow">Save the date</p>
+          <h1><em data-w="coupleA">McKenna</em><span class="amp">&amp;</span><em data-w="coupleB">Chandler</em></h1>
+          <p class="big-date">1 October 2027</p>
+          <p class="soft"><span data-w="venue">Capo Santa Fortunata</span> · <span data-w="town">Sorrento</span>, Italia</p>
+          <p class="countdown" id="countdown"></p>
+          <div class="actions">
+            <a class="button" href="#reply">Share your gut feeling</a>
+            <a class="button ghost" href="travel.html">Getting to Sorrento</a>
+          </div>
+        </div>
+        <figure class="arch turn">
+          <img src="assets/img/us-dancing.jpg" alt="McKenna and Chandler dancing barefoot on the beach beneath a cliff" width="1067" height="1600">
+        </figure>
+      </div>
+    </section>
+
+    <section class="page page-lemon">
+      <svg class="lemon-deco l1" aria-hidden="true"><use href="#lemon"/></svg>
+      <svg class="lemon-deco l2" aria-hidden="true"><use href="#lemon"/></svg>
+      <div class="wrap story turn">
+        <p class="script">Sì, lo voglio!</p>
+        <p class="story-lead">We're getting married on the cliffs of Sorrento, and we would love for you to be there.</p>
+        <div class="dates">
+          <div class="date-chip"><span class="dow">Mer</span><b>29</b><span>Settembre</span><small>The celebrations begin</small></div>
+          <div class="date-chip main"><span class="dow">Ven</span><b>1</b><span>Ottobre</span><small>We say "sì"</small></div>
+        </div>
+        <p class="story-note">We know Italy is a long way to come, so we're telling you early. Formal invitation to follow.</p>
+      </div>
+    </section>
+
+    <section class="page page-venue" id="venue">
+      <div class="wrap">
+        <div class="section-head turn">
+          <p class="eyebrow">The venue</p>
+          <h2>Capo Santa Fortunata</h2>
+          <p>A pink villa in an old olive grove on the cliffs just outside Sorrento, looking out over the Bay of Naples to Vesuvius.</p>
+        </div>
+        <div class="scrapbook">
+          <figure class="print p1 turn"><img src="assets/img/venue-garden.jpg" alt="Dinner tables set among olive trees at sunset, with the Sorrento coastline and the sea behind" width="1200" height="1598" loading="lazy"><figcaption>Dinner under the olive trees</figcaption></figure>
+          <figure class="print p2 turn"><img src="assets/img/venue-villa.jpg" alt="The villa's pink façade covered in bougainvillea" width="480" height="638" loading="lazy"><figcaption>La villa</figcaption></figure>
+          <figure class="print p3 turn"><img src="assets/img/venue-aerial.jpg" alt="Aerial view of the villa among pine trees above the sea" width="480" height="638" loading="lazy"><figcaption>Above the bay</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="schedule" hidden>
+      <div class="wrap">
         <div class="section-head">
-          <p class="eyebrow">No pressure, just planning</p>
-          <h2>Have a gut feeling?</h2>
-          <p>This isn't your RSVP. It just helps us plan while it's still early. You'll get a formal invitation later.</p>
+          <p class="eyebrow">Il programma</p>
+          <h2>Schedule</h2>
         </div>
+        <div class="days" id="schedule-days"></div>
+      </div>
+    </section>
 
-        <form class="rsvp" id="reply-form" novalidate>
-          <div class="field-row">
-            <div class="field">
-              <label for="name">Your name(s)</label>
-              <input type="text" id="name" name="name" autocomplete="name" required>
-            </div>
-            <div class="field">
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" autocomplete="email" required>
-            </div>
+    <section class="page page-sea" id="reply">
+      <div class="wrap">
+        <div class="feel-card turn">
+          <p class="script" id="feel-hello">Ciao!</p>
+          <h2>Have a gut feeling?</h2>
+          <p class="feel-sub">This isn't your RSVP. It just helps us plan.</p>
+          <div class="feel-options" role="radiogroup" aria-label="Your gut feeling">
+            <button type="button" class="feel feel-yes" role="radio" aria-checked="false" data-feeling="yes">
+              <span class="feel-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Absolutely, count me in!
+            </button>
+            <button type="button" class="feel feel-maybe" role="radio" aria-checked="false" data-feeling="maybe">
+              <span class="feel-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="18" cy="12" r="2" fill="currentColor"/></svg></span>
+              I still need some time to think.
+            </button>
+            <button type="button" class="feel feel-no" role="radio" aria-checked="false" data-feeling="no">
+              <span class="feel-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></span>
+              Likely not, count me out.
+            </button>
           </div>
-
-          <fieldset>
-            <legend class="sr-only">Your gut feeling</legend>
-            <div class="choices stacked">
-              <label class="choice"><input type="radio" id="feel-yes" name="feeling" value="yes" required><span>Absolutely, count me in!</span></label>
-              <label class="choice"><input type="radio" id="feel-maybe" name="feeling" value="maybe"><span>I still need some time to think.</span></label>
-              <label class="choice"><input type="radio" id="feel-no" name="feeling" value="no"><span>Likely not, count me out.</span></label>
-            </div>
-          </fieldset>
-
-          <div class="field">
-            <label for="message">A note for McKenna &amp; Chandler <span class="hint">(optional)</span></label>
-            <textarea id="message" name="message"></textarea>
-          </div>
-
-          <p class="error" id="form-error" role="alert" hidden></p>
-          <div><button class="button" type="submit" id="submit">Send</button></div>
-        </form>
-
-        <div class="confirm" id="confirm" hidden tabindex="-1">
-          <p class="eyebrow">Grazie</p>
-          <h2 id="confirm-title">Thank you!</h2>
-          <p id="confirm-text"></p>
-          <p class="hint" id="confirm-draft" hidden>This is a preview, so your answer wasn't saved anywhere.</p>
-          <div><button class="button ghost" type="button" id="edit-reply">Change my answer</button></div>
+          <p class="feel-status" id="feel-status" role="status"></p>
         </div>
       </div>
-    </div>
-  </section>
-</main>
+    </section>
+  </main>
 
-<footer id="site-footer" class="site-footer"></footer>
+  <footer id="site-footer" class="site-footer"></footer>
+</div>
+
 <script src="assets/js/site.js"></script>
-<script src="assets/js/reply.js"></script>
+<script src="assets/js/home.js"></script>
 </body>
 </html>
