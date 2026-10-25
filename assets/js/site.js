@@ -242,14 +242,27 @@ window.PAGES = [
   // fades in as the one before fades out.
   window.setupPageFades = function (root) {
     var head = document.getElementById("site-header");
+    var html = document.documentElement;
     function measure() {
-      document.documentElement.style.setProperty("--head", (head ? head.offsetHeight : 0) + "px");
+      var h = head ? head.offsetHeight : 0;
+      html.style.setProperty("--head", h + "px");
+      // Snapping only works when every section fits on the screen. If one is
+      // taller (phones, short windows), scroll freely so nothing is skipped.
+      var room = window.innerHeight - h + 2;
+      var tall = Array.prototype.some.call((root || document).querySelectorAll(".page, .page-hero"), function (el) {
+        var spare = parseFloat(getComputedStyle(el).paddingBottom) || 0;   // empty space may tuck under
+        return !el.hidden && el.offsetHeight - spare > room;
+      });
+      html.classList.toggle("free-scroll", tall);
     }
     measure();
     window.addEventListener("resize", measure);
+    window.addEventListener("load", measure);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
     var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce || !("IntersectionObserver" in window)) return;
     document.documentElement.classList.add("paged");
+    measure();   // sections grow to a full screen once paged
     // the section crossing the middle of the screen is the one showing
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) { en.target.classList.toggle("shown", en.isIntersecting); });

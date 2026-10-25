@@ -260,6 +260,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 /* Pages: as you scroll, each section settles into place and the one before
    fades out while the next fades in (see setupPageFades in site.js). */
 html.paged { scroll-snap-type: y mandatory; } /* past halfway, it settles on the next page */
+html.paged.free-scroll { scroll-snap-type: none; } /* a section is taller than the screen: let people read it */
 html.paged .page, html.paged .page-hero { scroll-snap-align: start; min-height: calc(100svh - var(--head, 96px)); }
 html.paged .page { display: grid; align-content: center; padding-block: clamp(40px, 7vh, 80px); }
 html.paged .page-hero { align-content: start; }
