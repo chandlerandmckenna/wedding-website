@@ -148,7 +148,7 @@
     var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!animate || reduce) {
       cover.hidden = true;
-      window.setupPageTurns(book);
+      window.setupPageFades(book);
       return;
     }
     window.scrollTo(0, 0);
@@ -156,7 +156,7 @@
     setTimeout(function () {
       cover.hidden = true;
       cover.classList.remove("opening");
-      window.setupPageTurns(book);
+      window.setupPageFades(book);
     }, 1100);
   }
 

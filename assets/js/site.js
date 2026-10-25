@@ -1,6 +1,6 @@
 /*
  * Shared site setup: wedding details, guest sign-in, navigation,
- * header/footer, countdown, page flips and the hidden schedule.
+ * header/footer, countdown, section fades and the hidden schedule.
  * Edit WEDDING to change details everywhere. Add a page by creating the
  * HTML file and adding one line to PAGES.
  */
@@ -230,23 +230,23 @@ window.PAGES = [
   // scrolls in. Browsers with scroll-driven animations do this in CSS, tied
   // to the scroll; others get the same flip once, when the section arrives.
   // Sections already on screen stay put.
-  window.setupPageTurns = function (root) {
+  // Each section fills the screen; scrolling settles on the next one, which
+  // fades in as the one before fades out.
+  window.setupPageFades = function (root) {
+    var head = document.getElementById("site-header");
+    function measure() {
+      document.documentElement.style.setProperty("--head", (head ? head.offsetHeight : 0) + "px");
+    }
+    measure();
+    window.addEventListener("resize", measure);
     var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var cssDriven = window.CSS && CSS.supports && CSS.supports("animation-timeline: view()");
-    if (reduce || cssDriven || !("IntersectionObserver" in window)) return;
+    if (reduce || !("IntersectionObserver" in window)) return;
+    document.documentElement.classList.add("paged");
+    // the section crossing the middle of the screen is the one showing
     var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        en.target.classList.remove("pending");
-        io.unobserve(en.target);
-      });
-    }, { threshold: 0.15 });
-    (root || document).querySelectorAll(".flip").forEach(function (el) {
-      if (el.getBoundingClientRect().top > window.innerHeight * 0.9) {
-        el.classList.add("pending");
-        io.observe(el);
-      }
-    });
+      entries.forEach(function (en) { en.target.classList.toggle("shown", en.isIntersecting); });
+    }, { rootMargin: "-45% 0px -45% 0px" });
+    (root || document).querySelectorAll(".fade").forEach(function (el) { io.observe(el); });
   };
 
   // Every page except the cover needs a signed-in guest.
@@ -261,5 +261,5 @@ window.PAGES = [
   fillDetails();
   countdown();
   renderSchedule();
-  if (!isHome) window.setupPageTurns();
+  if (!isHome) window.setupPageFades();
 })();

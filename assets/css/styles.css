@@ -1,7 +1,7 @@
 /* Layout: a hand-painted wedding book on ivory paper. One background
-   throughout; colour arrives as watercolor: lemon and olive branches,
-   a painted view of the bay, majolica tile bands and lemon sprigs. Each section folds down
-   from its top edge as you scroll, like flipping to the next page.
+   throughout; colour arrives as watercolor: a painted view of the bay,
+   majolica tile bands and lemon sprigs. Each section fades into the next
+   as you scroll, like turning to the next page.
    Deliberately a single light look, like a printed invitation. */
 :root {
   color-scheme: light;
@@ -36,7 +36,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 120px; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: var(--head, 120px); }
 body {
   margin: 0;
   background-color: var(--ivory);
@@ -154,11 +154,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   text-align: center;
 }
 .cover-card > * { width: 100%; }
-.wreath-mark { position: relative; width: 64px; height: 64px; display: grid; place-items: center; margin-bottom: 6px; }
-.wreath-mark svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.wreath-mark span { font-family: var(--display); font-size: 0.9rem; letter-spacing: 0.04em; color: var(--cobalt); }
-.wreath-mark i { font-family: var(--script); font-style: normal; color: var(--lemon-deep); font-size: 1.2em; margin-inline: 1px; }
-.cover-eyebrow, .hero-eyebrow { font-size: 0.78rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--olive); }
+.cover-eyebrow { font-size: 0.78rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--olive); }
 .cover-names { font-size: clamp(2.3rem, 9vw, 3.2rem); font-style: italic; color: var(--cobalt); margin-top: 4px; }
 .cover-names .amp { font-family: var(--script); font-style: normal; color: var(--lemon-deep); font-size: 0.9em; }
 .cover-date { font-family: var(--display); font-size: var(--step-1); color: var(--ink); }
@@ -247,93 +243,68 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 .section-head.center { margin-inline: auto; text-align: center; justify-items: center; }
 .section-head p:not(.eyebrow) { color: var(--ink-soft); }
 
-/* Page flip, tied to scroll where the browser supports it. Each section
-   folds down from its top edge as it comes into view. */
-.flip { transform-origin: 50% 0; }
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .flip {
-      animation: page-flip linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 100%;
-    }
-  }
-  .flip.pending { opacity: 0; transform: perspective(1800px) rotateX(-62deg); }
-  .flip:not(.pending) { transition: transform 1s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.8s ease; }
-}
-@keyframes page-flip {
-  0% { transform: perspective(1800px) rotateX(-62deg); opacity: 0; }
-  45% { opacity: 1; }
-  100% { transform: none; opacity: 1; }
-}
+/* Pages: as you scroll, each section settles into place and the one before
+   fades out while the next fades in (see setupPageFades in site.js). */
+html.paged { scroll-snap-type: y mandatory; }
+html.paged .page, html.paged .page-hero { scroll-snap-align: start; min-height: calc(100svh - var(--head, 96px)); }
+html.paged .page { display: grid; align-content: center; padding-block: clamp(40px, 7vh, 80px); }
+html.paged .page-hero { align-content: start; }
+html.paged .site-footer { scroll-snap-align: end; }
+html.paged .fade { opacity: 0; transition: opacity 0.9s ease; }
+html.paged .fade.shown { opacity: 1; }
 
-/* Title page: lemons hang in from the top left, olives from the grove at the
-   top right, and the bay below is painted from the venue's garden. */
+/* Title page: the painted view from the venue's garden fills the page, and
+   fades into the ivory paper at the bottom. */
 .page-hero {
   position: relative;
   overflow: hidden;
   display: grid;
   align-content: start;
-  min-height: calc(100svh - 96px);
-  padding-block: clamp(28px, 5vh, 56px) clamp(170px, 30vh, 340px);
+  justify-items: center;
+  min-height: calc(100svh - var(--head, 96px));
+  padding: clamp(36px, 8vh, 96px) max(16px, env(safe-area-inset-right, 0px)) 120px max(16px, env(safe-area-inset-left, 0px));
 }
-.hero-lemons, .hero-olives { position: absolute; top: 0; pointer-events: none; overflow: visible; aspect-ratio: 340 / 460; }
-.hero-lemons { left: 0; width: clamp(150px, 25vw, 330px); }
-.hero-olives { right: 0; width: clamp(130px, 24vw, 320px); }
+.hero-bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; max-width: none;
+  object-fit: cover;
+  object-position: 62% 40%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent);
+  mask-image: linear-gradient(to bottom, #000 78%, transparent);
+}
+/* a pale wash over the sky so the words read cleanly */
+.page-hero::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(251, 248, 241, 0.82), rgba(251, 248, 241, 0.55) 45%, rgba(251, 248, 241, 0) 75%);
+}
 .hero-text {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   justify-items: center;
-  gap: 6px;
+  gap: 10px;
   text-align: center;
-  padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+  max-width: 100%;
 }
+.hero-eyebrow { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink); }
 .hero-title {
-  display: grid;
-  font-size: clamp(2.6rem, min(11vw, 9vh), 4.6rem);
-  line-height: 1.02;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: "Great Vibes", var(--script);
+  font-size: clamp(2.6rem, 11vw, 6.6rem);
+  line-height: 1.15;
+  white-space: nowrap;
   color: var(--cobalt);
-  margin-block: 6px 4px;
 }
-.hero-title .in { font-style: italic; text-transform: none; letter-spacing: 0; font-size: 0.5em; color: var(--lemon-deep); line-height: 1.2; }
-.hero-title .town { font-size: 1.12em; letter-spacing: 0.1em; }
-.hero-date {
-  font-family: var(--display);
-  font-size: clamp(1.5rem, 5.8vw, 2.4rem);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  padding-block: 8px 2px;
-}
-.hero-date::before, .hero-date::after { content: ""; display: inline-block; width: 28px; border-top: 1px solid var(--lemon-deep); vertical-align: middle; margin: 0 14px 0.2em; opacity: 0.7; }
-.hero-family { font-family: var(--script); font-size: clamp(2.7rem, 10vw, 3.6rem); line-height: 1; color: var(--lemon-deep); margin-top: 10px; }
-.hero-couple { font-family: var(--display); font-size: 0.95rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--cobalt); }
-.hero-couple .lc { text-transform: none; letter-spacing: 0.12em; }
-.hero-place { color: var(--ink-soft); font-size: var(--step--1); letter-spacing: 0.08em; margin-top: 2px; }
-/* the painted bay is a backdrop: its hazy sky sits behind the lower lines of text */
-.hero-scene { position: absolute; inset: auto 0 0; height: min(64%, 640px); pointer-events: none; }
-.hero-scene img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 30%;
-  /* keep the painted edges soft however the view is cropped */
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 34%, #000 82%, transparent), linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to bottom, transparent, #000 34%, #000 82%, transparent), linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-  mask-composite: intersect;
-}
+.hero-date { font-family: var(--display); font-size: clamp(1.5rem, 4.6vw, 2.2rem); letter-spacing: 0.04em; color: var(--ink); }
+.hero-family { font-family: var(--display); font-size: clamp(1.25rem, 3.4vw, 1.6rem); color: var(--ink); margin-top: 8px; }
+.hero-couple { font-size: var(--step-0); font-weight: 500; letter-spacing: 0.06em; color: var(--ink); margin-top: -6px; }
+.hero-place { font-size: var(--step--1); color: var(--ink); }
 .scroll-cue {
-  pointer-events: auto;
-  position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
-  font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; color: var(--cobalt);
+  position: absolute; left: 50%; bottom: 20px; z-index: 2; transform: translateX(-50%);
+  font-size: 0.72rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; color: var(--cobalt);
   display: grid; justify-items: center; gap: 6px;
 }
 .scroll-cue::after { content: ""; width: 1px; height: 32px; background: var(--cobalt); opacity: 0.6; }
-.countdown { color: var(--ink-soft); margin-top: 6px; }
+.countdown { color: var(--ink); margin-top: 4px; }
 .count-num { font-family: var(--display); font-size: var(--step-2); color: var(--cobalt); margin-right: 4px; font-variant-numeric: tabular-nums; }
 .arch-wrap { position: relative; justify-self: center; width: min(78%, 340px); margin-bottom: 20px; }
 .arch {
@@ -379,6 +350,15 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 .gallery .g-main img { aspect-ratio: 4 / 5; }
 .gallery figure:not(.g-main) { grid-template-rows: 1fr auto; }
 .gallery figure:not(.g-main) img { aspect-ratio: 4 / 3; }
+/* on wide screens the photo sits beside the story and the venue photos line
+   up in one row, so each section fits on one screen */
+@media (min-width: 900px) {
+  .story { grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr); column-gap: clamp(40px, 6vw, 88px); align-items: center; }
+  .story .arch-wrap { grid-row: 1 / span 4; width: min(100%, 320px); margin-bottom: 0; }
+  .gallery { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto; }
+  .gallery .g-main { grid-row: auto; }
+  .gallery .g-main img, .gallery figure:not(.g-main) img { aspect-ratio: auto; height: min(50vh, 440px); }
+}
 .gallery figcaption { font-family: var(--display); font-style: italic; font-size: var(--step--1); color: var(--ink-soft); }
 
 /* Gut feeling */
@@ -484,8 +464,6 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 .footer-names { font-family: var(--display); font-style: italic; font-size: var(--step-2); color: var(--cobalt); }
 
 @media (max-width: 760px) {
-  .page-hero { padding-top: 92px; }
-  .hero-date::before, .hero-date::after { display: none; }
   .arch-sprig { width: 150px; height: 106px; left: -50px; bottom: -30px; }
   .gallery { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .gallery .g-main { grid-column: 1 / -1; grid-row: auto; }
@@ -501,5 +479,3 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 }
 .inline-field .phone-field input:first-child { padding-left: 14px; }
 .inline-field .phone-field input:focus { box-shadow: none; }
-/* a soft halo keeps the lines over the painted bay easy to read */
-.hero-family, .hero-couple, .hero-place, .hero-date, .countdown { text-shadow: 0 0 14px #fbf8f1, 0 0 6px #fbf8f1, 0 0 2px #fbf8f1; }
