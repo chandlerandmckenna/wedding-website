@@ -1,6 +1,6 @@
 /*
  * Shared site setup: wedding details, guest sign-in, navigation,
- * header/footer, countdown, page-turn animations and the hidden schedule.
+ * header/footer, countdown, page flips and the hidden schedule.
  * Edit WEDDING to change details everywhere. Add a page by creating the
  * HTML file and adding one line to PAGES.
  */
@@ -152,7 +152,7 @@ window.PAGES = [
       return '<a href="' + p.href + '"' + cur + ">" + p.label + "</a>";
     }).join("");
     el.innerHTML =
-      '<div class="awning" aria-hidden="true"></div>' +
+      '<svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>' +
       '<div class="header-inner">' +
       '<a class="monogram" href="' + homeHref() + '">' + W.monogram + "</a>" +
       '<nav class="site-nav" aria-label="Main">' + links + "</nav>" +
@@ -175,7 +175,7 @@ window.PAGES = [
       '<p class="footer-names">' + W.coupleA + " &amp; " + W.coupleB + "</p>" +
       "<p>" + W.dateLabel + " · " + W.venue + ", " + W.town + "</p>" +
       "</div>" +
-      '<div class="tile-band" aria-hidden="true"></div>';
+      '<svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>';
   }
 
   function fillDetails() {
@@ -221,11 +221,14 @@ window.PAGES = [
     section.hidden = false;
   }
 
-  // Page turns: anything with .turn that starts below the fold swings in
-  // like a page as it scrolls into view. Things already on screen stay put.
+  // Page flips: each .flip section folds down from its top edge as it
+  // scrolls in. Browsers with scroll-driven animations do this in CSS, tied
+  // to the scroll; others get the same flip once, when the section arrives.
+  // Sections already on screen stay put.
   window.setupPageTurns = function (root) {
     var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce || !("IntersectionObserver" in window)) return;
+    var cssDriven = window.CSS && CSS.supports && CSS.supports("animation-timeline: view()");
+    if (reduce || cssDriven || !("IntersectionObserver" in window)) return;
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (!en.isIntersecting) return;
@@ -233,7 +236,7 @@ window.PAGES = [
         io.unobserve(en.target);
       });
     }, { threshold: 0.15 });
-    (root || document).querySelectorAll(".turn").forEach(function (el) {
+    (root || document).querySelectorAll(".flip").forEach(function (el) {
       if (el.getBoundingClientRect().top > window.innerHeight * 0.9) {
         el.classList.add("pending");
         io.observe(el);
