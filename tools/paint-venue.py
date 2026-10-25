@@ -1,6 +1,10 @@
 """Paint a venue photo as a sunny, painterly view (lemon branches are added by the page).
 
-    python3 tools/paint-venue.py <photo> <out.jpg> <top> <bottom> [seed]
+    python3 tools/paint-venue.py <photo> <out.jpg> <top> <bottom> [seed] [extras]
+
+extras: none, or villa:<photo>:<x>,<y>,<w>,<h>:<cx>,<cy>,<width>, which lifts
+that box out of another photo (a villa in its trees) and blends it into the
+view, centred at cx,cy (fractions of the view) and scaled to width px.
 
 Needs opencv-python-headless and numpy.
 """
@@ -10,11 +14,41 @@ import numpy as np
 
 src, out, y0, y1 = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
 rng = np.random.default_rng(int(sys.argv[5]) if len(sys.argv) > 5 else 4)
+extras = sys.argv[6] if len(sys.argv) > 6 else "none"
+VIVID = float(sys.argv[8]) if len(sys.argv) > 8 else 1.0   # extra colour saturation
+TOWN_SOFT = float(sys.argv[7]) if len(sys.argv) > 7 else 1.2   # blur of the pastel town; higher is softer
 
 img = cv2.imread(src)[y0:y1]
 W = 1800
 img = cv2.resize(img, (W, int(img.shape[0] * W / img.shape[1])), interpolation=cv2.INTER_CUBIC)
 H = img.shape[0]
+
+if extras.startswith("villa:"):
+    _, vsrc, box, at = extras.split(":")
+    bx, by, bw, bh = map(int, box.split(","))
+    cx, cy, vw = map(float, at.split(","))
+    patch = cv2.imread(vsrc)[by:by + bh, bx:bx + bw]
+    vh = int(bh * vw / bw); vw = int(vw)
+    patch = cv2.resize(patch, (vw, vh), interpolation=cv2.INTER_CUBIC).astype(np.float32)
+    m = np.zeros((vh, vw), np.float32)
+    cv2.ellipse(m, (vw // 2, vh // 2), (int(vw * 0.42), int(vh * 0.4)), 0, 0, 360, 1, -1)
+    m = cv2.GaussianBlur(m, (0, 0), vw * 0.06)[..., None]
+    x0, y0 = int(W * cx - vw / 2), int(H * cy - vh / 2)
+    xs, ys = max(0, x0), max(0, y0)
+    xe, ye = min(W, x0 + vw), min(H, y0 + vh)
+    pv, mv = patch[ys - y0:ye - y0, xs - x0:xe - x0], m[ys - y0:ye - y0, xs - x0:xe - x0]
+    roi = img[ys:ye, xs:xe].astype(np.float32)
+    pv = pv * (roi.mean((0, 1)) / pv.mean((0, 1))) ** 0.5   # match the light of the view
+    # warm the walls to sunlit cream and the roofs to terracotta (never pink)
+    ph = cv2.cvtColor(np.clip(pv, 0, 255).astype(np.uint8), cv2.COLOR_BGR2HSV).astype(np.float32)
+    wall = (ph[..., 2] > 95) & (ph[..., 1] < 80)
+    lilac = (ph[..., 0] > 115) | (ph[..., 0] < 8)
+    ph[..., 0][lilac] = 16
+    ph[..., 0][wall] = 21; ph[..., 1][wall] = 70; ph[..., 2][wall] = np.clip(ph[..., 2][wall] * 1.06, 0, 255)
+    roof = (ph[..., 2] > 120) & ((ph[..., 0] < 22) | (ph[..., 0] > 160)) & (ph[..., 1] >= 40)
+    ph[..., 0][roof] = 11; ph[..., 1][roof] = np.clip(ph[..., 1][roof] * 1.5, 0, 200)
+    pv = cv2.cvtColor(ph.astype(np.uint8), cv2.COLOR_HSV2BGR).astype(np.float32)
+    img[ys:ye, xs:xe] = np.clip(roi * (1 - mv) + pv * mv, 0, 255).astype(np.uint8)
 
 # ---- colour: golden afternoon, no pink in the sky, bluer sea, richer greens
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.float32)
@@ -57,8 +91,10 @@ cells = rng.integers(0, 6, (H // 7 + 1, W // 11 + 1)).astype(np.uint8)
 cells = cv2.resize(cells, (W + 11, H + 7), interpolation=cv2.INTER_NEAREST)[:H, :W]
 PASTELS = np.array([[80, 205, 250], [90, 170, 240], [150, 225, 252], [70, 140, 215], [225, 240, 250], [110, 200, 235]], np.float32)  # BGR
 tint = PASTELS[cells]
-a = np.clip(cv2.GaussianBlur(bright * 1.6, (0, 0), 1.2), 0, 0.95)[..., None]
+a = np.clip(cv2.GaussianBlur(bright * 1.6, (0, 0), TOWN_SOFT), 0, 0.95)[..., None]
 img = np.clip(img * (1 - a) + tint * a, 0, 255).astype(np.uint8)
+
+
 
 boats = img.copy()
 def sailboat(x, y, s):
@@ -82,5 +118,9 @@ strokes = cv2.resize(strokes, (W, H))
 strokes = cv2.filter2D(strokes, -1, np.ones((1, 9), np.float32) / 9)  # horizontal brush drag
 tex = 0.95 + 0.05 * grain + 0.06 * (strokes - 0.5)
 p = np.clip(p.astype(np.float32) * tex[..., None], 0, 255).astype(np.uint8)
+if VIVID != 1.0:
+    q = cv2.cvtColor(p, cv2.COLOR_BGR2HSV).astype(np.float32)
+    q[..., 1] = np.clip(q[..., 1] * VIVID, 0, 255)
+    p = cv2.cvtColor(q.astype(np.uint8), cv2.COLOR_HSV2BGR)
 cv2.imwrite(out, p, [cv2.IMWRITE_JPEG_QUALITY, 84])
 print(W, H)
