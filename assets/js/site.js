@@ -10,7 +10,7 @@ window.WEDDING = {
   surname: "Queenan",
   monogram: "M & C",
   dateISO: "2027-10-01T16:00:00+02:00",
-  dateLabel: "Friday, 1 October 2027",
+  dateLabel: "Friday, October 1, 2027",
   town: "Sorrento",
   venue: "Capo Santa Fortunata",
   // Google Apps Script web app URL (see backend/apps-script.gs). It looks up
@@ -26,19 +26,19 @@ window.WEDDING = {
 // the guests invited to them, as guest.privateEvents.
 window.SCHEDULE = [
   {
-    day: "Wednesday", date: "29 September",
+    day: "Wednesday", date: "September 29",
     events: [
       { time: "5:00 pm", title: "Welcome party", place: "Sorrento" }
     ]
   },
   {
-    day: "Thursday", date: "30 September",
+    day: "Thursday", date: "September 30",
     events: [
       { time: "11:00 am", title: "Beach club", place: "Sorrento" }
     ]
   },
   {
-    day: "Friday", date: "1 October", main: true,
+    day: "Friday", date: "October 1", main: true,
     events: [
       { time: "", title: "Wedding ceremony", place: "Capo Santa Fortunata" },
       { time: "", title: "Reception", place: "Immediately following" }

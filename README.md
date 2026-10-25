@@ -1,6 +1,6 @@
 # McKenna & Chandler: wedding website
 
-Static site for our wedding in Sorrento, Italy, 1 October 2027. Plain HTML, CSS and JavaScript, no build step.
+Static site for our wedding in Sorrento, Italy, October 1, 2027. Plain HTML, CSS and JavaScript, no build step.
 
 ## Pages
 - `index.html`: the cover (phone sign-in), then the save the date, venue and "Have a gut feeling?" buttons. A schedule section stays hidden until it's switched on.

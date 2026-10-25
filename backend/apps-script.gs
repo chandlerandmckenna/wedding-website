@@ -10,7 +10,7 @@
  *
  * Sheet "Private events" (row 1 is headers):
  *   Group | Date | Time | Title | Place
- *   Date must match the site's schedule, e.g. "30 September".
+ *   Date must match the site's schedule, e.g. "September 30".
  *
  * Deploy: Extensions > Apps Script, paste this file, then
  * Deploy > New deployment > Web app, execute as "Me", access "Anyone".
