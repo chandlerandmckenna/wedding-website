@@ -20,9 +20,9 @@
   --terracotta: #b8623f;
   --terracotta-soft: #f5e3da;
 
-  --display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --display: "Cormorant Garamond", "Cormorant", Garamond, Georgia, serif;
   --body: "Jost", "Futura", "Avenir Next", system-ui, sans-serif;
-  --script: "Italianno", "Snell Roundhand", "Apple Chancery", cursive;
+  --script: "Great Vibes", "Snell Roundhand", "Apple Chancery", cursive;
 
   --step--1: 0.875rem;
   --step-0: 1.0625rem;
@@ -51,7 +51,7 @@ body {
 img { max-width: 100%; }
 a { color: var(--cobalt); text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--cobalt); outline-offset: 3px; }
-h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.12; text-wrap: balance; margin: 0; }
+h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.12; text-wrap: balance; margin: 0; }
 h2 { font-size: var(--step-3); }
 h3 { font-size: var(--step-1); }
 p, figure { margin: 0; }
@@ -70,7 +70,7 @@ p, figure { margin: 0; }
   color: var(--cobalt);
   font-weight: 500;
 }
-.script { font-family: var(--script); font-size: clamp(2.5rem, 6vw, 3.2rem); line-height: 1; color: var(--cobalt); }
+.script { font-family: var(--script); font-size: clamp(2rem, 5vw, 2.6rem); line-height: 1.1; color: var(--lemon-deep); }
 .hint { font-size: var(--step--1); color: var(--ink-soft); }
 .soft { color: var(--ink-soft); }
 .error { color: #a4312a; font-size: var(--step--1); font-weight: 500; }
@@ -268,14 +268,14 @@ html.paged .fade.shown { opacity: 1; }
   position: absolute; inset: 0;
   width: 100%; height: 100%; max-width: none;
   object-fit: cover;
-  object-position: 62% 40%;
+  object-position: 60% 50%;
   -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent);
   mask-image: linear-gradient(to bottom, #000 78%, transparent);
 }
 /* a pale wash over the sky so the words read cleanly */
 .page-hero::before {
   content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(to bottom, rgba(251, 248, 241, 0.82), rgba(251, 248, 241, 0.55) 45%, rgba(251, 248, 241, 0) 75%);
+  background: linear-gradient(to bottom, rgba(251, 248, 241, 0.7), rgba(251, 248, 241, 0.45) 40%, rgba(251, 248, 241, 0) 62%);
 }
 .hero-text {
   position: relative;
@@ -288,16 +288,21 @@ html.paged .fade.shown { opacity: 1; }
 }
 .hero-eyebrow { font-size: 0.8rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ink); }
 .hero-title {
-  font-family: "Great Vibes", var(--script);
+  font-family: var(--script);
   font-size: clamp(2.6rem, 11vw, 6.6rem);
   line-height: 1.15;
   white-space: nowrap;
   color: var(--cobalt);
 }
-.hero-date { font-family: var(--display); font-size: clamp(1.5rem, 4.6vw, 2.2rem); letter-spacing: 0.04em; color: var(--ink); }
-.hero-family { font-family: var(--display); font-size: clamp(1.25rem, 3.4vw, 1.6rem); color: var(--ink); margin-top: 8px; }
-.hero-couple { font-size: var(--step-0); font-weight: 500; letter-spacing: 0.06em; color: var(--ink); margin-top: -6px; }
-.hero-place { font-size: var(--step--1); color: var(--ink); }
+.hero-date {
+  font-family: var(--display); font-weight: 600;
+  font-size: clamp(1.45rem, 4.4vw, 2.1rem);
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink);
+}
+.hero-date::after { content: ""; display: block; width: 56px; height: 1px; margin: 16px auto 4px; background: var(--lemon-deep); }
+.hero-family { font-family: var(--display); font-style: italic; font-weight: 500; font-size: clamp(1.5rem, 4vw, 1.9rem); line-height: 1.2; color: var(--cobalt); }
+.hero-couple { font-family: var(--display); font-weight: 500; font-size: clamp(1.2rem, 3.2vw, 1.4rem); color: var(--ink); }
+.hero-place { font-size: var(--step--1); color: var(--ink-soft); letter-spacing: 0.04em; }
 .scroll-cue {
   position: absolute; left: 50%; bottom: 20px; z-index: 2; transform: translateX(-50%);
   font-size: 0.72rem; font-weight: 500; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; color: var(--cobalt);
@@ -407,6 +412,11 @@ html.paged .fade.shown { opacity: 1; }
 .has-choice .feel[aria-checked="false"]:hover { opacity: 1; }
 .send { margin-top: 10px; }
 .switch { text-align: center; }
+/* A better address for the invitation */
+.address-panel { max-width: 560px; margin: 0 auto; display: grid; gap: 10px; text-align: center; }
+.address-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px 12px; margin-bottom: 8px; }
+.address-grid .span-2 { grid-column: 1 / -1; }
+.optional { font-weight: 400; color: var(--ink-soft); }
 .feel-status { min-height: 1.6em; margin-top: 10px; font-family: var(--display); font-style: italic; font-size: var(--step-1); color: var(--ink); }
 
 /* Schedule (hidden for now) */
@@ -464,6 +474,8 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 .footer-names { font-family: var(--display); font-style: italic; font-size: var(--step-2); color: var(--cobalt); }
 
 @media (max-width: 760px) {
+  .hero-bg { object-position: 84% 50%; }
+  .page-hero::before { background: linear-gradient(to bottom, rgba(251, 248, 241, 0.75), rgba(251, 248, 241, 0.7) 55%, rgba(251, 248, 241, 0) 78%); }
   .arch-sprig { width: 150px; height: 106px; left: -50px; bottom: -30px; }
   .gallery { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .gallery .g-main { grid-column: 1 / -1; grid-row: auto; }

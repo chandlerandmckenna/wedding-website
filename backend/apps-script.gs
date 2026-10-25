@@ -3,7 +3,7 @@
  * bound to a Google Sheet.
  *
  * Sheet "Guests" (row 1 is headers):
- *   Phone | Name | Email | Group | Feeling | Updated
+ *   Phone | Name | Email | Group | Feeling | Updated | Street | Apt | City | State | ZIP | Country
  *   Phone is digits only with country code, e.g. 19259636950.
  *   Guests can sign in with either their phone or their email.
  *   Group is optional, e.g. "party" for the wedding party and families.
@@ -17,7 +17,8 @@
  * Put the web app URL in WEDDING.apiEndpoint in assets/js/site.js.
  */
 
-var COLS = { phone: 0, name: 1, email: 2, group: 3, feeling: 4, updated: 5 };
+var COLS = { phone: 0, name: 1, email: 2, group: 3, feeling: 4, updated: 5, address: 6 };
+var ADDRESS = ["line1", "line2", "city", "state", "zip", "country"];
 var FEELINGS = { yes: true, maybe: true, no: true };
 
 function doPost(e) {
@@ -34,6 +35,7 @@ function doPost(e) {
     if (req.action === "lookup") return json(lookup(id));
     if (req.action === "register") return json(register(id, req));
     if (req.action === "reply") return json(reply(id, req.feeling));
+    if (req.action === "address") return json(saveAddress(id, req.address));
     return json({ error: "unknown action" });
   } finally {
     lock.releaseLock();
@@ -63,6 +65,7 @@ function lookup(id) {
     name: r[COLS.name],
     email: r[COLS.email],
     feeling: r[COLS.feeling] || "",
+    address: readAddress(r),
     privateEvents: privateEvents(r[COLS.group])
   };
 }
@@ -87,6 +90,22 @@ function reply(id, feeling) {
   var hit = findRow(id);
   if (!hit) return { error: "not found" };
   guests().getRange(hit.index, COLS.feeling + 1, 1, 2).setValues([[feeling, new Date()]]);
+  return { ok: true };
+}
+
+function readAddress(r) {
+  var a = {}, any = false;
+  ADDRESS.forEach(function (k, i) { a[k] = String(r[COLS.address + i] || ""); if (a[k]) any = true; });
+  return any ? a : null;
+}
+
+function saveAddress(id, address) {
+  if (!address || !address.line1) return { error: "address required" };
+  var hit = findRow(id);
+  if (!hit) return { error: "not found" };
+  var values = ADDRESS.map(function (k) { return String(address[k] || "").slice(0, 200); });
+  guests().getRange(hit.index, COLS.address + 1, 1, ADDRESS.length).setValues([values]);
+  guests().getRange(hit.index, COLS.updated + 1).setValue(new Date());
   return { ok: true };
 }
 

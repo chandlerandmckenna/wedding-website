@@ -124,6 +124,14 @@ window.PAGES = [
       var g = demo.find(guest);
       if (g) { g.feeling = feeling; demo.put(g); }
       return Promise.resolve({ ok: true });
+    },
+    // address is { line1, line2, city, state, zip, country }
+    address: function (guest, address) {
+      var p = call("address", { phone: guest.phone, email: guest.email, address: address });
+      if (p) return p;
+      var g = demo.find(guest);
+      if (g) { g.address = address; demo.put(g); }
+      return Promise.resolve({ ok: true });
     }
   };
 })();

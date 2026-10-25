@@ -8,7 +8,7 @@
 <meta name="description" content="Save the date: McKenna and Chandler are getting married in Sorrento, Italy, on October 1, 2027.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&family=Great+Vibes&family=Italianno&family=Jost:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Jost:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -65,9 +65,9 @@
   <header id="site-header" class="site-header"></header>
 
   <main>
-    <!-- The title page: a watercolor of the view from Capo Santa Fortunata. -->
+    <!-- The title page: a watercolor of an Amalfi Coast village. -->
     <section class="page-hero fade" id="top">
-      <img class="hero-bg" src="assets/img/hero-bay.jpg" alt="" width="1600" height="1046">
+      <img class="hero-bg" src="assets/img/hero-amalfi.jpg" alt="" width="1800" height="960">
       <div class="hero-text">
         <p class="hero-eyebrow">Save the date</p>
         <h1 class="hero-title">Meet Us in Sorrento</h1>
@@ -156,6 +156,44 @@
           <button class="button wide send" type="button" id="feel-send" disabled>Send my answer</button>
           <p class="feel-status" id="feel-status" role="status"></p>
         </div>
+      </div>
+    </section>
+
+    <section class="page page-address fade" id="address">
+      <div class="wrap">
+        <form class="address-panel" id="address-form" novalidate>
+          <p class="script">Per posta</p>
+          <h2>Got a better place for us to send an RSVP?</h2>
+          <p class="feel-sub">Leave the address where you'd like your formal invitation and RSVP card to arrive.</p>
+          <div class="address-grid">
+            <div class="field span-2">
+              <label for="addr-line1">Street address</label>
+              <input type="text" id="addr-line1" name="line1" autocomplete="address-line1">
+            </div>
+            <div class="field span-2">
+              <label for="addr-line2">Apartment, suite, etc. <span class="optional">(optional)</span></label>
+              <input type="text" id="addr-line2" name="line2" autocomplete="address-line2">
+            </div>
+            <div class="field span-2">
+              <label for="addr-city">City</label>
+              <input type="text" id="addr-city" name="city" autocomplete="address-level2">
+            </div>
+            <div class="field">
+              <label for="addr-state">State</label>
+              <input type="text" id="addr-state" name="state" autocomplete="address-level1">
+            </div>
+            <div class="field">
+              <label for="addr-zip">ZIP code</label>
+              <input type="text" id="addr-zip" name="zip" inputmode="numeric" autocomplete="postal-code">
+            </div>
+            <div class="field span-2">
+              <label for="addr-country">Country</label>
+              <input type="text" id="addr-country" name="country" autocomplete="country-name" value="United States">
+            </div>
+          </div>
+          <button class="button wide" type="submit" id="address-send">Save my address</button>
+          <p class="feel-status" id="address-status" role="status"></p>
+        </form>
       </div>
     </section>
   </main>

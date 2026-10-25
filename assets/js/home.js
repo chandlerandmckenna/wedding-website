@@ -1,5 +1,6 @@
 /* Home page: sign-in on the cover (phone, or email as a fallback), the
-   cover lifting away, and the "Have a gut feeling?" answer. */
+   cover lifting away, the "Have a gut feeling?" answer and the guest's
+   mailing address. */
 (function () {
   var cover = document.getElementById("cover");
   var book = document.getElementById("book");
@@ -144,6 +145,7 @@
     window.renderHeader();
     window.renderSchedule();
     setupFeelings(guest);
+    fillAddress(guest);
     book.hidden = false;
     var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!animate || reduce) {
@@ -225,6 +227,42 @@
       statusEl.textContent = "We couldn't send that. Please try again.";
       refreshSend();
     });
+  });
+
+  /* ---------- A better address for the invitation ---------- */
+  var addressForm = document.getElementById("address-form");
+  var addressStatus = document.getElementById("address-status");
+  var ADDRESS_FIELDS = ["line1", "line2", "city", "state", "zip", "country"];
+
+  function fillAddress(guest) {
+    var a = guest.address || {};
+    ADDRESS_FIELDS.forEach(function (k) {
+      var el = addressForm.elements[k];
+      if (a[k]) el.value = a[k];
+    });
+    addressStatus.textContent = guest.address ? "We have your address. Update it here any time." : "";
+  }
+
+  addressForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var a = {};
+    ADDRESS_FIELDS.forEach(function (k) { a[k] = addressForm.elements[k].value.trim(); });
+    var missing = ["line1", "city", "country"].filter(function (k) { return !a[k]; })[0];
+    if (missing) {
+      addressStatus.textContent = "Please add your " + { line1: "street address", city: "city", country: "country" }[missing] + ".";
+      addressForm.elements[missing].focus();
+      return;
+    }
+    var guest = window.Guest.current();
+    var btn = document.getElementById("address-send");
+    busy(btn, true);
+    window.GuestAPI.address(guest, a).then(function () {
+      guest.address = a;
+      window.Guest.save(guest);
+      addressStatus.textContent = "Grazie! Your invitation will be sent there.";
+    }).catch(function () {
+      addressStatus.textContent = "We couldn't save that. Please try again.";
+    }).then(function () { busy(btn, false, "Save my address"); });
   });
 
   // Returning guests skip the cover.
