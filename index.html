@@ -14,17 +14,19 @@
 <body>
 <script src="assets/js/art.js"></script>
 
-<!-- The cover: guests sign in with their phone number to open the book. -->
+<!-- The cover: a painted save-the-date. Guests sign in with their phone number to open the book. -->
 <section class="cover" id="cover">
-  <svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>
+  <svg class="cover-lemons" aria-hidden="true" focusable="false"><use href="#lemon-branch"/></svg>
+  <svg class="cover-olives" aria-hidden="true" focusable="false"><use href="#olive-branch"/></svg>
   <div class="cover-inner" id="cover-inner">
     <div class="cover-card">
-      <svg class="sprig cover-sprig" aria-hidden="true" focusable="false"><use href="#sprig"/></svg>
-      <div class="plane-banner" aria-hidden="true"><span class="banner">save the date</span><svg class="plane"><use href="#plane"/></svg></div>
-      <p class="sr-only">Save the date</p>
-      <h1 class="cover-names"><span>McKenna</span><span class="amp">&amp;</span><span>Chandler</span></h1>
-      <p class="cover-date">10 · 1 · 27</p>
-      <p class="cover-place">Capo Santa Fortunata · Sorrento, Italia</p>
+      <div class="wreath-mark" aria-hidden="true"><svg><use href="#wreath"/></svg><span>M<i>&amp;</i>C</span></div>
+      <p class="cover-eyebrow">Save the date</p>
+      <h1 class="cover-title">Meet us <span class="in">in</span> <span class="town">Sorrento</span></h1>
+      <p class="cover-date">October 1, 2027</p>
+      <p class="cover-family">The Queenans</p>
+      <p class="cover-couple">M<span class="lc">c</span>Kenna &amp; Chandler</p>
+      <p class="cover-place">Capo Santa Fortunata · Sorrento, Italy</p>
 
       <form class="cover-form" id="signin-form" novalidate>
         <div id="phone-mode">
@@ -63,7 +65,10 @@
       <p class="hint preview-note" id="preview-note" hidden>Preview: any number or email works, and sign-ins stay in this browser.</p>
     </div>
   </div>
-  <svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>
+  <div class="cover-scene" aria-hidden="true">
+    <img src="assets/img/cover-bay.webp" alt="" width="1400" height="747">
+    <svg class="lace"><rect width="100%" height="100%" fill="url(#laceP)"/></svg>
+  </div>
 </section>
 
 <div class="book" id="book" hidden>

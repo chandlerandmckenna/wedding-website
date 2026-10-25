@@ -1,6 +1,6 @@
 /* Layout: a hand-painted wedding book on ivory paper. One background
-   throughout; colour arrives as watercolor: painted majolica tile bands,
-   a little biplane and lemon sprigs. Each section folds down
+   throughout; colour arrives as watercolor: lemon and olive branches,
+   a painted view of the bay, majolica tile bands and lemon sprigs. Each section folds down
    from its top edge as you scroll, like flipping to the next page.
    Deliberately a single light look, like a printed invitation. */
 :root {
@@ -80,26 +80,6 @@ p, figure { margin: 0; }
 .sprig { position: absolute; pointer-events: none; overflow: visible; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* a little watercolor biplane towing the "save the date" banner */
-.plane-banner { display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
-.plane { width: 74px; height: 46px; overflow: visible; }
-.banner {
-  position: relative;
-  font-family: var(--display); font-style: italic; font-size: 1.05rem; line-height: 1;
-  color: var(--cobalt);
-  background: #fffdf8;
-  border: 1px solid var(--cobalt);
-  padding: 6px 14px 7px 20px;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 10px 50%);
-  margin-right: 18px;
-}
-.banner::after { /* the tow line */
-  content: ""; position: absolute; right: -19px; top: 50%; width: 18px; border-top: 1px solid var(--ink-soft);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .plane-banner { animation: drift 5s ease-in-out infinite; }
-  @keyframes drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px) rotate(-1deg); } }
-}
 .swash { position: absolute; left: 50%; bottom: 4px; width: 120px; height: 18px; margin-left: -60px; overflow: visible; }
 
 /* ---------- Buttons and fields ---------- */
@@ -148,40 +128,83 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   position: fixed;
   inset: 0;
   z-index: 30;
+  overflow-x: hidden;
   overflow-y: auto;
   background: inherit;
   background-color: var(--ivory);
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 1fr auto;
   padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
   transform-origin: 50% 0;
 }
+/* lemons hang in from the top left, olives from the grove at the top right */
+.cover-lemons, .cover-olives { position: absolute; top: 0; pointer-events: none; overflow: visible; }
+.cover-lemons { left: 0; width: clamp(150px, 25vw, 330px); aspect-ratio: 340 / 460; }
+.cover-olives { right: 0; width: clamp(130px, 24vw, 320px); aspect-ratio: 340 / 460; }
 .cover-inner {
+  position: relative;
+  z-index: 1;
   display: grid;
   place-items: center;
-  padding-block: 32px;
+  padding-block: 24px 0;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .cover-card {
-  position: relative;
-  width: min(100%, 440px);
+  width: min(100%, 520px);
   display: grid;
-  gap: 12px;
+  justify-items: center;
+  gap: 6px;
   text-align: center;
-  padding: 40px 28px 30px;
-  border: 1px solid var(--cobalt);
-  outline: 1px solid var(--cobalt);
-  outline-offset: 6px;
-  background: rgba(255, 253, 248, 0.6);
 }
-.cover-card > :not(.sprig) { position: relative; z-index: 1; }
-.cover-sprig { width: 170px; height: 120px; right: -48px; top: -46px; z-index: 2; }
-.cover-names { font-size: clamp(2.7rem, 10vw, 3.7rem); font-style: italic; color: var(--cobalt); display: grid; line-height: 1.02; }
-.cover-names .amp, .hero h1 .amp { font-family: var(--script); font-style: normal; color: var(--lemon-deep); font-size: 0.85em; line-height: 0.9; }
-.cover-date { font-family: var(--display); font-size: var(--step-2); letter-spacing: 0.1em; }
-.cover-place { color: var(--ink-soft); font-size: var(--step--1); letter-spacing: 0.08em; }
+.cover-card > * { width: 100%; }
+.wreath-mark { position: relative; width: 64px; height: 64px; display: grid; place-items: center; margin-bottom: 6px; }
+.wreath-mark svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.wreath-mark span { font-family: var(--display); font-size: 0.9rem; letter-spacing: 0.04em; color: var(--cobalt); }
+.wreath-mark i { font-family: var(--script); font-style: normal; color: var(--lemon-deep); font-size: 1.2em; margin-inline: 1px; }
+.cover-eyebrow { font-size: 0.78rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--olive); }
+.cover-title {
+  display: grid;
+  font-size: clamp(2.5rem, min(10.5vw, 8.4vh), 3.9rem);
+  line-height: 1.02;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cobalt);
+  margin-block: 6px 4px;
+}
+.cover-title .in { font-style: italic; text-transform: none; letter-spacing: 0; font-size: 0.5em; color: var(--lemon-deep); line-height: 1.2; }
+.cover-title .town { font-size: 1.12em; letter-spacing: 0.1em; }
+.cover-date {
+  font-family: var(--display);
+  font-size: clamp(1.45rem, 5.6vw, 2.15rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  padding-block: 8px 2px;
+}
+.cover-date::before, .cover-date::after { content: ""; display: inline-block; width: 28px; border-top: 1px solid var(--lemon-deep); vertical-align: middle; margin: 0 14px 0.2em; opacity: 0.7; }
+.cover-family { font-family: var(--script); font-size: clamp(2.6rem, 10vw, 3.4rem); line-height: 1; color: var(--lemon-deep); margin-top: 10px; }
+.cover-couple { font-family: var(--display); font-size: 0.95rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--cobalt); }
+.cover-couple .lc { text-transform: none; letter-spacing: 0.12em; }
+.cover-place { color: var(--ink-soft); font-size: var(--step--1); letter-spacing: 0.08em; margin-top: 2px; }
+.cover-card .cover-form { width: min(100%, 420px); margin-top: 12px; }
+.hero h1 .amp { font-family: var(--script); font-style: normal; color: var(--lemon-deep); font-size: 0.85em; line-height: 0.9; }
+/* the view from the villa's garden, across the bay to the Sorrento cliffs */
+.cover-scene { position: relative; margin-top: -56px; pointer-events: none; }
+.cover-scene img {
+  display: block;
+  width: min(100%, 1100px);
+  height: clamp(180px, 30vh, 320px);
+  margin-inline: auto;
+  object-fit: cover;
+  object-position: 50% 15%;
+  /* keep the painted edges soft however the view is cropped */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28%), linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, #000 28%), linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  mask-composite: intersect;
+}
+.lace { display: block; width: 100%; height: 16px; margin-bottom: env(safe-area-inset-bottom, 0px); }
 .cover-form { display: grid; gap: 12px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--line); text-align: left; }
 .cover-form .script, .cover-form .hint { text-align: center; }
 .inline-field { display: flex; gap: 8px; }
@@ -454,7 +477,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
   .hero { grid-template-columns: minmax(0, 1fr); }
   .arch-wrap { width: min(86%, 320px); margin-top: 12px; }
   .arch-sprig { width: 150px; height: 106px; left: -50px; bottom: -30px; }
-  .cover-sprig { width: 130px; height: 92px; right: -20px; top: -40px; }
+  .cover-inner { padding-top: 92px; }
   .gallery { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .gallery .g-main { grid-column: 1 / -1; grid-row: auto; }
   .gallery .g-main img { aspect-ratio: 4 / 3; }
