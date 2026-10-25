@@ -8,7 +8,7 @@
 <meta name="description" content="Save the date: McKenna and Chandler are getting married in Sorrento, Italy, on October 1, 2027.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Jost:wght@400;500;600&family=Playfair+Display:ital,wght@0,400..800;1,400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Playfair+Display:ital,wght@0,400..800;1,400..700&display=swap">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -16,11 +16,14 @@
 
 <!-- The cover: a simple sign-in. Guests enter their phone number to open the book. -->
 <section class="cover" id="cover">
+  <svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>
+  <svg class="cover-lemons" aria-hidden="true" focusable="false"><use href="#lemon-branch"/></svg>
+  <svg class="cover-lemons cover-lemons-right" aria-hidden="true" focusable="false"><use href="#lemon-branch"/></svg>
   <div class="cover-inner" id="cover-inner">
     <div class="cover-card">
-      <p class="cover-eyebrow">Save the date</p>
+      <p class="cover-eyebrow">Save the Date</p>
       <h1 class="cover-names">McKenna <span class="amp">&amp;</span> Chandler</h1>
-      <p class="cover-date">October 1, 2027 · Sorrento, Italy</p>
+      <p class="cover-date"><span>10</span><i>·</i><span>1</span><i>·</i><span>2027</span></p>
 
       <form class="cover-form" id="signin-form" novalidate>
         <div id="phone-mode">
@@ -59,6 +62,7 @@
       <p class="hint preview-note" id="preview-note" hidden>Preview: any number or email works, and sign-ins stay in this browser.</p>
     </div>
   </div>
+  <svg class="tile-band" aria-hidden="true" focusable="false"><rect width="100%" height="100%" fill="url(#tileP)" filter="url(#wc)"/></svg>
 </section>
 
 <div class="book" id="book" hidden>
@@ -71,11 +75,10 @@
       <svg class="hero-lemons" aria-hidden="true" focusable="false"><use href="#lemon-branch"/></svg>
       <svg class="hero-lemons hero-lemons-right" aria-hidden="true" focusable="false"><use href="#lemon-branch"/></svg>
       <div class="hero-text">
-        <h1 class="hero-title">Meet Us in Sorrento</h1>
+        <h1 class="hero-title">Meet Us in Italy</h1>
         <p class="hero-date">October 1, 2027</p>
         <p class="hero-place">Sorrento, Italy</p>
         <p class="hero-family">The Queenans</p>
-        <p class="hero-couple">McKenna &amp; Chandler</p>
         <p class="countdown" id="countdown"></p>
       </div>
     </section>
@@ -112,12 +115,12 @@
         <div class="section-head center">
           <p class="eyebrow">The venue</p>
           <h2>Capo Santa Fortunata</h2>
-          <p>A pink villa in an old olive grove on the cliffs just outside Sorrento, looking out over the Bay of Naples to Vesuvius.</p>
+          <p>A historic villa on the cliffs of the Amalfi Coast in Sorrento, looking out over the Bay of Naples &amp; Capri.</p>
         </div>
         <div class="gallery">
-          <figure class="g-main"><img src="assets/img/venue-garden.jpg" alt="Dinner tables set among olive trees at sunset, with the Sorrento coastline and the sea behind" width="1200" height="1598" loading="lazy"><figcaption>Dinner under the olive trees</figcaption></figure>
-          <figure><img src="assets/img/venue-aerial.jpg" alt="Aerial view of the villa among pine trees above the sea" width="480" height="638" loading="lazy"><figcaption>Above the bay</figcaption></figure>
-          <figure><img src="assets/img/venue-villa.jpg" alt="The villa's façade covered in bougainvillea" width="480" height="638" loading="lazy"><figcaption>La villa</figcaption></figure>
+          <figure class="g-main"><img src="assets/img/venue-villa.jpg" alt="The villa's façade covered in climbing flowers" width="480" height="638" loading="lazy"></figure>
+          <figure><img src="assets/img/venue-garden.jpg" alt="Dinner tables set among olive trees at sunset, with the Sorrento coastline and the sea behind" width="1200" height="1598" loading="lazy"></figure>
+          <figure><img src="assets/img/venue-aerial.jpg" alt="Aerial view of the villa among pine trees above the sea" width="480" height="638" loading="lazy"></figure>
         </div>
       </div>
     </section>

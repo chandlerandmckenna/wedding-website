@@ -202,7 +202,7 @@ window.PAGES = [
     var el = document.getElementById("countdown");
     if (!el) return;
     var days = Math.ceil((new Date(W.dateISO) - new Date()) / 86400000);
-    if (days > 1) el.innerHTML = '<span class="count-num">' + days + '</span> days to go';
+    if (days > 1) el.innerHTML = '<span class="count-num">' + days + '</span> Days to go';
     else if (days === 1) el.textContent = "Tomorrow!";
     else if (days === 0) el.textContent = "Today is the day";
     else el.textContent = "Grazie for celebrating with us";

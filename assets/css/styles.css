@@ -22,7 +22,7 @@
 
   --display: "Playfair Display", "Didot", Georgia, serif;
   --body: "Jost", "Futura", "Avenir Next", system-ui, sans-serif;
-  --script: "Great Vibes", "Snell Roundhand", "Apple Chancery", cursive;
+  --script: var(--display); /* used in italic for flourishes; two fonts in all */
 
   --step--1: 0.875rem;
   --step-0: 1.0625rem;
@@ -70,7 +70,7 @@ p, figure { margin: 0; }
   color: var(--cobalt);
   font-weight: 500;
 }
-.script { font-family: var(--script); font-size: clamp(2rem, 5vw, 2.6rem); line-height: 1.1; color: var(--lemon-deep); }
+.script { font-family: var(--script); font-style: italic; font-weight: 500; font-size: clamp(1.6rem, 4vw, 2.1rem); line-height: 1.15; color: var(--lemon-deep); }
 .hint { font-size: var(--step--1); color: var(--ink-soft); }
 .soft { color: var(--ink-soft); }
 .error { color: #a4312a; font-size: var(--step--1); font-weight: 500; }
@@ -133,6 +133,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   background: inherit;
   background-color: var(--ivory);
   display: grid;
+  grid-template-rows: auto 1fr auto;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   transform-origin: 50% 0;
@@ -154,10 +155,18 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   text-align: center;
 }
 .cover-card > * { width: 100%; }
-.cover-eyebrow { font-size: 0.78rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--olive); }
-.cover-names { font-size: clamp(2.3rem, 9vw, 3.2rem); font-style: italic; color: var(--cobalt); margin-top: 4px; }
-.cover-names .amp { font-family: var(--script); font-style: normal; color: var(--lemon-deep); font-size: 0.9em; }
-.cover-date { font-family: var(--display); font-size: var(--step-1); color: var(--ink); }
+.cover-eyebrow {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  font-family: var(--display); font-style: italic; font-size: clamp(1.3rem, 4vw, 1.6rem); color: var(--lemon-deep);
+}
+.cover-eyebrow::before, .cover-eyebrow::after { content: ""; width: 40px; height: 1px; background: currentColor; opacity: 0.6; }
+.cover-names { font-family: var(--display); font-weight: 600; font-size: clamp(2.5rem, 10vw, 3.8rem); line-height: 1.05; color: var(--cobalt); margin-top: 6px; }
+.cover-names .amp { font-style: italic; font-weight: 400; color: var(--lemon-deep); }
+.cover-date { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 8px; font-family: var(--display); font-weight: 600; font-size: clamp(1.4rem, 5vw, 1.8rem); letter-spacing: 0.06em; color: var(--ink); font-variant-numeric: lining-nums; }
+.cover-date i { font-style: normal; color: var(--lemon-deep); font-size: 1.3em; line-height: 1; }
+/* lemons hang into the corners of the sign-in page */
+.cover-lemons { position: absolute; top: 22px; left: -8px; width: clamp(120px, 20vw, 260px); aspect-ratio: 340 / 460; overflow: visible; pointer-events: none; }
+.cover-lemons-right { left: auto; right: -8px; transform: scaleX(-1); }
 .cover-card .cover-form { width: min(100%, 420px); margin-top: 12px; }
 .cover-form { display: grid; gap: 12px; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--line); text-align: left; }
 .cover-form .script, .cover-form .hint { text-align: center; }
@@ -295,10 +304,11 @@ html.paged .fade.shown { opacity: 1; }
   background: radial-gradient(closest-side, rgba(251, 248, 241, 0.82), rgba(251, 248, 241, 0.6) 55%, rgba(251, 248, 241, 0));
 }
 .hero-title {
-  font-family: var(--script);
-  font-weight: 400;
-  font-size: clamp(2.7rem, 11.5vw, 7rem);
-  line-height: 1.1;
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(2.6rem, 9.5vw, 5.8rem);
+  line-height: 1.05;
   white-space: nowrap;
   color: var(--cobalt);
 }
@@ -310,6 +320,7 @@ html.paged .fade.shown { opacity: 1; }
   color: var(--ink);
 }
 .hero-place {
+  margin-top: 14px;
   display: flex; align-items: center; gap: 14px;
   font-size: clamp(0.95rem, 2.6vw, 1.15rem); font-weight: 600;
   letter-spacing: 0.3em; text-transform: uppercase;
@@ -317,8 +328,7 @@ html.paged .fade.shown { opacity: 1; }
   padding-left: 0.3em; /* balances the trailing letter-spacing */
 }
 .hero-place::before, .hero-place::after { content: ""; width: 34px; height: 2px; background: var(--lemon); border-radius: 2px; }
-.hero-family { font-family: var(--display); font-style: italic; font-weight: 500; font-size: clamp(1.45rem, 4vw, 1.9rem); line-height: 1.2; color: var(--cobalt); margin-top: 18px; }
-.hero-couple { font-size: clamp(1.05rem, 3vw, 1.2rem); font-weight: 500; color: var(--ink); }
+.hero-family { font-family: var(--display); font-style: italic; font-weight: 500; font-size: clamp(1.6rem, 4.4vw, 2.1rem); line-height: 1.2; color: var(--cobalt); margin-top: 18px; }
 .countdown { color: var(--ink); margin-top: 6px; }
 .count-num { font-family: var(--display); font-size: var(--step-2); color: var(--cobalt); margin-right: 4px; font-variant-numeric: tabular-nums; }
 .arch-wrap { position: relative; justify-self: center; width: min(78%, 340px); margin-bottom: 20px; }
@@ -374,7 +384,6 @@ html.paged .fade.shown { opacity: 1; }
   .gallery .g-main { grid-row: auto; }
   .gallery .g-main img, .gallery figure:not(.g-main) img { aspect-ratio: auto; height: min(50vh, 440px); }
 }
-.gallery figcaption { font-family: var(--display); font-style: italic; font-size: var(--step--1); color: var(--ink-soft); }
 
 /* Gut feeling */
 .feel-panel {
