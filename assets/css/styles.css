@@ -363,26 +363,22 @@ html.paged .fade.shown { opacity: 1; }
 .date-rule { width: 1px; height: 120px; background: var(--line); }
 
 /* Venue */
+/* two portraits either side of the landscape star, all the same height */
 .gallery {
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
-  grid-template-rows: auto auto;
-  gap: 20px 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
 }
-.gallery figure { display: grid; gap: 8px; min-width: 0; }
-.gallery img { width: 100%; height: 100%; min-height: 0; object-fit: cover; display: block; }
-.gallery .g-main { grid-row: span 2; grid-template-rows: 1fr auto; }
-.gallery .g-main img { aspect-ratio: 4 / 5; }
-.gallery figure:not(.g-main) { grid-template-rows: 1fr auto; }
-.gallery figure:not(.g-main) img { aspect-ratio: 4 / 3; }
+.gallery figure { min-width: 0; }
+.gallery img { width: 100%; height: auto; object-fit: cover; display: block; aspect-ratio: 3 / 4; }
+.gallery .g-main img { aspect-ratio: 3 / 2; object-position: 50% 62%; }
 /* on wide screens the photo sits beside the story and the venue photos line
    up in one row, so each section fits on one screen */
 @media (min-width: 900px) {
   .story { grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr); column-gap: clamp(40px, 6vw, 88px); align-items: center; }
   .story .arch-wrap { grid-row: 1 / span 4; width: min(100%, 320px); margin-bottom: 0; }
-  .gallery { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto; }
-  .gallery .g-main { grid-row: auto; }
-  .gallery .g-main img, .gallery figure:not(.g-main) img { aspect-ratio: auto; height: min(50vh, 440px); }
+  .gallery { width: min(100%, calc(66vh * 2)); margin-inline: auto; } /* keeps the row on one screen */
 }
 
 /* Gut feeling */
@@ -499,10 +495,9 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
   .hero-bg { object-position: 72% 40%; }
   .page-hero { padding-top: clamp(120px, 20vh, 170px); }
   .arch-sprig { width: 150px; height: 106px; left: -50px; bottom: -30px; }
-  .gallery { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .gallery .g-main { grid-column: 1 / -1; grid-row: auto; }
-  .gallery .g-main img { aspect-ratio: 4 / 3; }
-  .gallery figure:not(.g-main) img { aspect-ratio: 3 / 4; }
+  /* on phones the star leads, full width, with the two portraits below */
+  .gallery { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .gallery .g-main { grid-column: 1 / -1; order: -1; }
   .date-rule { display: none; }
   .reply-sprig { width: 110px; height: 78px; right: -10px; top: -50px; }
 }
