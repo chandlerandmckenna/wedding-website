@@ -277,9 +277,9 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   position: absolute; inset: 0;
   width: 100%; height: 100%; max-width: none;
   object-fit: cover;
-  object-position: 55% 44%;
-  -webkit-mask-image: linear-gradient(to bottom, #000 86%, transparent);
-  mask-image: linear-gradient(to bottom, #000 86%, transparent);
+  object-position: 50% 72%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 90%, transparent);
+  mask-image: linear-gradient(to bottom, #000 90%, transparent);
 }
 .hero-lemons {
   position: absolute; top: -10px; left: -8px; z-index: 1;
@@ -301,7 +301,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 /* a soft pool of light behind the words, so they read on any part of the painting */
 .hero-text::before {
   content: ""; position: absolute; inset: -18% -14%; z-index: -1;
-  background: radial-gradient(closest-side, rgba(251, 248, 241, 0.82), rgba(251, 248, 241, 0.6) 55%, rgba(251, 248, 241, 0));
+  background: radial-gradient(closest-side, rgba(251, 248, 241, 0.55), rgba(251, 248, 241, 0.3) 60%, rgba(251, 248, 241, 0));
 }
 .hero-title {
   font-family: var(--display);
@@ -498,7 +498,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 .footer-names { font-family: var(--display); font-style: italic; font-size: var(--step-2); color: var(--cobalt); }
 
 @media (max-width: 760px) {
-  .hero-bg { object-position: 86% 40%; }
+  .hero-bg { object-position: 76% 60%; }
   .page-hero { padding-top: clamp(120px, 20vh, 170px); }
   .arch-sprig { width: 150px; height: 106px; left: -50px; bottom: -30px; }
   /* on phones the three portraits stay in a row, a little closer together */
