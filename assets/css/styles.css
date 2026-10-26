@@ -367,11 +367,12 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .hero-date .swash { width: 88%; height: 20px; left: 6%; margin-left: 0; bottom: 0; }
 .hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.25rem, 3.6vw, 1.6rem); color: var(--gold); text-shadow: 0 1px 3px rgba(255, 250, 240, 0.9); font-variant-numeric: lining-nums; }
 .hero-family {
-  margin-top: 10px;
-  font-family: var(--script); font-weight: 400;
-  font-size: clamp(2.4rem, 7.5vw, 3.8rem);
-  line-height: 1.1;
-  color: var(--cobalt);   /* same blue as "Sì, lo voglio" */
+  margin-top: 14px;
+  font-family: var(--body); font-weight: 500;   /* same spaced capitals as SORRENTO · ITALY, set larger */
+  font-size: clamp(1.4rem, 4.2vw, 2.1rem);
+  letter-spacing: 0.24em; padding-left: 0.24em; text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--cobalt);
 }
 .arch-wrap { position: relative; justify-self: center; width: min(86%, 380px); margin-bottom: 20px; }
 .arch {
@@ -805,7 +806,7 @@ html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
 .footer-sail .sail { animation: bob 4s ease-in-out infinite; transform-origin: 110px 30px; }
 @keyframes bob { 50% { transform: translateY(-2px) rotate(-3deg); } }
 .footer-inner > .script { font-size: clamp(1.4rem, 3vw, 1.75rem); color: var(--ink-soft); }
-.footer-names { font-family: var(--body); font-weight: 500; font-size: clamp(1.4rem, 4.2vw, 2rem); letter-spacing: 0.24em; padding-left: 0.24em; text-transform: uppercase; line-height: 1.2; margin-block: 6px 4px; color: var(--cobalt); }
+.footer-names { font-family: var(--script); font-size: clamp(2.8rem, 7vw, 3.8rem); line-height: 1.1; color: var(--cobalt); }
 
 @media (max-width: 760px) {
   /* the title page fills the phone screen; the next section fades in below */
