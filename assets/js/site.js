@@ -239,10 +239,6 @@ window.PAGES = [
     section.hidden = false;
   }
 
-  // Page flips: each .flip section folds down from its top edge as it
-  // scrolls in. Browsers with scroll-driven animations do this in CSS, tied
-  // to the scroll; others get the same flip once, when the section arrives.
-  // Sections already on screen stay put.
   // Each section fills the screen; scrolling settles on the next one, which
   // fades in as the one before fades out.
   window.setupPageFades = function (root) {
