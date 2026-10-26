@@ -204,7 +204,7 @@ window.PAGES = [
       '<path d="M107 8V25L97 25Z" fill="#fff" stroke="#1d3fbd" stroke-width="1.6" stroke-linejoin="round"/>' +
       '<path d="M94 26H128L123 31H99Z" fill="#1d3fbd"/></g></svg>' +
       '<p class="script">Ci vediamo a Sorrento!</p>' +
-      '<p class="footer-names">' + W.coupleA + " &amp; " + W.coupleB + "</p>" +
+      '<p class="footer-names">The Queenans</p>' +
       "<p>" + W.dateLabel + " · " + W.venue + ", " + W.town + "</p>" +
       "</div>" +
       '<div class="tile-band" aria-hidden="true"></div>';
