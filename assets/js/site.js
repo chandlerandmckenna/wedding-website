@@ -307,13 +307,32 @@ window.PAGES = [
       if (!best) return;
       var goal = Math.max(0, Math.min(best.y, html.scrollHeight - window.innerHeight));
       if (Math.abs(goal - y) < 3 || Math.abs(goal - y) > t.view * 0.6) return;
-      gliding = true;
-      window.scrollTo({ top: goal, behavior: "smooth" });
-      setTimeout(function () { gliding = false; }, 900);
+      glide(y, goal);
     }
-    function soon() { clearTimeout(timer); timer = setTimeout(settle, 180); }
+    // a slow, gentle ease into place; any wheel, touch or key lets go of it
+    function glide(from, to) {
+      var dist = Math.abs(to - from);
+      var ms = Math.min(1800, 900 + dist * 2.2);
+      var start = 0;
+      gliding = true;
+      html.style.scrollBehavior = "auto";   // step it ourselves, not the browser's quick smooth scroll
+      function ease(t) { return (1 - Math.cos(Math.PI * t)) / 2; }
+      function step(now) {
+        if (!gliding) { html.style.scrollBehavior = ""; return; }
+        if (!start) start = now;
+        var t = Math.min(1, (now - start) / ms);
+        window.scrollTo(0, from + (to - from) * ease(t));
+        if (t < 1) requestAnimationFrame(step);
+        else setTimeout(function () { gliding = false; html.style.scrollBehavior = ""; }, 60);
+      }
+      requestAnimationFrame(step);
+    }
+    function letGo() { gliding = false; clearTimeout(timer); }
+    function soon() { if (!gliding) { clearTimeout(timer); timer = setTimeout(settle, 450); } }
     window.addEventListener("scroll", soon, { passive: true });
-    window.addEventListener("touchstart", function () { touching = true; clearTimeout(timer); }, { passive: true });
+    window.addEventListener("wheel", function () { letGo(); soon(); }, { passive: true });
+    window.addEventListener("keydown", letGo);
+    window.addEventListener("touchstart", function () { touching = true; letGo(); }, { passive: true });
     window.addEventListener("touchend", function () { touching = false; soon(); }, { passive: true });
   }
 
