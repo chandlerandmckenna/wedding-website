@@ -222,6 +222,29 @@
         </form>
       </div>
     </section>
+
+    <section class="page page-notes stripes fade" id="notes">
+      <div class="wrap">
+        <form class="notes-card scallop" id="notes-form" novalidate>
+          <p class="eyebrow">Lascia un messaggio</p>
+          <h2 class="script">Notes for the couple</h2>
+          <p class="lede">Advice, well wishes, song requests, your favorite spot in Sorrento, a dance move you expect to see… Anything goes, and you can leave as many as you like.</p>
+          <div class="note-kinds" role="group" aria-label="What kind of note?">
+            <button type="button" aria-pressed="false" data-kind="Advice" data-hint="The best marriage advice you've ever heard…">Advice</button>
+            <button type="button" aria-pressed="false" data-kind="Well wishes" data-hint="A wish for the two of us…">Well wishes</button>
+            <button type="button" aria-pressed="false" data-kind="Song request" data-hint="The song that will get you on the dance floor…">Song requests</button>
+            <button type="button" aria-pressed="false" data-kind="Italy tip" data-hint="A restaurant, beach or gelato we have to try…">Italy tips</button>
+            <button type="button" aria-pressed="false" data-kind="Dance dare" data-hint="The dance move you dare us to pull off…">Dance dares</button>
+            <button type="button" aria-pressed="false" data-kind="Memory" data-hint="A favorite memory with us…">Memories</button>
+          </div>
+          <label class="sr-only" for="note-text">Your note</label>
+          <textarea id="note-text" name="note" maxlength="1500" placeholder="Write anything you like…"></textarea>
+          <button class="button" type="submit" id="note-send">Send my note</button>
+          <p class="feel-status" id="note-status" role="status"></p>
+          <svg class="bow" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#bow"/></svg>
+        </form>
+      </div>
+    </section>
   </main>
 
   <footer id="site-footer" class="site-footer"></footer>

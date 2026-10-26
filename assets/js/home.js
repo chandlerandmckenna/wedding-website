@@ -363,6 +363,35 @@
     }).then(function () { busy(btn, false, "Save my address"); });
   });
 
+  /* ---------- Notes for the couple ---------- */
+  var notesForm = document.getElementById("notes-form");
+  var noteText = document.getElementById("note-text");
+  var noteStatus = document.getElementById("note-status");
+  var noteKind = "";
+  notesForm.querySelectorAll(".note-kinds button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var on = b.getAttribute("aria-pressed") !== "true";
+      notesForm.querySelectorAll(".note-kinds button").forEach(function (o) { o.setAttribute("aria-pressed", "false"); });
+      b.setAttribute("aria-pressed", String(on));
+      noteKind = on ? b.dataset.kind : "";
+      noteText.placeholder = on ? b.dataset.hint : "Write anything you like…";
+      noteText.focus();
+    });
+  });
+  notesForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var text = noteText.value.trim();
+    if (!text) { noteStatus.textContent = "Write a little something first."; noteText.focus(); return; }
+    var btn = document.getElementById("note-send");
+    busy(btn, true);
+    window.GuestAPI.note(window.Guest.current(), noteKind, text).then(function () {
+      noteText.value = "";
+      noteStatus.textContent = "Grazie mille! We can't wait to read it. Leave another any time.";
+    }).catch(function () {
+      noteStatus.textContent = "We couldn't send that. Please try again.";
+    }).then(function () { busy(btn, false, "Send my note"); });
+  });
+
   // Returning guests skip the cover.
   if (window.Guest.current()) openBook(false);
 })();

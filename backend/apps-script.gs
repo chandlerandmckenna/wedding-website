@@ -8,6 +8,9 @@
  *   Guests can sign in with either their phone or their email.
  *   Group is optional, e.g. "party" for the wedding party and families.
  *
+ * Sheet "Notes" (row 1 is headers), one row per note left on the site:
+ *   Sent | Name | Phone | Email | Kind | Note
+ *
  * Sheet "Private events" (row 1 is headers):
  *   Group | Date | Time | Title | Place
  *   Date must match the site's schedule, e.g. "September 30".
@@ -36,6 +39,7 @@ function doPost(e) {
     if (req.action === "register") return json(register(id, req));
     if (req.action === "reply") return json(reply(id, req.feeling));
     if (req.action === "address") return json(saveAddress(id, req.address));
+    if (req.action === "note") return json(saveNote(id, req));
     return json({ error: "unknown action" });
   } finally {
     lock.releaseLock();
@@ -106,6 +110,18 @@ function saveAddress(id, address) {
   var values = ADDRESS.map(function (k) { return String(address[k] || "").slice(0, 200); });
   guests().getRange(hit.index, COLS.address + 1, 1, ADDRESS.length).setValues([values]);
   guests().getRange(hit.index, COLS.updated + 1).setValue(new Date());
+  return { ok: true };
+}
+
+function saveNote(id, req) {
+  var note = String(req.note || "").trim().slice(0, 1500);
+  if (!note) return { error: "note required" };
+  var hit = findRow(id);
+  if (!hit) return { error: "not found" };
+  SpreadsheetApp.getActive().getSheetByName("Notes").appendRow([
+    new Date(), String(hit.row[COLS.name] || req.name || ""), id.phone, id.email,
+    String(req.kind || "").slice(0, 40), note
+  ]);
   return { ok: true };
 }
 

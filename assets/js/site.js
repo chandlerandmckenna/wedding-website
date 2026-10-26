@@ -132,6 +132,14 @@ window.PAGES = [
       var g = demo.find(guest);
       if (g) { g.address = address; demo.put(g); }
       return Promise.resolve({ ok: true });
+    },
+    // a note for the couple; kind is "Advice", "Song request" and so on, or ""
+    note: function (guest, kind, text) {
+      var p = call("note", { phone: guest.phone, email: guest.email, name: guest.name, kind: kind, note: text });
+      if (p) return p;
+      var g = demo.find(guest);
+      if (g) { g.notes = (g.notes || []).concat([{ kind: kind, note: text, at: new Date().toISOString() }]); demo.put(g); }
+      return Promise.resolve({ ok: true });
     }
   };
 })();

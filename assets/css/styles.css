@@ -41,7 +41,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: var(--head, 120px); }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: var(--head, 120px); }
 body {
   margin: 0;
   background-color: var(--ivory);
@@ -266,8 +266,9 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .monogram {
-  font-family: var(--script); font-size: 1.7rem; line-height: 1;
+  font-family: var(--script); font-size: 2.25rem; line-height: 1;
   color: var(--cobalt); text-decoration: none; margin-right: auto;
+  -webkit-text-stroke: 0.6px var(--cobalt); text-shadow: 1px 2px 0 var(--gold-soft, #f6d98a);
 }
 .site-nav { display: flex; gap: 18px; overflow-x: auto; max-width: 100%; }
 .site-nav a {
@@ -294,10 +295,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 
 /* Pages: as you scroll, each section settles into place and the one before
    fades out while the next fades in (see setupPageFades in site.js). */
-/* each section fills the screen; when a scroll ends near one, the browser
-   eases it to the middle (proximity, so it never traps you inside a long one) */
-html.paged { scroll-snap-type: y proximity; }
-html.paged .page, html.paged .page-hero { scroll-snap-align: center; }
+/* each section fills the screen; scrolling is the browser's own, no snapping */
 /* the travel guide reads as one page: sections are only as tall as their content */
 html.paged .page-travel .page:not(.page-intro) { min-height: 0; padding-block: clamp(56px, 9vh, 96px); }
 html.paged .page, html.paged .page-hero { min-height: calc(100svh - var(--head, 96px)); }
@@ -738,6 +736,29 @@ html.paged .flights-plane.go { animation: fly-in 5s cubic-bezier(0.2, 0.7, 0.2, 
 .trip p:not(.trip-meta) { font-size: var(--step--1); color: var(--ink-soft); }
 .trip-link { justify-self: start; margin-top: 6px; font-size: 0.8125rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; text-decoration: none; border-bottom: 2px solid var(--gold); padding-bottom: 2px; }
 .trip-link:hover { color: var(--cobalt-deep); border-color: var(--cobalt); }
+
+/* Notes for the couple: a cream scalloped card on the stripes, a bookend to
+   the sign-in card. A row of prompts fills in an idea; the note is free text. */
+.page-notes .wrap { display: grid; justify-items: center; }
+.notes-card { width: min(100%, 620px); display: grid; gap: 14px; text-align: center; }
+.notes-card .script { font-size: clamp(2.4rem, 6vw, 3.2rem); line-height: 1.05; color: var(--cobalt); }
+.notes-card .lede { color: var(--ink-soft); max-width: 34rem; margin-inline: auto; }
+.note-kinds { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 4px; }
+.note-kinds button {
+  font: 500 0.75rem/1 var(--body); letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 9px 14px; border-radius: 999px; cursor: pointer;
+  background: #fffdf8; color: var(--cobalt); border: 1.5px solid var(--periwinkle);
+}
+.note-kinds button[aria-pressed="true"] { background: var(--cobalt); border-color: var(--cobalt); color: #fff; }
+.notes-card textarea {
+  width: 100%; min-height: 140px; resize: vertical; padding: 14px 16px; border-radius: 12px;
+  font: 400 1rem/1.6 var(--body); color: var(--ink); background: #fffdf8; border: 1px solid var(--line);
+  background-image: repeating-linear-gradient(transparent 0 calc(1.6rem - 1px), rgba(125, 155, 230, 0.35) calc(1.6rem - 1px) 1.6rem);
+  background-position: 0 14px; background-attachment: local;
+}
+.notes-card textarea:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px var(--cobalt-soft); }
+.notes-card .button { justify-self: center; min-width: 220px; }
+.page-notes .wrap { filter: drop-shadow(0 18px 30px rgba(23, 36, 90, 0.28)); }
 
 /* ---------- Footer ---------- */
 .footer-inner {
