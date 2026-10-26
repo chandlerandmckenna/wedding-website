@@ -793,7 +793,8 @@ html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
 .footer-sail { display: block; width: min(220px, 60%); height: 34px; margin-bottom: 14px; overflow: visible; }
 .footer-sail .sail { animation: bob 4s ease-in-out infinite; transform-origin: 110px 30px; }
 @keyframes bob { 50% { transform: translateY(-2px) rotate(-3deg); } }
-.footer-names { font-family: var(--script); font-size: 2.2rem; line-height: 1.2; color: var(--cobalt); }
+.footer-inner > .script { font-size: clamp(1.4rem, 3vw, 1.75rem); color: var(--ink-soft); }
+.footer-names { font-family: var(--script); font-size: clamp(2.8rem, 7vw, 3.8rem); line-height: 1.1; color: var(--cobalt); }
 
 @media (max-width: 760px) {
   /* the title page fills the phone screen; the next section fades in below */
