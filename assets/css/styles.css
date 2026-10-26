@@ -178,25 +178,25 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   z-index: 1;
   display: grid;
   place-items: center;
-  padding-block: 40px;
+  padding-block: clamp(16px, 3vh, 40px);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .cover-card {
-  width: min(100%, 560px);
+  width: min(100%, 500px);
   display: grid;
   justify-items: center;
   gap: 4px;
   text-align: center;
-  padding-bottom: calc(var(--r) * 2 + clamp(40px, 7vw, 56px));
+  padding-bottom: calc(var(--r) * 2 + clamp(34px, 5vh, 48px));
 }
-.cover > .tile-band { visibility: hidden; }
+.cover > .tile-band { visibility: hidden; height: 0; }
 .cover-card > * { width: 100%; }
 .cover-eyebrow {
-  font-family: var(--script); font-size: clamp(3.2rem, 13vw, 5rem); line-height: 1.05; color: var(--cobalt);
+  font-family: var(--script); font-size: clamp(2.6rem, min(12vw, 8vh), 4.2rem); line-height: 1.05; color: var(--cobalt);
 }
-.cover-card > .cover-sprig { width: min(62%, 250px); aspect-ratio: 240 / 170; height: auto; margin: 2px auto -6px; }
-.cover-names { font-family: var(--script); font-weight: 400; font-size: clamp(2.2rem, 8.5vw, 3.1rem); line-height: 1.1; color: var(--cobalt); }
+.cover-card > .cover-sprig { width: min(54%, 210px, 26vh); aspect-ratio: 240 / 170; height: auto; margin: 2px auto -6px; }
+.cover-names { font-family: var(--script); font-weight: 400; font-size: clamp(2rem, min(8vw, 5.2vh), 2.7rem); line-height: 1.1; color: var(--cobalt); }
 .cover-names .amp { font-size: 0.8em; }
 .cover-date { display: flex; justify-content: center; align-items: center; gap: 12px; font-family: var(--body); font-weight: 500; font-size: clamp(1.05rem, 4vw, 1.3rem); letter-spacing: 0.2em; color: var(--cobalt); }
 .cover-date i { font-style: normal; color: var(--gold); font-size: 1.3em; line-height: 1; }
