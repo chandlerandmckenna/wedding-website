@@ -294,12 +294,10 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 
 /* Pages: as you scroll, each section settles into place and the one before
    fades out while the next fades in (see setupPageFades in site.js). */
-html.paged { scroll-snap-type: y mandatory; } /* past halfway, it settles on the next page */
-html.paged.free-scroll { scroll-snap-type: none; } /* a section is taller than the screen: let people read it */
-html.paged .page, html.paged .page-hero { scroll-snap-align: start; min-height: calc(100svh - var(--head, 96px)); }
+/* each section fills the screen; site.js glides the nearest one to the middle when scrolling stops */
+html.paged .page, html.paged .page-hero { min-height: calc(100svh - var(--head, 96px)); }
 html.paged .page { display: grid; align-content: center; padding-block: clamp(40px, 7vh, 80px); }
 html.paged .page-hero { align-content: start; }
-html.paged .site-footer { scroll-snap-align: end; }
 html.paged .fade { opacity: 0.08; transform: translateY(18px); transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1), transform 1.8s cubic-bezier(0.2, 0.6, 0.2, 1); }
 html.paged .fade.shown { opacity: 1; transform: none; }
 
@@ -393,7 +391,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   font-size: clamp(1.25rem, 2.8vw, 1.6rem); line-height: 1.45;
   max-width: 26ch; text-wrap: balance; color: var(--ink);
 }
-.story-note { max-width: 46ch; color: var(--ink-soft); }
+.story-note { max-width: 46ch; color: var(--ink-soft); text-wrap: balance; }
 .dates { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 20px 44px; margin-block: 6px; }
 .date { display: grid; justify-items: center; gap: 4px; }
 .date-num { position: relative; display: grid; place-items: center; min-width: 120px; padding-bottom: 14px; margin-bottom: 8px; }
@@ -431,14 +429,19 @@ html.paged .page-story.shown .story-car { animation: drive-in 2.8s cubic-bezier(
 .gallery figure { position: relative; min-width: 0; }
 .gallery .g-main { z-index: 1; }
 .gallery img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; display: block; }
-html.paged .gallery figure:not(.g-main) { transition: transform 1.8s cubic-bezier(0.25, 0.6, 0.2, 1) 0.6s, opacity 1.6s ease 0.6s; }
-html.paged .page-venue:not(.shown) .gallery figure:first-child { transform: translateX(calc(100% + 16px)); opacity: 0; }
-html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: translateX(calc(-100% - 16px)); opacity: 0; }
+/* the middle photo settles first, then the outer two fan out slowly from behind it */
+html.paged .gallery .g-main { transition: transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s, opacity 1.2s ease 0.3s; }
+html.paged .page-venue:not(.shown) .gallery .g-main { transform: scale(0.92); opacity: 0; }
+html.paged .gallery figure:not(.g-main) { transition: transform 3s cubic-bezier(0.22, 0.61, 0.18, 1) 1.3s, opacity 2.2s ease 1.3s; }
+html.paged .page-venue:not(.shown) .gallery figure:first-child { transform: translateX(calc(100% + 16px)) rotate(4deg) scale(0.9); opacity: 0; }
+html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: translateX(calc(-100% - 16px)) rotate(-4deg) scale(0.9); opacity: 0; }
 /* on wide screens the photo sits beside the story and the venue photos line
    up in one row, so each section fits on one screen */
 @media (min-width: 900px) {
-  .story { grid-template-columns: 300px minmax(0, 32rem); justify-content: center; column-gap: clamp(48px, 6vw, 80px); row-gap: 14px; align-items: center; align-content: center; }
+  .story { grid-template-columns: 300px minmax(0, 38rem); justify-content: center; column-gap: clamp(48px, 6vw, 80px); row-gap: 22px; align-items: center; align-content: center; }
   .story .arch-wrap { grid-row: 1 / span 5; width: 100%; margin-bottom: 0; align-self: center; }
+  .story-lead { max-width: 36rem; font-size: clamp(1.25rem, 1.9vw, 1.45rem); }
+  .story .dates { margin-block: 0; }
 }
 
 /* Gut feeling: a cream train ticket to Sorrento on the stripes, with a
@@ -654,19 +657,39 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 .weather b { font-weight: 500; font-size: var(--step-3); line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--cobalt); }
 .weather span { font-size: var(--step--1); color: var(--ink-soft); }
 
-/* the welcome sits on Chandler's watercolor of the coast, in a cream card */
-.page-intro {
-  display: grid; align-items: center; min-height: min(86svh, 820px);
-  background: url("../img/travel-watercolor.jpg") center 42% / cover no-repeat;
+/* the welcome sits on Chandler's watercolor of the coast: the painting
+   blooms in when the page opens and fades away as you scroll on, with a
+   see-through cream card on the right so the town still shows */
+.page-intro { display: grid; align-items: center; min-height: min(86svh, 820px); overflow: hidden; }
+.intro-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%; max-width: none;
+  object-fit: cover; object-position: 30% 42%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent);
+  mask-image: linear-gradient(to bottom, #000 82%, transparent);
+  animation: intro-bloom 3.2s cubic-bezier(0.2, 0.6, 0.2, 1) both;
 }
-.intro-card { max-width: 36rem; padding: 30px 34px 34px; display: grid; gap: 8px; background: color-mix(in srgb, var(--card) 94%, transparent); border-radius: 18px; box-shadow: 0 18px 40px rgba(23, 36, 90, 0.25); }
+@keyframes intro-bloom { from { opacity: 0; transform: scale(1.1); filter: blur(8px) saturate(0.5); } 40% { opacity: 1; } }
+.page-intro .wrap { position: relative; z-index: 1; display: grid; }
+.intro-card {
+  justify-self: end; max-width: 31rem; padding: 30px 34px 34px; display: grid; gap: 8px;
+  background: color-mix(in srgb, var(--card) 72%, transparent);
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+  border-radius: 18px; box-shadow: 0 18px 40px rgba(23, 36, 90, 0.22);
+  will-change: transform, opacity;
+  animation: fade-in 1.2s ease 1s both;
+}
+.intro-card > * { animation: rise-in 1.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(1.4s + var(--n, 0) * 0.3s); }
+.intro-card > :nth-child(2) { --n: 1; }
+.intro-card > :nth-child(3) { --n: 2; }
 .intro-card .page-title { font-family: var(--script); font-weight: 400; line-height: 1.05; }
-.intro-card p:last-child { color: var(--ink-soft); }
-@media (max-width: 760px) { .page-intro { align-items: end; background-position: 30% center; } .intro-card { padding: 24px 22px 26px; } }
+.intro-card p:last-child { color: var(--ink); }
+html.paged .page-intro.fade { opacity: 1; transform: none; }   /* the painting does its own fading */
+@media (max-width: 760px) { .page-intro { align-items: end; } .intro-bg { object-position: 22% center; } .intro-card { justify-self: stretch; padding: 24px 22px 26px; } }
+@media (prefers-reduced-motion: reduce) { .intro-bg, .intro-card, .intro-card > * { animation: none; } }
 
 /* the little plane flies across Flying in, left to right, towing its banner */
 .page-flights { overflow: hidden; }
-.flights-plane { display: block; width: clamp(240px, 32vw, 360px); height: auto; aspect-ratio: 300 / 80; margin: 0 0 10px 52%; }
+.flights-plane { display: block; width: clamp(240px, 32vw, 360px); height: auto; aspect-ratio: 300 / 80; margin: 0 6% 10px auto; }
 html.paged .page-flights.shown .flights-plane { animation: fly-in 4s cubic-bezier(0.2, 0.7, 0.2, 1) both, float 5s ease-in-out 4s infinite; }
 @keyframes fly-in { from { translate: -70vw 24px; } }
 @keyframes float { 50% { translate: 0 -6px; } }
@@ -684,7 +707,7 @@ html.paged .page-flights.shown .flights-plane { animation: fly-in 4s cubic-bezie
 }
 .trip-stamp {
   --r: 4px;
-  justify-self: stretch; padding: 9px; margin: -48px 6px 10px;
+  display: block; justify-self: stretch; padding: 9px; margin: -48px 6px 10px;
   background: #fffdf8;
   -webkit-mask:
     linear-gradient(#000 0 0) center / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat,

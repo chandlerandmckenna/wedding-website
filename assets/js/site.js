@@ -270,13 +270,60 @@ window.PAGES = [
     }, { rootMargin: "-45% 0px -45% 0px" });
     (root || document).querySelectorAll(".fade").forEach(function (el) { io.observe(el); });
     floatHeroText(root);
+    settleOnSections(root);
   };
 
+  // When scrolling stops, glide the nearest section into the middle of the
+  // screen. A section taller than the screen settles on its top or bottom
+  // edge when one is close, and is left alone while someone reads inside it.
+  function settleOnSections(root) {
+    if (window.__settling) return;
+    window.__settling = true;
+    var html = document.documentElement;
+    var head = document.getElementById("site-header");
+    var gliding = false, timer = 0, touching = false;
+    function targets() {
+      var h = head ? head.offsetHeight : 0;
+      var view = window.innerHeight - h;
+      var out = [];
+      (root || document).querySelectorAll(".page, .page-hero").forEach(function (el) {
+        if (el.hidden || !el.offsetHeight) return;
+        var top = -h, height = el.offsetHeight;      // layout position, ignoring the fade's nudge
+        for (var n = el; n; n = n.offsetParent) top += n.offsetTop;
+        if (height <= view + 2) out.push({ y: top - (view - height) / 2 });
+        else out.push({ y: top, from: top, to: top + height - view }, { y: top + height - view });
+      });
+      out.push({ y: html.scrollHeight - window.innerHeight });   // the footer
+      return { list: out, view: view };
+    }
+    function settle() {
+      if (gliding || touching) return;
+      var y = window.scrollY, t = targets(), best = null;
+      for (var i = 0; i < t.list.length; i++) {
+        var c = t.list[i];
+        if (c.to !== undefined && y > c.from + 4 && y < c.to - 4) return;   // reading inside a tall section
+        if (!best || Math.abs(c.y - y) < Math.abs(best.y - y)) best = c;
+      }
+      if (!best) return;
+      var goal = Math.max(0, Math.min(best.y, html.scrollHeight - window.innerHeight));
+      if (Math.abs(goal - y) < 3 || Math.abs(goal - y) > t.view * 0.6) return;
+      gliding = true;
+      window.scrollTo({ top: goal, behavior: "smooth" });
+      setTimeout(function () { gliding = false; }, 900);
+    }
+    function soon() { clearTimeout(timer); timer = setTimeout(settle, 180); }
+    window.addEventListener("scroll", soon, { passive: true });
+    window.addEventListener("touchstart", function () { touching = true; clearTimeout(timer); }, { passive: true });
+    window.addEventListener("touchend", function () { touching = false; soon(); }, { passive: true });
+  }
+
   // On the title page the words hang in place while the painting scrolls
-  // up beneath them, fading out by the time the page is half gone.
+  // up beneath them, fading out by the time the page is half gone. The
+  // travel welcome does the same, and its painting fades away with it.
   function floatHeroText(root) {
-    var hero = (root || document).querySelector(".page-hero");
-    var text = hero && hero.querySelector(".hero-text");
+    var hero = (root || document).querySelector(".page-hero, .page-intro");
+    var text = hero && hero.querySelector(".hero-text, .intro-card");
+    var art = hero && hero.querySelector(".intro-bg");
     if (!text) return;
     var ticking = false;
     function update() {
@@ -285,6 +332,7 @@ window.PAGES = [
       var t = Math.min(1, y / (hero.offsetHeight * 0.55));
       text.style.transform = y ? "translate3d(0," + (y * 0.85).toFixed(1) + "px,0)" : "";
       text.style.opacity = (1 - t).toFixed(3);
+      if (art) art.style.opacity = (1 - Math.min(1, y / (hero.offsetHeight * 0.8))).toFixed(3);
     }
     window.addEventListener("scroll", function () {
       if (!ticking) { ticking = true; requestAnimationFrame(update); }

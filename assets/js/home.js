@@ -326,6 +326,12 @@
   var addressStatus = document.getElementById("address-status");
   var ADDRESS_FIELDS = ["line1", "line2", "city", "state", "zip", "country"];
 
+  // the state is a two-letter code, kept in capitals as it is typed
+  addressForm.elements.state.addEventListener("input", function () {
+    var v = this.value.replace(/[^a-z]/gi, "").slice(0, 2).toUpperCase();
+    if (v !== this.value) this.value = v;
+  });
+
   function fillAddress(guest) {
     var a = guest.address || {};
     ADDRESS_FIELDS.forEach(function (k) {
