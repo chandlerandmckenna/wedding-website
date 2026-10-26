@@ -184,6 +184,11 @@ window.PAGES = [
     if (!el) return;
     el.innerHTML =
       '<div class="footer-inner">' +
+      '<svg class="footer-sail" viewBox="0 0 220 34" aria-hidden="true" focusable="false">' +
+      '<path d="M0 31H220" stroke="#eeaa22" stroke-width="2"/>' +
+      '<g class="sail"><path d="M110 4V25L124 24Z" fill="#fff" stroke="#1d3fbd" stroke-width="1.6" stroke-linejoin="round"/>' +
+      '<path d="M107 8V25L97 25Z" fill="#fff" stroke="#1d3fbd" stroke-width="1.6" stroke-linejoin="round"/>' +
+      '<path d="M94 26H128L123 31H99Z" fill="#1d3fbd"/></g></svg>' +
       '<p class="script">Ci vediamo a Sorrento!</p>' +
       '<p class="footer-names">' + W.coupleA + " &amp; " + W.coupleB + "</p>" +
       "<p>" + W.dateLabel + " · " + W.venue + ", " + W.town + "</p>" +
