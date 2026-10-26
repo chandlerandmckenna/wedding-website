@@ -714,15 +714,14 @@ html.paged .page-intro.fade { opacity: 1; transform: none; }   /* the painting d
 @keyframes flap { 0%, 100% { transform: translateY(calc(var(--a) * -1px)); } 50% { transform: translateY(calc(var(--a) * 1px)); } }
 html.paged .flights-plane:not(.go) { opacity: 0; }
 html.paged .flights-plane.go { animation: fly-in 5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both, float 5s ease-in-out 5.3s infinite; }
-/* a little wooden launch motors in from the right above the ferry table, then rocks on the swell */
+/* a little wooden launch rocking on the swell above the ferry table */
 .page-boat { overflow: hidden; }
 .page-boat .wrap { position: relative; }
-.ferry-boat { position: absolute; right: 0; top: -44px; width: clamp(220px, 26vw, 340px); height: auto; }
+.ferry-boat { position: absolute; right: 0; top: -30px; width: clamp(170px, 19vw, 250px); height: auto; transition: opacity 1.4s ease; }
 html.paged .ferry-boat:not(.go) { opacity: 0; }
-html.paged .ferry-boat.go { animation: sail-in 5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both, rock 4.5s ease-in-out 5.3s infinite; }
-@keyframes sail-in { from { translate: 60vw 6px; } }
+html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
 @keyframes rock { 50% { transform: translateY(-3px) rotate(-1.5deg); } }
-@media (max-width: 900px) { .ferry-boat { position: relative; top: 0; display: block; width: min(70%, 260px); margin: 0 0 8px auto; } }
+@media (max-width: 900px) { .ferry-boat { position: relative; top: 0; display: block; width: min(52%, 200px); margin: 0 0 8px auto; } }
 @keyframes fly-in { from { translate: -70vw 24px; } }
 @keyframes float { 50% { translate: 0 -6px; } }
 @media (max-width: 760px) { .flights-plane { width: min(92%, 340px); margin: 0 16px 10px auto; } }
