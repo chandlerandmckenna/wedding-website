@@ -33,7 +33,16 @@
 
   var swash = '<symbol id="swash" viewBox="0 0 200 30"><path d="M8 18C50 12 120 11 192 16" fill="none" stroke="' + GOLD + '" stroke-width="4" stroke-linecap="round"/></symbol>';
 
+  // a round Sorrento postmark with wavy cancellation lines
+  var postmark = '<symbol id="postmark" viewBox="0 0 200 120"><g fill="none" stroke="' + COBALT + '" stroke-width="2" opacity=".75">' +
+    '<circle cx="60" cy="60" r="46"/><circle cx="60" cy="60" r="32"/>' +
+    '<path id="pm-arc" d="M24 60A36 36 0 0 1 96 60" stroke="none"/>' +
+    '<path d="M112 36C124 30 136 42 148 36S172 30 196 36M112 52C124 46 136 58 148 52S172 46 196 52M112 68C124 62 136 74 148 68S172 62 196 68M112 84C124 78 136 90 148 84S172 78 196 84"/></g>' +
+    '<g fill="' + COBALT + '" opacity=".8" font-family="Courier Prime, monospace" font-weight="700" text-anchor="middle">' +
+    '<text font-size="11" letter-spacing="2"><textPath href="#pm-arc" startOffset="50%">SORRENTO</textPath></text>' +
+    '<text x="60" y="64" font-size="12">1·10·27</text><text x="60" y="94" font-size="9" letter-spacing="2">ITALIA</text></g></symbol>';
+
   document.body.insertAdjacentHTML("afterbegin",
     '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
-    sprig + bow + swash + "</defs></svg>");
+    sprig + bow + swash + postmark + "</defs></svg>");
 })();

@@ -8,7 +8,7 @@
 <meta name="description" content="Save the date: McKenna and Chandler are getting married in Sorrento, Italy, on October 1, 2027.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Jost:wght@400;500;600&family=Norican&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Jost:wght@400;500;600&family=Norican&family=Playfair+Display:ital@1&display=swap">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -73,7 +73,7 @@
     <section class="page-hero fade" id="top">
       <img class="hero-bg" src="assets/img/hero-venue.jpg" alt="" width="1087" height="958">
       <div class="hero-text">
-        <h1 class="hero-title">Meet Us in Italy</h1>
+        <h1 class="hero-title">Meet us in Italy</h1>
         <p class="hero-place">Sorrento · Italy</p>
         <p class="hero-date"><b>October 1, 2027</b><svg class="swash" viewBox="0 0 200 30" preserveAspectRatio="none" aria-hidden="true" focusable="false"><use href="#swash"/></svg></p>
         <p class="hero-note countdown" id="countdown"></p>
@@ -161,13 +161,24 @@
       </div>
     </section>
 
-    <section class="page page-address stripes fade" id="address">
+    <!-- A postcard: a note from us on the left, their address on the right
+         under a lemon stamp and a Sorrento postmark. -->
+    <section class="page page-address fade" id="address">
       <div class="wrap">
-        <form class="address-panel scallop" id="address-form" novalidate>
-          <p class="script">Per posta</p>
-          <h2>Got a better place for us to send an RSVP?</h2>
-          <p class="feel-sub">Leave the address where you'd like your formal invitation and RSVP card to arrive.</p>
-          <div class="address-grid">
+        <form class="address-panel postcard" id="address-form" novalidate>
+          <div class="pc-note">
+            <p class="script">Per posta</p>
+            <h2>Got a better place for us to send an RSVP?</h2>
+            <p class="feel-sub">Leave the address where you'd like your formal invitation and RSVP card to arrive.</p>
+            <p class="pc-sign">Con amore,<br>McKenna &amp; Chandler</p>
+          </div>
+          <div class="pc-to">
+            <div class="pc-stamp" aria-hidden="true">
+              <svg viewBox="0 0 240 170" focusable="false"><use href="#sprig"/></svg>
+              <span>ITALIA</span>
+            </div>
+            <svg class="pc-postmark" viewBox="0 0 200 120" aria-hidden="true" focusable="false"><use href="#postmark"/></svg>
+            <div class="address-grid">
             <div class="field span-2">
               <label for="addr-line1">Street address</label>
               <input type="text" id="addr-line1" name="line1" autocomplete="address-line1">
@@ -193,9 +204,9 @@
               <input type="text" id="addr-country" name="country" autocomplete="country-name" value="United States">
             </div>
           </div>
-          <button class="button wide" type="submit" id="address-send">Save my address</button>
-          <p class="feel-status" id="address-status" role="status"></p>
-          <svg class="bow" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#bow"/></svg>
+            <button class="button wide" type="submit" id="address-send">Save my address</button>
+            <p class="feel-status" id="address-status" role="status"></p>
+          </div>
         </form>
       </div>
     </section>
