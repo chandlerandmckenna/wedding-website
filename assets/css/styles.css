@@ -199,7 +199,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 .cover-names { font-family: var(--script); font-weight: 400; font-size: clamp(2rem, min(8vw, 5.2vh), 2.7rem); line-height: 1.1; margin-bottom: 10px; color: var(--cobalt); }
 .cover-names .amp { font-size: 0.8em; }
 .cover-names .surname { display: block; }
-.cover-date { display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 4px; font-family: var(--body); font-weight: 500; font-size: clamp(1.35rem, 5.4vw, 1.75rem); letter-spacing: 0.08em; color: var(--cobalt); }
+.cover-date { display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 4px; font-family: var(--body); font-weight: 500; font-size: clamp(1.15rem, 4.8vw, 1.6rem); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; color: var(--cobalt); }
 .cover-date i { font-style: normal; color: var(--gold); font-size: 1.3em; line-height: 1; }
 .cover-card .cover-form { width: min(100%, 420px); margin-top: 12px; }
 .cover-form { display: grid; gap: 12px; margin-top: 8px; padding-top: 20px; border-top: 1px dashed var(--gold); text-align: left; }
