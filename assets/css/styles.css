@@ -1,7 +1,8 @@
 /* Layout: a save-the-date book in the style of the couple's "Salute!" card:
    cream scalloped cards laid on cobalt and periwinkle ribbon stripes, a flat
    cobalt lemon sprig with one ripe lemon, gold rules and a gold bow, a
-   rounded handwritten script for titles and typewriter type for details.
+   rounded handwritten script for titles, spaced capitals for details and a
+   soft serif italic for little notes.
    Each section fades into the next as you scroll, like turning a page.
    Deliberately a single light look, like a printed invitation. */
 :root {
@@ -25,7 +26,7 @@
   --terracotta-soft: #f5e3da;
 
   --script: "Norican", "Brush Script MT", cursive;          /* titles, names, dates */
-  --type: "Courier Prime", "Courier New", monospace;        /* typewriter details */
+  --italic: "Playfair Display", Georgia, serif;            /* soft italic notes */
   --body: "Jost", "Futura", "Avenir Next", system-ui, sans-serif;
 
   --step--1: 0.875rem;
@@ -59,7 +60,7 @@ a { color: var(--cobalt); text-underline-offset: 3px; }
 h1, h2, h3 { font-weight: 400; line-height: 1.12; text-wrap: balance; margin: 0; }
 h1, h2 { font-family: var(--script); color: var(--cobalt); }
 h2 { font-size: clamp(2.3rem, 6vw, 3.3rem); line-height: 1.15; }
-h3 { font-family: var(--type); font-weight: 700; font-size: var(--step-1); }
+h3 { font-family: var(--body); font-weight: 500; font-size: var(--step-1); }
 p, figure { margin: 0; }
 
 .wrap {
@@ -70,12 +71,11 @@ p, figure { margin: 0; }
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .eyebrow {
-  font-family: var(--type);
-  font-size: 0.875rem;
-  letter-spacing: 0.16em;
+  font-size: 0.8125rem;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--cobalt);
-  font-weight: 700;
+  font-weight: 500;
 }
 .script { font-family: var(--script); font-weight: 400; font-size: clamp(2rem, 5vw, 2.7rem); line-height: 1.15; color: var(--cobalt); }
 .hint { font-size: var(--step--1); color: var(--ink-soft); }
@@ -126,8 +126,8 @@ p, figure { margin: 0; }
   border-radius: 999px;
   background: var(--cobalt);
   color: #fff;
-  font: 700 0.9375rem/1 var(--type);
-  letter-spacing: 0.08em;
+  font: 500 0.8125rem/1 var(--body);
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   text-decoration: none;
   border: 1px solid var(--cobalt);
@@ -198,7 +198,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 .cover-card > .cover-sprig { width: min(62%, 250px); aspect-ratio: 240 / 170; height: auto; margin: 2px auto -6px; }
 .cover-names { font-family: var(--script); font-weight: 400; font-size: clamp(2.2rem, 8.5vw, 3.1rem); line-height: 1.1; color: var(--cobalt); }
 .cover-names .amp { font-size: 0.8em; }
-.cover-date { display: flex; justify-content: center; align-items: center; gap: 12px; font-family: var(--type); font-weight: 700; font-size: clamp(1.15rem, 4.4vw, 1.4rem); letter-spacing: 0.06em; color: var(--cobalt); }
+.cover-date { display: flex; justify-content: center; align-items: center; gap: 12px; font-family: var(--body); font-weight: 500; font-size: clamp(1.05rem, 4vw, 1.3rem); letter-spacing: 0.2em; color: var(--cobalt); }
 .cover-date i { font-style: normal; color: var(--gold); font-size: 1.3em; line-height: 1; }
 .cover-card .cover-form { width: min(100%, 420px); margin-top: 12px; }
 .cover-form { display: grid; gap: 12px; margin-top: 8px; padding-top: 20px; border-top: 1px dashed var(--gold); text-align: left; }
@@ -221,13 +221,18 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 }
 .preview-note { font-style: italic; }
 
-/* the cover lifts away from its top edge, like turning up a page */
-.cover.opening { pointer-events: none; animation: cover-lift 1.1s cubic-bezier(0.6, 0, 0.3, 1) forwards; }
-@keyframes cover-lift {
-  0% { transform: perspective(2000px) rotateX(0); opacity: 1; }
-  70% { opacity: 1; }
-  100% { transform: perspective(2000px) rotateX(88deg); opacity: 0; }
-}
+/* after sign-in the cover fades away, then the title page's painting and
+   words fade in one line at a time */
+.cover.opening { pointer-events: none; animation: cover-fade 0.9s ease forwards; }
+@keyframes cover-fade { to { opacity: 0; } }
+.book.arriving .site-header, .book.arriving .hero-bg { animation: fade-in 1.2s ease 0.3s both; }
+.book.arriving .hero-text > * { animation: rise-in 1.1s cubic-bezier(0.2, 0.6, 0.2, 1) both; animation-delay: calc(0.7s + var(--n, 0) * 0.22s); }
+.book.arriving .hero-text > :nth-child(2) { --n: 1; }
+.book.arriving .hero-text > :nth-child(3) { --n: 2; }
+.book.arriving .hero-text > :nth-child(4) { --n: 3; }
+.book.arriving .hero-text > :nth-child(5) { --n: 4; }
+@keyframes rise-in { from { opacity: 0; transform: translateY(12px); } }
+@keyframes fade-in { from { opacity: 0; } }
 
 /* ---------- Header: stays pinned while the pages scroll under it ---------- */
 .site-header {
@@ -262,8 +267,8 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 }
 .site-nav { display: flex; gap: 18px; overflow-x: auto; max-width: 100%; }
 .site-nav a {
-  color: var(--ink); text-decoration: none; font-family: var(--type);
-  letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.875rem; font-weight: 700;
+  color: var(--ink); text-decoration: none;
+  letter-spacing: 0.2em; text-transform: uppercase; font-size: 0.8125rem; font-weight: 500;
   padding: 6px 2px; white-space: nowrap;
 }
 .site-nav a:hover { color: var(--cobalt); }
@@ -355,7 +360,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   color: var(--cobalt);
 }
 .hero-date .swash { width: 88%; height: 20px; left: 6%; margin-left: 0; bottom: 0; }
-.hero-note { font-family: "Playfair Display", Georgia, serif; font-style: italic; font-size: clamp(1.05rem, 3vw, 1.3rem); color: var(--ink-soft); font-variant-numeric: lining-nums; }
+.hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.05rem, 3vw, 1.3rem); color: var(--ink-soft); font-variant-numeric: lining-nums; }
 .hero-family {
   margin-top: 10px;
   font-family: var(--script); font-weight: 400;
@@ -376,13 +381,12 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   outline-offset: 8px;
 }
 .arch img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 60%; display: block; }
-.arch-sprig { width: 200px; height: 142px; left: -70px; bottom: -40px; transform: scaleX(-1) rotate(8deg); }
 
 /* Story */
 .story { display: grid; gap: 28px; justify-items: center; text-align: center; }
 .story-lead {
-  font-family: var(--type);
-  font-size: clamp(1.3rem, 3.4vw, 1.8rem); line-height: 1.4;
+  font-family: var(--body); font-weight: 400;
+  font-size: clamp(1.35rem, 3.4vw, 1.85rem); line-height: 1.45;
   max-width: 26ch; text-wrap: balance; color: var(--ink);
 }
 .story-note { max-width: 46ch; color: var(--ink-soft); }
@@ -390,8 +394,8 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .date { display: grid; justify-items: center; gap: 4px; }
 .date-num { position: relative; display: grid; place-items: center; min-width: 120px; padding-bottom: 14px; margin-bottom: 8px; }
 .date-num b { position: relative; z-index: 1; font-family: var(--script); font-weight: 400; font-size: 5rem; line-height: 1.05; color: var(--cobalt); }
-.date-it { font-family: var(--type); font-size: 0.875rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cobalt); font-weight: 700; }
-.date-en { font-family: var(--type); font-style: italic; color: var(--ink-soft); }
+.date-it { font-size: 0.8125rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--cobalt); font-weight: 500; }
+.date-en { font-family: var(--italic); font-style: italic; color: var(--ink-soft); }
 .date-rule { width: 2px; height: 120px; background: var(--gold); opacity: 0.6; }
 
 /* Venue */
@@ -429,7 +433,6 @@ html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: trans
   text-align: center;
 }
 .feel-panel > :not(.sprig) { position: relative; }
-.reply-sprig { width: 170px; height: 120px; right: -36px; top: -64px; }
 .feel-sub { color: var(--ink-soft); margin-bottom: 18px; }
 .feel-options { display: grid; gap: 12px; }
 .feel {
@@ -473,7 +476,7 @@ html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: trans
   .address-grid .span-2 { grid-column: auto; }
 }
 .optional { font-weight: 400; color: var(--ink-soft); }
-.feel-status { min-height: 1.6em; margin-top: 10px; font-family: var(--type); font-style: italic; font-size: var(--step-1); color: var(--ink); }
+.feel-status { min-height: 1.6em; margin-top: 10px; font-family: var(--italic); font-style: italic; font-size: var(--step-1); color: var(--ink); }
 
 /* The address form is a postcard on plain paper, with an airmail edge, so it
    stands apart from the striped gut-feeling card above it. */
@@ -487,14 +490,13 @@ html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: trans
   border: 12px solid transparent;
   border-image: repeating-linear-gradient(135deg, var(--cobalt) 0 16px, var(--card) 16px 24px, var(--gold) 24px 40px, var(--card) 40px 48px) 12;
   box-shadow: 0 2px 4px rgba(23, 36, 90, 0.08), 0 22px 44px rgba(23, 36, 90, 0.16);
-  transform: rotate(-0.8deg);
 }
 .pc-note { display: grid; gap: 12px; align-content: center; padding: clamp(28px, 5vw, 52px); }
 .pc-note h2 { font-size: clamp(2rem, 4.4vw, 2.8rem); }
 .pc-note .feel-sub { margin: 0; }
 .pc-sign { font-family: var(--script); font-size: 1.6rem; line-height: 1.2; color: var(--cobalt); margin-top: 6px; }
 .pc-to { position: relative; display: grid; gap: 12px; align-content: start; padding: clamp(28px, 4vw, 44px); padding-top: 140px; border-left: 2px solid var(--line); }
-/* a perforated stamp in the corner, with the lemon sprig on it */
+/* a perforated stamp in the corner: the sun setting over the bay */
 .pc-stamp {
   --r: 4px;
   position: absolute; top: 22px; right: 24px;
@@ -511,23 +513,23 @@ html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: trans
   filter: drop-shadow(0 2px 2px rgba(23, 36, 90, 0.15));
   transform: rotate(4deg);
 }
-.pc-stamp svg { width: 62px; height: 46px; }
-.pc-stamp span { font-family: var(--type); font-weight: 700; font-size: 0.7rem; letter-spacing: 0.14em; color: var(--cobalt); }
+.pc-stamp svg { width: 64px; height: 58px; }
+.pc-stamp span { font-weight: 500; font-size: 0.66rem; letter-spacing: 0.14em; color: var(--cobalt); }
 .pc-postmark { position: absolute; top: 28px; right: 96px; width: 170px; height: 102px; transform: rotate(-8deg); pointer-events: none; }
 /* write the address on the lines, like on a real postcard */
 .postcard .address-grid { gap: 10px 18px; margin-bottom: 8px; }
-.postcard .field label { font-family: var(--type); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cobalt); }
+.postcard .field label { font-weight: 500; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--cobalt); }
 .postcard .field label .optional { text-transform: none; letter-spacing: 0; }
 .postcard input[type="text"] {
   min-height: 36px; padding: 4px 2px;
   background: transparent; border: 0; border-bottom: 2px solid var(--cobalt); border-radius: 0;
-  font-family: var(--type); font-size: 1.05rem;
+  font-size: 1.05rem;
 }
 .postcard input[type="text"]:focus { box-shadow: none; border-bottom-color: var(--gold); background: rgba(245, 179, 36, 0.08); }
 .postcard .address-grid .span-2 { grid-column: 1 / -1; }
 .postcard .feel-status { text-align: center; }
 @media (max-width: 760px) {
-  .postcard { grid-template-columns: minmax(0, 1fr); transform: none; }
+  .postcard { grid-template-columns: minmax(0, 1fr); }
   .pc-note { text-align: center; justify-items: center; padding-bottom: 8px; }
   .pc-to { border-left: 0; border-top: 2px dashed var(--line); margin-inline: 20px; padding-inline: 0; padding-top: 150px; }
   .pc-stamp { right: 0; }
@@ -538,7 +540,7 @@ html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: trans
 .days { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; }
 .day { display: grid; gap: 14px; align-content: start; min-width: 0; }
 .day-head { display: grid; gap: 2px; padding-bottom: 10px; border-bottom: 1px solid var(--cobalt); }
-.day-head .dow { font-family: var(--type); font-size: 0.875rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cobalt); font-weight: 700; }
+.day-head .dow { font-size: 0.8125rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--cobalt); font-weight: 500; }
 .day-head .date { font-family: var(--script); font-size: 2.2rem; color: var(--cobalt); }
 .event { display: grid; gap: 2px; }
 .event time { font-variant-numeric: tabular-nums; font-size: var(--step--1); color: var(--ink-soft); }
@@ -565,19 +567,19 @@ html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: trans
   font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500;
   padding: 3px 10px; background: var(--lemon-soft); color: #7a5a00;
 }
-.card .code { font-family: var(--type); font-weight: 700; font-size: 2.6rem; color: var(--cobalt); line-height: 1; }
+.card .code { font-weight: 500; font-size: 2.6rem; color: var(--cobalt); line-height: 1; }
 .card p { font-size: var(--step--1); color: var(--ink-soft); }
 .table-scroll { overflow-x: auto; max-width: 100%; border-top: 1px solid var(--cobalt); }
 table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: var(--step--1); }
 th, td { text-align: left; padding: 14px 14px 14px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-th { font-family: var(--type); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.72rem; color: var(--cobalt); }
+th { font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; font-size: 0.72rem; color: var(--cobalt); }
 td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 500; }
 .tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px 44px; }
 .tips > div { display: grid; gap: 6px; min-width: 0; }
 .tips p { color: var(--ink-soft); font-size: var(--step--1); }
 .weather { display: flex; flex-wrap: wrap; gap: 16px 48px; margin-bottom: 40px; }
 .weather div { display: grid; }
-.weather b { font-family: var(--type); font-weight: 700; font-size: var(--step-3); line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--cobalt); }
+.weather b { font-weight: 500; font-size: var(--step-3); line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--cobalt); }
 .weather span { font-size: var(--step--1); color: var(--ink-soft); }
 
 /* ---------- Footer ---------- */
@@ -593,11 +595,9 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
   /* the title page fills the phone screen; the next section fades in below */
   .hero-bg { object-position: 62% 50%; }
   .page-hero { padding-top: clamp(120px, 20vh, 170px); }
-  .arch-sprig { width: 150px; height: 106px; left: -50px; bottom: -30px; }
   /* on phones the three portraits stay in a row, a little closer together */
   .gallery { gap: 8px; width: auto; margin-inline: 0; }
   .date-rule { display: none; }
-  .reply-sprig { width: 120px; height: 85px; right: -8px; top: -46px; }
   .scallop { --r: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {

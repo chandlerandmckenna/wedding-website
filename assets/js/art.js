@@ -1,6 +1,6 @@
 /* Art shared by every page, in the flat style of the couple's "Salute!" card:
    a cobalt lemon sprig with one ripe lemon (#sprig), a little gold bow
-   (#bow) and a gold underline (#swash). Injected once so pages can <use> them. */
+   (#bow), a gold underline (#swash), a postmark and a stamp picture. Injected once so pages can <use> them. */
 (function () {
   var COBALT = "#1d3fbd", LEMON = "#f5b324", LEMON_DEEP = "#dc951a", GOLD = "#eeaa22";
 
@@ -33,16 +33,25 @@
 
   var swash = '<symbol id="swash" viewBox="0 0 200 30"><path d="M8 18C50 12 120 11 192 16" fill="none" stroke="' + GOLD + '" stroke-width="4" stroke-linecap="round"/></symbol>';
 
+  // the stamp's picture: the sun setting over the bay and a little sailboat
+  var stampView = '<symbol id="stamp-view" viewBox="0 0 64 58">' +
+    '<rect width="64" height="58" fill="#fffdf8"/>' +
+    '<circle cx="40" cy="30" r="13" fill="' + GOLD + '"/>' +
+    '<path d="M0 34H64V58H0Z" fill="' + COBALT + '"/>' +
+    '<path d="M0 41C8 38 14 44 22 41S36 38 44 41S56 44 64 41M0 49C8 46 14 52 22 49S36 46 44 49S56 52 64 49" fill="none" stroke="#7d9be6" stroke-width="2" stroke-linecap="round"/>' +
+    '<path d="M17 31L17 15L26 30Z" fill="#fff" stroke="' + COBALT + '" stroke-width="1"/><path d="M15 17L15 30L8 30Z" fill="#fff" stroke="' + COBALT + '" stroke-width="1"/><path d="M6 32H28L25 36H9Z" fill="' + LEMON + '"/>' +
+    '</symbol>';
+
   // a round Sorrento postmark with wavy cancellation lines
   var postmark = '<symbol id="postmark" viewBox="0 0 200 120"><g fill="none" stroke="' + COBALT + '" stroke-width="2" opacity=".75">' +
     '<circle cx="60" cy="60" r="46"/><circle cx="60" cy="60" r="32"/>' +
     '<path id="pm-arc" d="M24 60A36 36 0 0 1 96 60" stroke="none"/>' +
     '<path d="M112 36C124 30 136 42 148 36S172 30 196 36M112 52C124 46 136 58 148 52S172 46 196 52M112 68C124 62 136 74 148 68S172 62 196 68M112 84C124 78 136 90 148 84S172 78 196 84"/></g>' +
-    '<g fill="' + COBALT + '" opacity=".8" font-family="Courier Prime, monospace" font-weight="700" text-anchor="middle">' +
+    '<g fill="' + COBALT + '" opacity=".8" font-family="Jost, sans-serif" font-weight="500" text-anchor="middle">' +
     '<text font-size="11" letter-spacing="2"><textPath href="#pm-arc" startOffset="50%">SORRENTO</textPath></text>' +
     '<text x="60" y="64" font-size="12">1·10·27</text><text x="60" y="94" font-size="9" letter-spacing="2">ITALIA</text></g></symbol>';
 
   document.body.insertAdjacentHTML("afterbegin",
     '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
-    sprig + bow + swash + postmark + "</defs></svg>");
+    sprig + bow + swash + postmark + stampView + "</defs></svg>");
 })();

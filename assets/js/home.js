@@ -139,7 +139,7 @@
     openBook(true);
   }
 
-  // The cover lifts away from its top edge, then the book underneath shows.
+  // The cover fades away, then the title page fades in line by line.
   function openBook(animate) {
     var guest = window.Guest.current();
     window.renderHeader();
@@ -154,12 +154,14 @@
       return;
     }
     window.scrollTo(0, 0);
+    book.classList.add("arriving");
     cover.classList.add("opening");
     setTimeout(function () {
       cover.hidden = true;
       cover.classList.remove("opening");
       window.setupPageFades(book);
-    }, 1100);
+    }, 900);
+    setTimeout(function () { book.classList.remove("arriving"); }, 2800);
   }
 
   /* ---------- Gut feeling: pick one, then send ---------- */
