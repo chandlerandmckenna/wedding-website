@@ -273,15 +273,17 @@ window.PAGES = [
     settleOnSections(root);
   };
 
-  // When scrolling stops, glide the nearest section into the middle of the
-  // screen. A section taller than the screen settles on its top or bottom
-  // edge when one is close, and is left alone while someone reads inside it.
+  // Sections pull like a magnet: as a scroll slows down, the nearest
+  // section draws the page smoothly into place, carrying on the scroll's own
+  // momentum rather than stopping first. A section taller than the screen
+  // pulls on its top or bottom edge, and lets go while someone reads inside it.
   function settleOnSections(root) {
     if (window.__settling) return;
     window.__settling = true;
     var html = document.documentElement;
     var head = document.getElementById("site-header");
-    var gliding = false, timer = 0, touching = false;
+    var pulling = false, timer = 0, touching = false;
+    var lastY = window.scrollY, lastT = performance.now(), speed = 0;   // px per second
     function targets() {
       var h = head ? head.offsetHeight : 0;
       var view = window.innerHeight - h;
@@ -296,44 +298,61 @@ window.PAGES = [
       out.push({ y: html.scrollHeight - window.innerHeight });   // the footer
       return { list: out, view: view };
     }
-    function settle() {
-      if (gliding || touching) return;
+    var lastWheel = 0;
+    function pull() {
+      if (pulling || touching) return;
+      var quiet = performance.now() - lastWheel;
+      if (quiet < 90) { timer = setTimeout(pull, 90 - quiet); return; }   // still being scrolled by hand
       var y = window.scrollY, t = targets(), best = null;
+      var aim = y + speed * 0.18;                    // lean toward where the scroll was heading
       for (var i = 0; i < t.list.length; i++) {
         var c = t.list[i];
         if (c.to !== undefined && y > c.from + 4 && y < c.to - 4) return;   // reading inside a tall section
-        if (!best || Math.abs(c.y - y) < Math.abs(best.y - y)) best = c;
+        if (!best || Math.abs(c.y - aim) < Math.abs(best.y - aim)) best = c;
       }
       if (!best) return;
       var goal = Math.max(0, Math.min(best.y, html.scrollHeight - window.innerHeight));
-      if (Math.abs(goal - y) < 3 || Math.abs(goal - y) > t.view * 0.6) return;
-      glide(y, goal);
+      if (Math.abs(goal - y) < 2 || Math.abs(goal - y) > t.view * 0.75) return;
+      spring(y, goal, speed);
     }
-    // a slow, gentle ease into place; any wheel, touch or key lets go of it
-    function glide(from, to) {
-      var dist = Math.abs(to - from);
-      var ms = Math.min(1800, 900 + dist * 2.2);
-      var start = 0;
-      gliding = true;
-      html.style.scrollBehavior = "auto";   // step it ourselves, not the browser's quick smooth scroll
-      function ease(t) { return (1 - Math.cos(Math.PI * t)) / 2; }
+    // a soft spring (critically damped), so it eases in without a bounce
+    function spring(x, goal, v) {
+      var w = 6.5, prev = 0;
+      pulling = true;
+      html.style.scrollBehavior = "auto";
       function step(now) {
-        if (!gliding) { html.style.scrollBehavior = ""; return; }
-        if (!start) start = now;
-        var t = Math.min(1, (now - start) / ms);
-        window.scrollTo(0, from + (to - from) * ease(t));
-        if (t < 1) requestAnimationFrame(step);
-        else setTimeout(function () { gliding = false; html.style.scrollBehavior = ""; }, 60);
+        if (!pulling) { html.style.scrollBehavior = ""; return; }
+        var dt = prev ? Math.min(0.05, (now - prev) / 1000) : 1 / 60;
+        prev = now;
+        v += (-w * w * (x - goal) - 2 * w * v) * dt;
+        x += v * dt;
+        if (Math.abs(x - goal) < 0.5 && Math.abs(v) < 8) {
+          window.scrollTo(0, goal);
+          pulling = false; html.style.scrollBehavior = "";
+          lastY = goal; speed = 0;
+          return;
+        }
+        window.scrollTo(0, x);
+        lastY = x;
+        requestAnimationFrame(step);
       }
       requestAnimationFrame(step);
     }
-    function letGo() { gliding = false; clearTimeout(timer); }
-    function soon() { if (!gliding) { clearTimeout(timer); timer = setTimeout(settle, 450); } }
-    window.addEventListener("scroll", soon, { passive: true });
-    window.addEventListener("wheel", function () { letGo(); soon(); }, { passive: true });
+    function letGo() { pulling = false; clearTimeout(timer); }
+    window.addEventListener("scroll", function () {
+      if (pulling) return;
+      var now = performance.now(), y = window.scrollY, dt = (now - lastT) / 1000;
+      if (dt > 0) speed = dt > 0.2 ? 0 : speed * 0.4 + ((y - lastY) / dt) * 0.6;
+      lastY = y; lastT = now;
+      clearTimeout(timer);
+      // once the scroll is slowing (or the wheel goes quiet) the magnet takes over
+      if (!touching && Math.abs(speed) < 350) timer = setTimeout(pull, 30);
+      else timer = setTimeout(function () { speed *= 0.5; pull(); }, 110);
+    }, { passive: true });
+    window.addEventListener("wheel", function () { lastWheel = performance.now(); letGo(); }, { passive: true });
     window.addEventListener("keydown", letGo);
     window.addEventListener("touchstart", function () { touching = true; letGo(); }, { passive: true });
-    window.addEventListener("touchend", function () { touching = false; soon(); }, { passive: true });
+    window.addEventListener("touchend", function () { touching = false; }, { passive: true });
   }
 
   // On the title page the words hang in place while the painting scrolls

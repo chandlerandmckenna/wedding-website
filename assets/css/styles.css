@@ -362,7 +362,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   color: var(--cobalt);
 }
 .hero-date .swash { width: 88%; height: 20px; left: 6%; margin-left: 0; bottom: 0; }
-.hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.05rem, 3vw, 1.3rem); color: var(--ink-soft); font-variant-numeric: lining-nums; }
+.hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.25rem, 3.6vw, 1.6rem); color: var(--gold); text-shadow: 0 1px 3px rgba(255, 250, 240, 0.9); font-variant-numeric: lining-nums; }
 .hero-family {
   margin-top: 10px;
   font-family: var(--script); font-weight: 400;
