@@ -298,6 +298,15 @@ window.PAGES = [
         if (!entries[0].isIntersecting) el.classList.remove("go");
       }).observe(page);
     });
+    // venue photos fan out only when the whole gallery is in view, and tuck
+    // away again once it has scrolled off
+    (root || document).querySelectorAll(".gallery").forEach(function (el) {
+      new IntersectionObserver(function (entries) {
+        var en = entries[0];
+        if (en.intersectionRatio >= 0.9) el.classList.add("fanned");
+        else if (!en.isIntersecting) el.classList.remove("fanned");
+      }, { threshold: [0, 0.9], rootMargin: "0px 0px -12% 0px" }).observe(el);
+    });
   };
 
   // On the title page the words hang in place while the painting scrolls

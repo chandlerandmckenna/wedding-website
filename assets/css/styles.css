@@ -89,6 +89,7 @@ p, figure { margin: 0; }
   box-shadow: inset 0 -3px 0 var(--gold);
 }
 .stripes { background: var(--periwinkle) url("../img/stripes.jpg") repeat 0 0 / 120px 240px; }
+.page.stripes { box-shadow: inset 0 3px 0 var(--gold), inset 0 -3px 0 var(--gold); }
 /* A cream card with a scalloped edge and a thin gold frame inside it. The
    scallops are a mask on a layer behind the content, so sprigs and bows can
    still reach past the edge. */
@@ -366,7 +367,8 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   color: var(--cobalt);
 }
 .hero-date .swash { width: 88%; height: 20px; left: 6%; margin-left: 0; bottom: 0; }
-.hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.25rem, 3.6vw, 1.6rem); color: var(--gold); text-shadow: 0 1px 3px rgba(255, 250, 240, 0.9); font-variant-numeric: lining-nums; }
+.hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.45rem, 4.4vw, 1.9rem); color: var(--gold); -webkit-text-stroke: 2.5px var(--cobalt); paint-order: stroke fill; text-shadow: 0 1px 4px rgba(255, 250, 240, 0.8); font-variant-numeric: lining-nums; }
+.hero-place .dot { color: var(--gold); font-weight: 700; }
 .hero-family {
   margin-top: 14px;
   font-family: var(--body); font-weight: 500;   /* same spaced capitals as SORRENTO · ITALY, set larger */
@@ -439,9 +441,11 @@ html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25
 /* the middle photo settles first, then the outer two fan out slowly from behind it */
 html.paged .gallery .g-main { transition: transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s, opacity 1.2s ease 0.3s; }
 html.paged .page-venue:not(.shown) .gallery .g-main { transform: scale(0.92); opacity: 0; }
-html.paged .gallery figure:not(.g-main) { transition: transform 3s cubic-bezier(0.22, 0.61, 0.18, 1) 1.3s, opacity 2.2s ease 1.3s; }
-html.paged .page-venue:not(.shown) .gallery figure:first-child { transform: translateX(calc(100% + 16px)) rotate(4deg) scale(0.9); opacity: 0; }
-html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: translateX(calc(-100% - 16px)) rotate(-4deg) scale(0.9); opacity: 0; }
+/* the side photos fan out once the whole gallery is on screen (site.js adds
+   .fanned) and tuck back behind the middle one when it leaves */
+html.paged .gallery figure:not(.g-main) { transition: transform 3s cubic-bezier(0.22, 0.61, 0.18, 1) 0.5s, opacity 2.2s ease 0.5s; }
+html.paged .gallery:not(.fanned) figure:first-child { transform: translateX(calc(100% + 16px)) rotate(4deg) scale(0.9); opacity: 0; transition-delay: 0s; transition-duration: 0.6s; }
+html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(-100% - 16px)) rotate(-4deg) scale(0.9); opacity: 0; transition-delay: 0s; transition-duration: 0.6s; }
 /* on wide screens the photo sits beside the story and the venue photos line
    up in one row, so each section fits on one screen */
 @media (min-width: 900px) {
