@@ -85,21 +85,8 @@
   var spritz = '<symbol id="spritz" viewBox="0 -4 180 114">' + spritzGlass(4, -12) + spritzGlass(86, 12) +
     '<path d="M85 4V14M76 8L80 16M94 8L90 16" stroke="' + GOLD + '" stroke-width="3" stroke-linecap="round"/></symbol>';
 
-  // a Vespa carrying a crate of lemons
-  var vespa = '<symbol id="vespa" viewBox="0 0 170 104">' +
-    '<circle cx="40" cy="84" r="15" fill="' + INK + '"/><circle cx="40" cy="84" r="5.5" fill="' + CREAM + '"/>' +
-    '<circle cx="128" cy="84" r="15" fill="' + INK + '"/><circle cx="128" cy="84" r="5.5" fill="' + CREAM + '"/>' +
-    '<path d="M22 78C22 66 30 60 40 60C50 60 58 66 58 78Z" fill="' + COBALT + '"/>' +
-    '<path d="M32 74C32 52 38 36 46 22H56C50 38 48 56 54 70H98C98 50 112 40 132 42C148 44 156 58 154 78H40Z" fill="' + COBALT + '"/>' +
-    '<path d="M98 40C108 33 124 33 136 37L134 46C122 43 110 43 100 46Z" fill="' + INK + '"/>' +
-    '<path d="M38 20H64" stroke="' + INK + '" stroke-width="4" stroke-linecap="round"/><circle cx="46" cy="30" r="5" fill="' + GOLD + '"/>' +
-    '<path d="M112 64C120 58 134 58 144 64" stroke="' + PERI + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-    '<path d="M136 46H162" stroke="' + INK + '" stroke-width="3" stroke-linecap="round"/>' +
-    '<rect x="138" y="28" width="22" height="16" rx="2" fill="' + GOLD + '"/><path d="M138 36H160" stroke="' + CREAM + '" stroke-width="1.5"/>' +
-    '<ellipse cx="143" cy="26" rx="5.5" ry="4.5" fill="' + LEMON + '" stroke="' + CREAM + '" stroke-width="1"/><ellipse cx="152" cy="24" rx="5.5" ry="4.5" fill="' + LEMON + '" stroke="' + CREAM + '" stroke-width="1"/><ellipse cx="158" cy="27" rx="4.5" ry="4" fill="' + LEMON + '" stroke="' + CREAM + '" stroke-width="1"/>' +
-    '</symbol>';
 
   document.body.insertAdjacentHTML("afterbegin",
     '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
-    sprig + bow + swash + postmark + stampView + moor + spritz + vespa + "</defs></svg>");
+    sprig + bow + swash + postmark + stampView + moor + spritz + "</defs></svg>");
 })();
