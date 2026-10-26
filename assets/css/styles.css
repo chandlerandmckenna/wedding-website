@@ -406,7 +406,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 /* little Amalfi touches: the two of us driving in, testa di moro vases, spritzes */
 .doodle { display: block; overflow: visible; pointer-events: none; }
 .story-road { width: min(100%, 300px); display: flex; justify-content: center; border-bottom: 2px dashed var(--gold); margin-top: 2px; }
-.story-car { width: 210px; height: auto; margin-bottom: -2px; }
+.story-car { width: 230px; height: auto; margin-bottom: -2px; }
 html.paged .page-story.shown .story-car { animation: drive-in 2.8s cubic-bezier(0.25, 0.7, 0.25, 1) 0.6s both, putt 0.4s ease-in-out 0.6s 7; }
 @keyframes drive-in { from { translate: -190px 0; opacity: 0; } 15% { opacity: 1; } }
 @keyframes putt { 50% { margin-bottom: -4px; } }
@@ -654,16 +654,26 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 .weather b { font-weight: 500; font-size: var(--step-3); line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--cobalt); }
 .weather span { font-size: var(--step--1); color: var(--ink-soft); }
 
-/* the little plane drifts across the top of the travel page, towing its banner */
-.page-intro { overflow: hidden; }
-.intro-plane { position: absolute; top: clamp(24px, 6vh, 64px); right: 6%; width: clamp(220px, 30vw, 340px); height: auto; aspect-ratio: 300 / 70; }
-html.paged .page-intro.shown .intro-plane { animation: fly-in 3.5s cubic-bezier(0.2, 0.7, 0.2, 1) both, float 5s ease-in-out 3.5s infinite; }
-@keyframes fly-in { from { translate: 60vw 20px; } }
+/* the welcome sits on Chandler's watercolor of the coast, in a cream card */
+.page-intro {
+  display: grid; align-items: center; min-height: min(86svh, 820px);
+  background: url("../img/travel-watercolor.jpg") center 42% / cover no-repeat;
+}
+.intro-card { max-width: 36rem; padding: 30px 34px 34px; display: grid; gap: 8px; background: color-mix(in srgb, var(--card) 94%, transparent); border-radius: 18px; box-shadow: 0 18px 40px rgba(23, 36, 90, 0.25); }
+.intro-card .page-title { font-family: var(--script); font-weight: 400; line-height: 1.05; }
+.intro-card p:last-child { color: var(--ink-soft); }
+@media (max-width: 760px) { .page-intro { align-items: end; background-position: 30% center; } .intro-card { padding: 24px 22px 26px; } }
+
+/* the little plane flies across Flying in, left to right, towing its banner */
+.page-flights { overflow: hidden; }
+.flights-plane { display: block; width: clamp(240px, 32vw, 360px); height: auto; aspect-ratio: 300 / 80; margin: 0 0 10px 52%; }
+html.paged .page-flights.shown .flights-plane { animation: fly-in 4s cubic-bezier(0.2, 0.7, 0.2, 1) both, float 5s ease-in-out 4s infinite; }
+@keyframes fly-in { from { translate: -70vw 24px; } }
 @keyframes float { 50% { translate: 0 -6px; } }
-@media (max-width: 760px) { .intro-plane { position: relative; top: 0; right: auto; display: block; margin: 0 0 8px auto; width: 220px; } }
+@media (max-width: 760px) { .flights-plane { width: 230px; margin: 0 16px 10px auto; } }
 
 /* Day trips: cream cards on the stripes, each with a perforated stamp
-   painted with the place, set at a slight tilt like stamps on a letter. */
+   holding a photo of the place, set at a slight tilt like stamps on a letter. */
 .explore-head { max-width: 40rem; margin: 0 auto 36px; padding: 22px 28px 26px; text-align: center; display: grid; gap: 4px; background: var(--card); border-radius: 18px; }
 .explore-head p:last-child { color: var(--ink-soft); }
 .trips { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 26px; }
@@ -674,7 +684,7 @@ html.paged .page-intro.shown .intro-plane { animation: fly-in 3.5s cubic-bezier(
 }
 .trip-stamp {
   --r: 4px;
-  justify-self: start; width: 132px; padding: 8px 8px 9px; margin: -46px 0 8px -4px;
+  justify-self: stretch; padding: 9px; margin: -48px 6px 10px;
   background: #fffdf8;
   -webkit-mask:
     linear-gradient(#000 0 0) center / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat,
@@ -688,8 +698,8 @@ html.paged .page-intro.shown .intro-plane { animation: fly-in 3.5s cubic-bezier(
 .trip:nth-child(2n) .trip-stamp { transform: rotate(3deg); }
 .trip:nth-child(3n) .trip-stamp { transform: rotate(-2deg); }
 .trip:hover .trip-stamp { transform: rotate(0) scale(1.04); }
-.trip-stamp svg { display: block; width: 100%; height: auto; aspect-ratio: 120 / 100; }
-.trips { padding-top: 34px; }
+.trip-stamp img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+.trips { padding-top: 44px; row-gap: 64px; }
 .trip-meta { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; color: #b97a00; }
 .trip h3 { font-family: var(--script); font-weight: 400; font-size: 1.9rem; line-height: 1.1; color: var(--cobalt); }
 .trip p:not(.trip-meta) { font-size: var(--step--1); color: var(--ink-soft); }

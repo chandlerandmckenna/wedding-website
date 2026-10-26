@@ -53,24 +53,12 @@
 
   // a watercolor treatment: wobbly edges, uneven pigment and a darker rim
   // where the wash dries, so the little pieces sit with the painted car
-  var paint = '<filter id="wc" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">' +
-    '<feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="3" result="n"/>' +
-    '<feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G" result="d"/>' +
-    '<feTurbulence type="fractalNoise" baseFrequency="0.12" numOctaves="2" seed="8" result="g"/>' +
-    '<feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.55 1.3" result="ga"/>' +
-    '<feComposite in="d" in2="ga" operator="in" result="tex"/>' +
-    '<feMorphology in="d" operator="erode" radius="1.4" result="er"/>' +
-    '<feComposite in="d" in2="er" operator="out" result="rim"/>' +
-    '<feColorMatrix in="rim" type="matrix" values="0.7 0 0 0 0  0 0.7 0 0 0  0 0 0.7 0 0  0 0 0 0.55 0" result="rim2"/>' +
-    '<feComponentTransfer in="tex" result="tex2"><feFuncA type="linear" slope="0.88"/></feComponentTransfer>' +
-    '<feMerge><feMergeNode in="tex2"/><feMergeNode in="rim2"/></feMerge></filter>';
-
   /* Little Amalfi pieces in the same flat style as the stamp. */
   var PERI = "#7d9be6", CREAM = "#fcefdf", ORANGE = "#f07f22", INK = "#17245a";
 
   // a testa di moro: the painted ceramic head vases of Sicily and the coast,
   // a nod to Capo Santa Fortunata; drawn in blue-and-white majolica
-  var moor = '<symbol id="moor" viewBox="0 0 100 140"><g filter="url(#wc)">' +
+  var moor = '<symbol id="moor" viewBox="0 0 100 140">' +
     '<path d="M24 46C18 34 26 22 34 28C34 16 46 12 50 24C54 12 66 16 66 28C74 22 82 34 76 46Z" fill="' + PERI + '"/>' +
     '<ellipse cx="32" cy="28" rx="9" ry="7" fill="' + LEMON + '"/><ellipse cx="50" cy="20" rx="9" ry="7" fill="' + LEMON + '"/><ellipse cx="68" cy="28" rx="9" ry="7" fill="' + LEMON + '"/>' +
     '<path d="M28 36L23 24M72 36L77 24" stroke="' + COBALT + '" stroke-width="3" stroke-linecap="round"/>' +
@@ -83,7 +71,7 @@
     '<path d="M38 99L35 116H65L62 99Z" fill="' + COBALT + '"/>' +
     '<rect x="28" y="116" width="44" height="10" rx="3" fill="' + GOLD + '"/>' +
     '<path d="M38 107H62" stroke="' + CREAM + '" stroke-width="2" stroke-dasharray="2 4" stroke-linecap="round"/>' +
-    '</g></symbol>';
+    '</symbol>';
 
   // an Aperol spritz with a slice of orange
   function spritzGlass(x, a) {
@@ -96,81 +84,27 @@
       '<circle cx="62" cy="22" r="11" fill="' + ORANGE + '" stroke="#fff" stroke-width="2"/><path d="M62 13V31M53 22H71M56 16L68 28M68 16L56 28" stroke="#fff" stroke-width="1.2"/>' +
       '</g>';
   }
-  var spritz = '<symbol id="spritz" viewBox="0 -4 180 114"><g filter="url(#wc)">' + spritzGlass(4, -12) + spritzGlass(86, 12) +
-    '<path d="M85 4V14M76 8L80 16M94 8L90 16" stroke="' + GOLD + '" stroke-width="3" stroke-linecap="round"/></g></symbol>';
+  var spritz = '<symbol id="spritz" viewBox="0 -4 180 114">' + spritzGlass(4, -12) + spritzGlass(86, 12) +
+    '<path d="M85 4V14M76 8L80 16M94 8L90 16" stroke="' + GOLD + '" stroke-width="3" stroke-linecap="round"/></symbol>';
 
 
-  // a little plane towing a banner across the travel page, like the one
-  // on the couple's painted save-the-date
-  var plane = '<symbol id="plane" viewBox="0 0 300 70"><g filter="url(#wc)">' +
-    '<path d="M70 34H200" stroke="' + INK + '" stroke-width="1.5" opacity=".6"/>' +
-    '<path d="M196 18H290L280 34L290 50H196Z" fill="' + LEMON + '"/>' +
-    '<text x="243" y="40" text-anchor="middle" font-family="Norican, cursive" font-size="17" fill="' + COBALT + '">Benvenuti!</text>' +
-    '<path d="M8 30C8 24 16 22 30 22H58C66 22 70 28 70 32C70 38 64 40 56 40H24C14 40 8 36 8 30Z" fill="' + COBALT + '"/>' +
-    '<path d="M30 30L22 8H32L46 30Z" fill="' + PERI + '"/><path d="M30 34L20 56H30L46 34Z" fill="' + PERI + '"/>' +
-    '<path d="M8 30L2 18H10L16 28Z" fill="' + PERI + '"/>' +
-    '<circle cx="54" cy="29" r="4" fill="#fff"/><path d="M70 22V42" stroke="' + INK + '" stroke-width="3" stroke-linecap="round"/>' +
-    '</g></symbol>';
-
-  /* Stamp pictures for the travel page's day trips, painted in the same
-     watercolor treatment: Capri, Positano, Pompeii, the Path of the Gods,
-     limoncello and the Bagni della Regina Giovanna. */
-  var SKY = "#d6e1f7", SEA = "#4c72d0", TERRA = "#c8673e", OLIVE = "#7f9a52", STONE = "#e6d6b8";
-  function view(id, body) {
-    return '<symbol id="' + id + '" viewBox="0 0 120 100"><g filter="url(#wc)"><rect width="120" height="100" fill="' + SKY + '"/>' + body + '</g></symbol>';
-  }
-  var waves = '<path d="M0 84C10 81 18 87 28 84S46 81 56 84S74 87 84 84S102 81 120 84" fill="none" stroke="' + PERI + '" stroke-width="2.5" stroke-linecap="round"/>';
-  var trips =
-    view("trip-capri",
-      '<circle cx="94" cy="24" r="10" fill="' + LEMON + '"/>' +
-      '<path d="M0 70H120V100H0Z" fill="' + SEA + '"/>' +
-      '<path d="M14 72C16 50 24 40 30 40C36 40 40 54 42 72Z" fill="' + STONE + '"/>' +
-      '<path d="M44 72C46 44 54 30 60 30C68 30 72 48 74 72Z" fill="#d8c29c"/>' +
-      '<path d="M78 72C80 56 86 50 92 50C98 50 102 60 104 72Z" fill="' + STONE + '"/>' +
-      '<path d="M52 72C56 64 64 64 66 72Z" fill="' + SEA + '"/>' + waves +
-      '<path d="M86 78L88 66L94 77Z" fill="#fff"/><path d="M82 79H98L95 82H85Z" fill="' + COBALT + '"/>') +
-    view("trip-positano",
-      '<path d="M0 30C30 20 60 26 90 18L120 14V100H0Z" fill="' + OLIVE + '" opacity=".7"/>' +
-      '<path d="M0 74H120V100H0Z" fill="' + SEA + '"/>' +
-      '<g>' +
-      '<rect x="16" y="56" width="16" height="16" fill="' + LEMON + '"/><rect x="34" y="50" width="14" height="22" fill="' + CREAM + '"/>' +
-      '<rect x="50" y="44" width="16" height="28" fill="' + TERRA + '"/><rect x="68" y="52" width="14" height="20" fill="#fff"/>' +
-      '<rect x="84" y="46" width="18" height="26" fill="' + LEMON + '"/><rect x="40" y="34" width="14" height="14" fill="#fff"/>' +
-      '<rect x="60" y="30" width="14" height="14" fill="' + CREAM + '"/><rect x="78" y="34" width="12" height="12" fill="' + TERRA + '"/>' +
-      '<path d="M54 44C54 32 66 32 66 44Z" fill="' + COBALT + '"/><path d="M58 40C58 36 62 36 62 40" stroke="' + GOLD + '" stroke-width="1.5" fill="none"/>' +
-      '</g>' +
-      '<path d="M20 62h3M38 58h3M72 58h3M88 54h3M88 62h3M44 40h3M64 36h3" stroke="' + INK + '" stroke-width="2" opacity=".6"/>' + waves) +
-    view("trip-pompeii",
-      '<path d="M0 62L34 22C38 18 42 18 46 22L84 62Z" fill="#9a8f9c"/>' +
-      '<path d="M30 26C30 18 36 12 42 14C46 8 54 10 54 16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".8"/>' +
-      '<path d="M0 62H120V100H0Z" fill="' + STONE + '"/>' +
-      '<rect x="56" y="34" width="56" height="7" fill="#d8c29c"/>' +
-      '<rect x="60" y="41" width="8" height="40" fill="#f3e9d6"/><rect x="78" y="41" width="8" height="40" fill="#f3e9d6"/><rect x="96" y="41" width="8" height="34" fill="#f3e9d6"/>' +
-      '<rect x="56" y="81" width="52" height="5" fill="#d8c29c"/>' +
-      '<path d="M10 90H40" stroke="#d8c29c" stroke-width="3" stroke-linecap="round"/>') +
-    view("trip-gods",
-      '<circle cx="26" cy="22" r="10" fill="' + LEMON + '"/>' +
-      '<path d="M0 60L30 34L52 48L78 26L120 52V100H0Z" fill="' + OLIVE + '"/>' +
-      '<path d="M0 78H120V100H0Z" fill="' + SEA + '"/>' +
-      '<path d="M10 70C30 62 44 60 58 52S86 40 108 46" fill="none" stroke="' + CREAM + '" stroke-width="2.5" stroke-dasharray="4 4" stroke-linecap="round"/>' +
-      '<path d="M86 44L84 38L88 38Z" fill="' + COBALT + '"/><circle cx="86" cy="35" r="2.4" fill="' + COBALT + '"/>' + waves) +
-    view("trip-lemons",
-      '<path d="M0 72H120V100H0Z" fill="' + STONE + '"/>' +
-      '<path d="M50 20H62V30C70 36 72 44 72 54V84H40V54C40 44 42 36 50 30Z" fill="#f7e48a"/>' +
-      '<path d="M50 14H62V22H50Z" fill="' + COBALT + '"/>' +
-      '<rect x="44" y="52" width="24" height="16" rx="2" fill="#fff"/><path d="M48 60H64" stroke="' + COBALT + '" stroke-width="2"/>' +
-      '<ellipse cx="88" cy="80" rx="12" ry="9" fill="' + LEMON + '"/><ellipse cx="24" cy="82" rx="11" ry="8" fill="' + LEMON + '"/>' +
-      '<path d="M84 70C90 62 98 62 102 66C96 70 90 72 84 70Z" fill="' + OLIVE + '"/><path d="M28 74C22 66 14 66 10 70C16 74 22 76 28 74Z" fill="' + OLIVE + '"/>') +
-    view("trip-bagni",
-      '<path d="M0 40C20 34 34 40 44 46V100H0Z" fill="' + STONE + '"/>' +
-      '<path d="M120 36C100 32 86 40 78 46V100H120Z" fill="' + STONE + '"/>' +
-      '<path d="M40 50C46 36 74 36 82 50V58H40Z" fill="' + STONE + '"/>' +
-      '<path d="M46 58C48 46 74 46 76 58Z" fill="' + SKY + '"/>' +
-      '<path d="M22 66C40 60 82 60 100 66C96 82 74 88 60 88C44 88 26 82 22 66Z" fill="#5fc0d0"/>' +
-      '<path d="M34 72C44 70 52 74 62 72S80 70 88 72" stroke="#fff" stroke-width="2" fill="none" opacity=".8" stroke-linecap="round"/>' +
-      '<circle cx="60" cy="74" r="2.6" fill="' + TERRA + '"/>');
+  // a little plane towing a "Benvenuti!" banner, drawn like the sailboat
+  // on the stamp: white with cobalt lines and a lemon trim; it flies right
+  var plane = '<symbol id="plane" viewBox="0 0 300 80">' +
+    '<path d="M112 40C124 39 136 40 150 42" fill="none" stroke="' + COBALT + '" stroke-width="1.5" stroke-dasharray="3 3"/>' +
+    '<path d="M14 24H112V56H14L24 40Z" fill="' + LEMON + '" stroke="' + COBALT + '" stroke-width="2" stroke-linejoin="round"/>' +
+    '<text x="66" y="47" text-anchor="middle" font-family="Norican, cursive" font-size="19" fill="' + COBALT + '">Benvenuti!</text>' +
+    '<path d="M190 38L176 8H192L214 38Z" fill="#fff" stroke="' + COBALT + '" stroke-width="2" stroke-linejoin="round"/>' +
+    '<path d="M152 34L144 20H154L164 34Z" fill="#fff" stroke="' + COBALT + '" stroke-width="2" stroke-linejoin="round"/>' +
+    '<path d="M150 42C150 34 160 32 176 32H250C266 32 278 36 282 42C278 48 266 52 250 52H176C160 52 150 50 150 42Z" fill="#fff" stroke="' + COBALT + '" stroke-width="2.4"/>' +
+    '<path d="M158 44H274" stroke="' + LEMON + '" stroke-width="3"/>' +
+    '<path d="M246 33C250 26 262 26 266 36Z" fill="' + PERI + '" stroke="' + COBALT + '" stroke-width="2" stroke-linejoin="round"/>' +
+    '<circle cx="208" cy="40" r="2.6" fill="' + COBALT + '"/><circle cx="222" cy="40" r="2.6" fill="' + COBALT + '"/><circle cx="236" cy="40" r="2.6" fill="' + COBALT + '"/>' +
+    '<path d="M196 46L180 74H196L220 46Z" fill="#fff" stroke="' + COBALT + '" stroke-width="2" stroke-linejoin="round"/>' +
+    '<path d="M284 30V54" stroke="' + COBALT + '" stroke-width="3" stroke-linecap="round"/><circle cx="283" cy="42" r="3" fill="' + GOLD + '"/>' +
+    '</symbol>';
 
   document.body.insertAdjacentHTML("afterbegin",
     '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
-    sprig + bow + swash + postmark + stampView + paint + moor + spritz + trips + plane + "</defs></svg>");
+    sprig + bow + swash + postmark + stampView + moor + spritz + plane + "</defs></svg>");
 })();
