@@ -223,15 +223,17 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 
 /* after sign-in the cover fades away, then the title page's painting and
    words fade in one line at a time */
-.cover.opening { pointer-events: none; animation: cover-fade 0.9s ease forwards; }
-@keyframes cover-fade { to { opacity: 0; } }
-.book.arriving .site-header, .book.arriving .hero-bg { animation: fade-in 1.2s ease 0.3s both; }
-.book.arriving .hero-text > * { animation: rise-in 1.1s cubic-bezier(0.2, 0.6, 0.2, 1) both; animation-delay: calc(0.7s + var(--n, 0) * 0.22s); }
+.cover.opening { pointer-events: none; animation: cover-fade 1.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+@keyframes cover-fade { 60% { opacity: 0.4; } to { opacity: 0; transform: scale(1.06); filter: blur(6px); } }
+.book.arriving .site-header { animation: fade-in 1.4s ease 0.9s both; }
+.book.arriving .hero-bg { animation: hero-in 3.2s cubic-bezier(0.2, 0.6, 0.2, 1) 0.2s both; }
+.book.arriving .hero-text > * { animation: rise-in 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(1.1s + var(--n, 0) * 0.42s); }
 .book.arriving .hero-text > :nth-child(2) { --n: 1; }
 .book.arriving .hero-text > :nth-child(3) { --n: 2; }
 .book.arriving .hero-text > :nth-child(4) { --n: 3; }
 .book.arriving .hero-text > :nth-child(5) { --n: 4; }
-@keyframes rise-in { from { opacity: 0; transform: translateY(12px); } }
+@keyframes hero-in { from { opacity: 0; transform: scale(1.12); filter: blur(10px) saturate(0.6); } }
+@keyframes rise-in { from { opacity: 0; transform: translateY(34px) scale(0.96); filter: blur(8px); } }
 @keyframes fade-in { from { opacity: 0; } }
 
 /* ---------- Header: stays pinned while the pages scroll under it ---------- */
@@ -398,6 +400,18 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .date-en { font-family: var(--italic); font-style: italic; color: var(--ink-soft); }
 .date-rule { width: 2px; height: 120px; background: var(--gold); opacity: 0.6; }
 
+.story-title { font-size: clamp(3.2rem, 8vw, 4.8rem); line-height: 1.05; }
+/* little Amalfi doodles: a Vespa, testa di moro vases, spritzes */
+.doodle { display: block; overflow: visible; pointer-events: none; }
+.story-vespa { width: 140px; height: 86px; margin-top: -6px; }
+html.paged .page-story.shown .story-vespa { animation: putter 2.4s cubic-bezier(0.2, 0.7, 0.2, 1) 0.8s both; }
+@keyframes putter { from { opacity: 0; transform: translateX(-90px); } }
+.venue-title { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 3vw, 28px); }
+.moor { flex: none; width: clamp(48px, 7vw, 76px); height: auto; aspect-ratio: 100 / 140; }
+.moor-right { transform: scaleX(-1); }
+@media (min-width: 700px) { .venue-title h2 { white-space: nowrap; } }
+.spritz { justify-self: center; width: 116px; height: 74px; margin-bottom: 4px; }
+
 /* Venue */
 /* three portrait photos in a row, sized so the row fits on one screen; the
    middle one shows first and the other two drift out from behind it */
@@ -419,8 +433,8 @@ html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: trans
 /* on wide screens the photo sits beside the story and the venue photos line
    up in one row, so each section fits on one screen */
 @media (min-width: 900px) {
-  .story { grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr); column-gap: clamp(40px, 6vw, 88px); align-items: center; }
-  .story .arch-wrap { grid-row: 1 / span 4; width: min(100%, 320px); margin-bottom: 0; }
+  .story { grid-template-columns: auto minmax(0, 36rem); justify-content: center; column-gap: clamp(28px, 3.5vw, 48px); align-items: center; }
+  .story .arch-wrap { grid-row: 1 / span 5; width: min(100%, 320px); margin-bottom: 0; }
 }
 
 /* Gut feeling */

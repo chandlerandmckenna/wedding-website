@@ -51,7 +51,55 @@
     '<text font-size="11" letter-spacing="2"><textPath href="#pm-arc" startOffset="50%">SORRENTO</textPath></text>' +
     '<text x="60" y="64" font-size="12">1·10·27</text><text x="60" y="94" font-size="9" letter-spacing="2">ITALIA</text></g></symbol>';
 
+  /* Little Amalfi pieces in the same flat style as the stamp. */
+  var PERI = "#7d9be6", CREAM = "#fcefdf", ORANGE = "#f07f22", INK = "#17245a";
+
+  // a testa di moro: the painted ceramic head vases of Sicily and the coast,
+  // a nod to Capo Santa Fortunata; drawn in blue-and-white majolica
+  var moor = '<symbol id="moor" viewBox="0 0 100 140">' +
+    '<path d="M24 46C18 34 26 22 34 28C34 16 46 12 50 24C54 12 66 16 66 28C74 22 82 34 76 46Z" fill="' + PERI + '"/>' +
+    '<ellipse cx="32" cy="28" rx="9" ry="7" fill="' + LEMON + '"/><ellipse cx="50" cy="20" rx="9" ry="7" fill="' + LEMON + '"/><ellipse cx="68" cy="28" rx="9" ry="7" fill="' + LEMON + '"/>' +
+    '<path d="M28 36L23 24M72 36L77 24" stroke="' + COBALT + '" stroke-width="3" stroke-linecap="round"/>' +
+    '<path d="M24 62C24 44 36 40 50 40C64 40 76 44 76 62C76 88 66 100 50 100C34 100 24 88 24 62Z" fill="' + COBALT + '"/>' +
+    '<path d="M22 48H78L74 58H26Z" fill="' + GOLD + '"/>' +
+    '<circle cx="34" cy="53" r="2.2" fill="' + CREAM + '"/><circle cx="50" cy="53" r="2.6" fill="' + CREAM + '"/><circle cx="66" cy="53" r="2.2" fill="' + CREAM + '"/>' +
+    '<g fill="none" stroke="' + CREAM + '" stroke-width="2.2" stroke-linecap="round">' +
+    '<path d="M36 69C39 72 43 72 46 69M54 69C57 72 61 72 64 69"/><path d="M50 72L48 82H53"/><path d="M44 89C48 92 52 92 56 89"/></g>' +
+    '<circle cx="25" cy="78" r="3.4" fill="' + GOLD + '"/><circle cx="75" cy="78" r="3.4" fill="' + GOLD + '"/>' +
+    '<path d="M38 99L35 116H65L62 99Z" fill="' + COBALT + '"/>' +
+    '<rect x="28" y="116" width="44" height="10" rx="3" fill="' + GOLD + '"/>' +
+    '<path d="M38 107H62" stroke="' + CREAM + '" stroke-width="2" stroke-dasharray="2 4" stroke-linecap="round"/>' +
+    '</symbol>';
+
+  // an Aperol spritz with a slice of orange
+  function spritzGlass(x, a) {
+    return '<g transform="translate(' + x + ' 0) rotate(' + a + ' 40 100)">' +
+      '<path d="M16 26C16 58 26 72 40 72C54 72 64 58 64 26Z" fill="' + ORANGE + '"/>' +
+      '<rect x="28" y="40" width="10" height="10" rx="2" fill="#fff" opacity=".55"/><rect x="42" y="46" width="9" height="9" rx="2" fill="#fff" opacity=".45"/>' +
+      '<path d="M14 12H66C66 56 56 74 40 74C24 74 14 56 14 12Z" fill="none" stroke="' + COBALT + '" stroke-width="3"/>' +
+      '<path d="M40 74V100M26 102H54" stroke="' + COBALT + '" stroke-width="3" stroke-linecap="round"/>' +
+      '<path d="M50 4L44 40" stroke="' + COBALT + '" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<circle cx="62" cy="22" r="11" fill="' + ORANGE + '" stroke="#fff" stroke-width="2"/><path d="M62 13V31M53 22H71M56 16L68 28M68 16L56 28" stroke="#fff" stroke-width="1.2"/>' +
+      '</g>';
+  }
+  var spritz = '<symbol id="spritz" viewBox="0 -4 180 114">' + spritzGlass(4, -12) + spritzGlass(86, 12) +
+    '<path d="M85 4V14M76 8L80 16M94 8L90 16" stroke="' + GOLD + '" stroke-width="3" stroke-linecap="round"/></symbol>';
+
+  // a Vespa carrying a crate of lemons
+  var vespa = '<symbol id="vespa" viewBox="0 0 170 104">' +
+    '<circle cx="40" cy="84" r="15" fill="' + INK + '"/><circle cx="40" cy="84" r="5.5" fill="' + CREAM + '"/>' +
+    '<circle cx="128" cy="84" r="15" fill="' + INK + '"/><circle cx="128" cy="84" r="5.5" fill="' + CREAM + '"/>' +
+    '<path d="M22 78C22 66 30 60 40 60C50 60 58 66 58 78Z" fill="' + COBALT + '"/>' +
+    '<path d="M32 74C32 52 38 36 46 22H56C50 38 48 56 54 70H98C98 50 112 40 132 42C148 44 156 58 154 78H40Z" fill="' + COBALT + '"/>' +
+    '<path d="M98 40C108 33 124 33 136 37L134 46C122 43 110 43 100 46Z" fill="' + INK + '"/>' +
+    '<path d="M38 20H64" stroke="' + INK + '" stroke-width="4" stroke-linecap="round"/><circle cx="46" cy="30" r="5" fill="' + GOLD + '"/>' +
+    '<path d="M112 64C120 58 134 58 144 64" stroke="' + PERI + '" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+    '<path d="M136 46H162" stroke="' + INK + '" stroke-width="3" stroke-linecap="round"/>' +
+    '<rect x="138" y="28" width="22" height="16" rx="2" fill="' + GOLD + '"/><path d="M138 36H160" stroke="' + CREAM + '" stroke-width="1.5"/>' +
+    '<ellipse cx="143" cy="26" rx="5.5" ry="4.5" fill="' + LEMON + '" stroke="' + CREAM + '" stroke-width="1"/><ellipse cx="152" cy="24" rx="5.5" ry="4.5" fill="' + LEMON + '" stroke="' + CREAM + '" stroke-width="1"/><ellipse cx="158" cy="27" rx="4.5" ry="4" fill="' + LEMON + '" stroke="' + CREAM + '" stroke-width="1"/>' +
+    '</symbol>';
+
   document.body.insertAdjacentHTML("afterbegin",
     '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
-    sprig + bow + swash + postmark + stampView + "</defs></svg>");
+    sprig + bow + swash + postmark + stampView + moor + spritz + vespa + "</defs></svg>");
 })();
