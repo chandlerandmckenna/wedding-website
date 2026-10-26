@@ -1,5 +1,5 @@
 /* Home page: sign-in on the cover (phone, or email as a fallback), the
-   cover lifting away, the "Have a gut feeling?" answer and the guest's
+   cover fading away, the "Have a gut feeling?" answer and the guest's
    mailing address. */
 (function () {
   var cover = document.getElementById("cover");
