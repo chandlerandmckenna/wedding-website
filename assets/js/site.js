@@ -311,7 +311,15 @@ window.PAGES = [
 
   // Moving between Save the date and Travel always starts at the top.
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-  window.addEventListener("pageshow", function () { window.scrollTo(0, 0); });
+  // jump straight there: the page's smooth scrolling would visibly race up
+  window.jumpToTop = function () {
+    var html = document.documentElement;
+    html.style.scrollBehavior = "auto";
+    window.scrollTo(0, 0);
+    requestAnimationFrame(function () { html.style.scrollBehavior = ""; });
+  };
+  window.jumpToTop();
+  window.addEventListener("pageshow", window.jumpToTop);
 
   // Every page except the cover needs a signed-in guest.
   var isHome = currentPage() === homeHref();

@@ -298,6 +298,8 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
    eases it to the middle (proximity, so it never traps you inside a long one) */
 html.paged { scroll-snap-type: y proximity; }
 html.paged .page, html.paged .page-hero { scroll-snap-align: center; }
+/* the travel guide reads as one page: sections are only as tall as their content */
+html.paged .page-travel .page:not(.page-intro) { min-height: 0; padding-block: clamp(56px, 9vh, 96px); }
 html.paged .page, html.paged .page-hero { min-height: calc(100svh - var(--head, 96px)); }
 html.paged .page { display: grid; align-content: center; padding-block: clamp(40px, 7vh, 80px); }
 html.paged .page-hero { align-content: start; }

@@ -154,7 +154,7 @@
       window.setupPageFades(book);
       return;
     }
-    window.scrollTo(0, 0);
+    window.jumpToTop();
     var wash = washReveal();
     book.classList.add("arriving");
     cover.classList.add("opening");
