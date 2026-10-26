@@ -8,7 +8,7 @@
 <meta name="description" content="Save the date: McKenna and Chandler are getting married in Sorrento, Italy, on October 1, 2027.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Playfair+Display:ital,wght@0,400..800;1,400..700&family=Playfair+Display+SC:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Jost:wght@400;500;600&family=Norican&display=swap">
 <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -17,11 +17,10 @@
 <!-- The cover: a simple sign-in. Guests enter their phone number to open the book. -->
 <section class="cover" id="cover">
   <div class="tile-band" aria-hidden="true"></div>
-  <svg class="cover-lemons" aria-hidden="true" focusable="false"><use href="#tomato-vine"/></svg>
-  <svg class="cover-lemons cover-lemons-right" aria-hidden="true" focusable="false"><use href="#tomato-vine"/></svg>
   <div class="cover-inner" id="cover-inner">
-    <div class="cover-card">
+    <div class="cover-card scallop">
       <p class="cover-eyebrow">Save the Date</p>
+      <svg class="cover-sprig" viewBox="0 0 240 170" aria-hidden="true" focusable="false"><use href="#sprig"/></svg>
       <h1 class="cover-names">McKenna <span class="amp">&amp;</span> Chandler</h1>
       <p class="cover-date"><span>10</span><i>·</i><span>1</span><i>·</i><span>2027</span></p>
 
@@ -60,6 +59,7 @@
 
       <p class="error" id="cover-error" role="alert" hidden></p>
       <p class="hint preview-note" id="preview-note" hidden>Preview: any number or email works, and sign-ins stay in this browser.</p>
+      <svg class="bow" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#bow"/></svg>
     </div>
   </div>
   <div class="tile-band" aria-hidden="true"></div>
@@ -133,9 +133,9 @@
       </div>
     </section>
 
-    <section class="page page-reply fade" id="reply">
+    <section class="page page-reply stripes fade" id="reply">
       <div class="wrap">
-        <div class="feel-panel">
+        <div class="feel-panel scallop">
           <svg class="sprig reply-sprig" aria-hidden="true" focusable="false"><use href="#sprig"/></svg>
           <p class="script" id="feel-hello">Ciao!</p>
           <h2>Have a gut feeling?</h2>
@@ -156,13 +156,14 @@
           </div>
           <button class="button wide send" type="button" id="feel-send" disabled>Send my answer</button>
           <p class="feel-status" id="feel-status" role="status"></p>
+          <svg class="bow" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#bow"/></svg>
         </div>
       </div>
     </section>
 
-    <section class="page page-address fade" id="address">
+    <section class="page page-address stripes fade" id="address">
       <div class="wrap">
-        <form class="address-panel" id="address-form" novalidate>
+        <form class="address-panel scallop" id="address-form" novalidate>
           <p class="script">Per posta</p>
           <h2>Got a better place for us to send an RSVP?</h2>
           <p class="feel-sub">Leave the address where you'd like your formal invitation and RSVP card to arrive.</p>
@@ -194,6 +195,7 @@
           </div>
           <button class="button wide" type="submit" id="address-send">Save my address</button>
           <p class="feel-status" id="address-status" role="status"></p>
+          <svg class="bow" viewBox="0 0 120 40" aria-hidden="true" focusable="false"><use href="#bow"/></svg>
         </form>
       </div>
     </section>
