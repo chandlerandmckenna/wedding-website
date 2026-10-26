@@ -294,7 +294,10 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 
 /* Pages: as you scroll, each section settles into place and the one before
    fades out while the next fades in (see setupPageFades in site.js). */
-/* each section fills the screen; site.js glides the nearest one to the middle when scrolling stops */
+/* each section fills the screen; when a scroll ends near one, the browser
+   eases it to the middle (proximity, so it never traps you inside a long one) */
+html.paged { scroll-snap-type: y proximity; }
+html.paged .page, html.paged .page-hero { scroll-snap-align: center; }
 html.paged .page, html.paged .page-hero { min-height: calc(100svh - var(--head, 96px)); }
 html.paged .page { display: grid; align-content: center; padding-block: clamp(40px, 7vh, 80px); }
 html.paged .page-hero { align-content: start; }
@@ -405,20 +408,22 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .doodle { display: block; overflow: visible; pointer-events: none; }
 .story-road { width: min(100%, 300px); display: flex; justify-content: center; border-bottom: 2px dashed var(--gold); margin-top: 2px; }
 .story-car { width: 230px; height: auto; margin-bottom: -2px; }
-html.paged .page-story.shown .story-car { animation: drive-in 2.8s cubic-bezier(0.25, 0.7, 0.25, 1) 0.6s both, putt 0.4s ease-in-out 0.6s 7; }
-@keyframes drive-in { from { translate: -190px 0; opacity: 0; } 15% { opacity: 1; } }
+html.paged .story-car:not(.go) { opacity: 0; }
+html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25, 1) 0.7s both, putt 0.45s ease-in-out 0.7s 9; }
+@keyframes drive-in { from { translate: -260px 0; opacity: 0; } 15% { opacity: 1; } }
 @keyframes putt { 50% { margin-bottom: -4px; } }
 .venue-title { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 3vw, 28px); }
 .moor { flex: none; width: clamp(48px, 7vw, 76px); height: auto; aspect-ratio: 100 / 140; }
 .moor-right { transform: scaleX(-1); }
 @media (min-width: 700px) { .venue-title h2 { white-space: nowrap; } }
+@media (min-width: 1000px) { .page-venue .section-head { max-width: none; margin-bottom: 32px; } .page-venue .section-head p:last-child { white-space: nowrap; } }
 .spritz { justify-self: center; width: 116px; height: 74px; margin-bottom: 4px; }
 
 /* Venue */
 /* three portrait photos in a row, sized so the row fits on one screen; the
    middle one shows first and the other two drift out from behind it */
 .gallery {
-  --gw: min(96vw, calc(117vh + 32px), 1200px);
+  --gw: min(96vw, calc((100svh - var(--head, 96px) - 330px) * 2.25 + 32px), 1200px);   /* photos fit under the heading on one screen */
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
@@ -644,6 +649,8 @@ html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: trans
 }
 .card .code { font-weight: 500; font-size: 2.6rem; color: var(--cobalt); line-height: 1; }
 .card p { font-size: var(--step--1); color: var(--ink-soft); }
+.star { color: var(--gold); font-weight: 600; font-size: 1.2em; line-height: 0; }
+.table-note { margin-top: 14px; font-family: var(--italic); font-style: italic; color: var(--ink-soft); }
 .table-scroll { overflow-x: auto; max-width: 100%; border-top: 1px solid var(--cobalt); }
 table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: var(--step--1); }
 th, td { text-align: left; padding: 14px 14px 14px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -690,7 +697,8 @@ html.paged .page-intro.fade { opacity: 1; transform: none; }   /* the painting d
 /* the little plane flies across Flying in, left to right, towing its banner */
 .page-flights { overflow: hidden; }
 .flights-plane { display: block; width: clamp(240px, 32vw, 360px); height: auto; aspect-ratio: 300 / 80; margin: 0 6% 10px auto; }
-html.paged .page-flights.shown .flights-plane { animation: fly-in 4s cubic-bezier(0.2, 0.7, 0.2, 1) both, float 5s ease-in-out 4s infinite; }
+html.paged .flights-plane:not(.go) { opacity: 0; }
+html.paged .flights-plane.go { animation: fly-in 5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both, float 5s ease-in-out 5.3s infinite; }
 @keyframes fly-in { from { translate: -70vw 24px; } }
 @keyframes float { 50% { translate: 0 -6px; } }
 @media (max-width: 760px) { .flights-plane { width: 230px; margin: 0 16px 10px auto; } }

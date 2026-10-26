@@ -270,90 +270,21 @@ window.PAGES = [
     }, { rootMargin: "-45% 0px -45% 0px" });
     (root || document).querySelectorAll(".fade").forEach(function (el) { io.observe(el); });
     floatHeroText(root);
-    settleOnSections(root);
+    // the Vespa and the plane set off only once they are well up the screen,
+    // and park again when their section scrolls away
+    function setOff(entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) en.target.classList.add("go"); });
+    }
+    var carGo = new IntersectionObserver(setOff, { threshold: 1 });     // the whole scooter is on screen
+    var planeGo = new IntersectionObserver(setOff, { rootMargin: "0px 0px -50% 0px", threshold: 1 });  // up in the top half
+    (root || document).querySelectorAll(".story-car, .flights-plane").forEach(function (el) {
+      (el.classList.contains("story-car") ? carGo : planeGo).observe(el);
+      var page = el.closest(".page");
+      new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) el.classList.remove("go");
+      }).observe(page);
+    });
   };
-
-  // Sections pull like a magnet: as a scroll slows down, the nearest
-  // section draws the page smoothly into place, carrying on the scroll's own
-  // momentum rather than stopping first. A section taller than the screen
-  // pulls on its top or bottom edge, and lets go while someone reads inside it.
-  function settleOnSections(root) {
-    if (window.__settling) return;
-    window.__settling = true;
-    var html = document.documentElement;
-    var head = document.getElementById("site-header");
-    var pulling = false, timer = 0, touching = false;
-    var lastY = window.scrollY, lastT = performance.now(), speed = 0;   // px per second
-    function targets() {
-      var h = head ? head.offsetHeight : 0;
-      var view = window.innerHeight - h;
-      var out = [];
-      (root || document).querySelectorAll(".page, .page-hero").forEach(function (el) {
-        if (el.hidden || !el.offsetHeight) return;
-        var top = -h, height = el.offsetHeight;      // layout position, ignoring the fade's nudge
-        for (var n = el; n; n = n.offsetParent) top += n.offsetTop;
-        if (height <= view + 2) out.push({ y: top - (view - height) / 2 });
-        else out.push({ y: top, from: top, to: top + height - view }, { y: top + height - view });
-      });
-      out.push({ y: html.scrollHeight - window.innerHeight });   // the footer
-      return { list: out, view: view };
-    }
-    var lastWheel = 0;
-    function pull() {
-      if (pulling || touching) return;
-      var quiet = performance.now() - lastWheel;
-      if (quiet < 90) { timer = setTimeout(pull, 90 - quiet); return; }   // still being scrolled by hand
-      var y = window.scrollY, t = targets(), best = null;
-      var aim = y + speed * 0.18;                    // lean toward where the scroll was heading
-      for (var i = 0; i < t.list.length; i++) {
-        var c = t.list[i];
-        if (c.to !== undefined && y > c.from + 4 && y < c.to - 4) return;   // reading inside a tall section
-        if (!best || Math.abs(c.y - aim) < Math.abs(best.y - aim)) best = c;
-      }
-      if (!best) return;
-      var goal = Math.max(0, Math.min(best.y, html.scrollHeight - window.innerHeight));
-      if (Math.abs(goal - y) < 2 || Math.abs(goal - y) > t.view * 0.75) return;
-      spring(y, goal, speed);
-    }
-    // a soft spring (critically damped), so it eases in without a bounce
-    function spring(x, goal, v) {
-      var w = 6.5, prev = 0;
-      pulling = true;
-      html.style.scrollBehavior = "auto";
-      function step(now) {
-        if (!pulling) { html.style.scrollBehavior = ""; return; }
-        var dt = prev ? Math.min(0.05, (now - prev) / 1000) : 1 / 60;
-        prev = now;
-        v += (-w * w * (x - goal) - 2 * w * v) * dt;
-        x += v * dt;
-        if (Math.abs(x - goal) < 0.5 && Math.abs(v) < 8) {
-          window.scrollTo(0, goal);
-          pulling = false; html.style.scrollBehavior = "";
-          lastY = goal; speed = 0;
-          return;
-        }
-        window.scrollTo(0, x);
-        lastY = x;
-        requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
-    function letGo() { pulling = false; clearTimeout(timer); }
-    window.addEventListener("scroll", function () {
-      if (pulling) return;
-      var now = performance.now(), y = window.scrollY, dt = (now - lastT) / 1000;
-      if (dt > 0) speed = dt > 0.2 ? 0 : speed * 0.4 + ((y - lastY) / dt) * 0.6;
-      lastY = y; lastT = now;
-      clearTimeout(timer);
-      // once the scroll is slowing (or the wheel goes quiet) the magnet takes over
-      if (!touching && Math.abs(speed) < 350) timer = setTimeout(pull, 30);
-      else timer = setTimeout(function () { speed *= 0.5; pull(); }, 110);
-    }, { passive: true });
-    window.addEventListener("wheel", function () { lastWheel = performance.now(); letGo(); }, { passive: true });
-    window.addEventListener("keydown", letGo);
-    window.addEventListener("touchstart", function () { touching = true; letGo(); }, { passive: true });
-    window.addEventListener("touchend", function () { touching = false; }, { passive: true });
-  }
 
   // On the title page the words hang in place while the painting scrolls
   // up beneath them, fading out by the time the page is half gone. The
@@ -377,6 +308,10 @@ window.PAGES = [
     }, { passive: true });
     update();
   }
+
+  // Moving between Save the date and Travel always starts at the top.
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  window.addEventListener("pageshow", function () { window.scrollTo(0, 0); });
 
   // Every page except the cover needs a signed-in guest.
   var isHome = currentPage() === homeHref();
