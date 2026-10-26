@@ -299,7 +299,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 /* the travel guide reads as one page: sections are only as tall as their content */
 html.paged .page-travel .page:not(.page-intro) { min-height: 0; padding-block: clamp(56px, 9vh, 96px); }
 html.paged .page, html.paged .page-hero { min-height: calc(100svh - var(--head, 96px)); }
-html.paged .page { display: grid; align-content: center; padding-block: clamp(40px, 7vh, 80px); }
+html.paged .page { display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; padding-block: clamp(40px, 7vh, 80px); }
 html.paged .page-hero { align-content: start; }
 html.paged .fade { opacity: 0.08; transform: translateY(18px); transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1), transform 1.8s cubic-bezier(0.2, 0.6, 0.2, 1); }
 html.paged .fade.shown { opacity: 1; transform: none; }
@@ -373,7 +373,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   line-height: 1.1;
   color: var(--cobalt);   /* same blue as "Sì, lo voglio" */
 }
-.arch-wrap { position: relative; justify-self: center; width: min(78%, 340px); margin-bottom: 20px; }
+.arch-wrap { position: relative; justify-self: center; width: min(86%, 380px); margin-bottom: 20px; }
 .arch {
   position: relative;
   aspect-ratio: 2 / 3;
@@ -443,7 +443,7 @@ html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: trans
 /* on wide screens the photo sits beside the story and the venue photos line
    up in one row, so each section fits on one screen */
 @media (min-width: 900px) {
-  .story { grid-template-columns: 300px minmax(0, 38rem); justify-content: center; column-gap: clamp(48px, 6vw, 80px); row-gap: 22px; align-items: center; align-content: center; }
+  .story { grid-template-columns: min(400px, calc((100svh - var(--head, 96px) - 124px) * 2 / 3)) minmax(0, 38rem); justify-content: center; column-gap: clamp(48px, 6vw, 80px); row-gap: 22px; align-items: center; align-content: center; }
   .story .arch-wrap { grid-row: 1 / span 5; width: 100%; margin-bottom: 0; align-self: center; }
   .story-lead { max-width: 36rem; font-size: clamp(1.25rem, 1.9vw, 1.45rem); }
   .story .dates { margin-block: 0; }
@@ -514,6 +514,8 @@ html.paged .page-venue:not(.shown) .gallery figure:last-child { transform: trans
 }
 .feel-panel > :not(.sprig) { position: relative; }
 .feel-sub { color: var(--ink-soft); margin-bottom: 18px; }
+.feel-panel #feel-hello { font-size: clamp(1.35rem, 3vw, 1.7rem); color: var(--ink-soft); margin-bottom: -6px; }
+.feel-panel h2 { font-size: clamp(2.8rem, 7vw, 4.2rem); line-height: 1.05; }
 .feel-options { display: grid; gap: 12px; }
 .feel {
   display: flex; align-items: center; gap: 16px;
@@ -712,6 +714,15 @@ html.paged .page-intro.fade { opacity: 1; transform: none; }   /* the painting d
 @keyframes flap { 0%, 100% { transform: translateY(calc(var(--a) * -1px)); } 50% { transform: translateY(calc(var(--a) * 1px)); } }
 html.paged .flights-plane:not(.go) { opacity: 0; }
 html.paged .flights-plane.go { animation: fly-in 5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both, float 5s ease-in-out 5.3s infinite; }
+/* a little wooden launch motors in from the right above the ferry table, then rocks on the swell */
+.page-boat { overflow: hidden; }
+.page-boat .wrap { position: relative; }
+.ferry-boat { position: absolute; right: 0; top: -44px; width: clamp(220px, 26vw, 340px); height: auto; }
+html.paged .ferry-boat:not(.go) { opacity: 0; }
+html.paged .ferry-boat.go { animation: sail-in 5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both, rock 4.5s ease-in-out 5.3s infinite; }
+@keyframes sail-in { from { translate: 60vw 6px; } }
+@keyframes rock { 50% { transform: translateY(-3px) rotate(-1.5deg); } }
+@media (max-width: 900px) { .ferry-boat { position: relative; top: 0; display: block; width: min(70%, 260px); margin: 0 0 8px auto; } }
 @keyframes fly-in { from { translate: -70vw 24px; } }
 @keyframes float { 50% { translate: 0 -6px; } }
 @media (max-width: 760px) { .flights-plane { width: min(92%, 340px); margin: 0 16px 10px auto; } }

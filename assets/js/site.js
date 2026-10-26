@@ -190,10 +190,16 @@ window.PAGES = [
   function renderFooter() {
     var el = document.getElementById("site-footer");
     if (!el) return;
+    // little ocean ripples for the boat to sail on
+    function waves(x0, x1, y) {
+      var d = "", w = 11;
+      for (var x = x0; x < x1; x += w) d += "Q" + (x + w / 2) + " " + (y + ((x - x0) / w % 2 ? 3 : -3)) + " " + (x + w) + " " + y;
+      return d;
+    }
     el.innerHTML =
       '<div class="footer-inner">' +
       '<svg class="footer-sail" viewBox="0 0 220 34" aria-hidden="true" focusable="false">' +
-      '<path d="M0 31H220" stroke="#eeaa22" stroke-width="2"/>' +
+      '<path d="M0 31' + waves(0, 220, 31) + '" fill="none" stroke="#eeaa22" stroke-width="2" stroke-linecap="round"/>' +
       '<g class="sail"><path d="M110 4V25L124 24Z" fill="#fff" stroke="#1d3fbd" stroke-width="1.6" stroke-linejoin="round"/>' +
       '<path d="M107 8V25L97 25Z" fill="#fff" stroke="#1d3fbd" stroke-width="1.6" stroke-linejoin="round"/>' +
       '<path d="M94 26H128L123 31H99Z" fill="#1d3fbd"/></g></svg>' +
@@ -285,7 +291,7 @@ window.PAGES = [
     }
     var carGo = new IntersectionObserver(setOff, { threshold: 1 });     // the whole scooter is on screen
     var planeGo = new IntersectionObserver(setOff, { rootMargin: "0px 0px -50% 0px", threshold: 1 });  // up in the top half
-    (root || document).querySelectorAll(".story-car, .flights-plane").forEach(function (el) {
+    (root || document).querySelectorAll(".story-car, .flights-plane, .ferry-boat").forEach(function (el) {
       (el.classList.contains("story-car") ? carGo : planeGo).observe(el);
       var page = el.closest(".page");
       new IntersectionObserver(function (entries) {
