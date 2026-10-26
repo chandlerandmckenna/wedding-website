@@ -149,21 +149,29 @@
     fillAddress(guest);
     book.hidden = false;
     var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!animate || reduce) {
+    if (reduce) {
       cover.hidden = true;
       window.setupPageFades(book);
       return;
     }
+    // Returning guests (back from Travel, or a new visit) skip the cover but
+    // still see the painting wash open and the title rise in, as on day one.
     window.jumpToTop();
     var wash = washReveal();
     book.classList.add("arriving");
-    cover.classList.add("opening");
-    setTimeout(function () {
+    if (animate) {
+      cover.classList.add("opening");
+      setTimeout(function () {
+        cover.hidden = true;
+        cover.classList.remove("opening");
+        wash.start();
+        window.setupPageFades(book);
+      }, 700);
+    } else {
       cover.hidden = true;
-      cover.classList.remove("opening");
       wash.start();
       window.setupPageFades(book);
-    }, 700);
+    }
     setTimeout(function () { book.classList.remove("arriving"); }, 5200);
   }
 
@@ -391,6 +399,10 @@
       noteStatus.textContent = "We couldn't send that. Please try again.";
     }).then(function () { busy(btn, false, "Send my note"); });
   });
+
+  // Coming back with the browser's Back button restores a frozen page; load
+  // it fresh instead so the title page plays its opening again.
+  window.addEventListener("pageshow", function (e) { if (e.persisted) location.reload(); });
 
   // Returning guests skip the cover.
   if (window.Guest.current()) openBook(false);

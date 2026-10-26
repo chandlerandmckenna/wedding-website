@@ -692,16 +692,29 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 .intro-card p:last-child { color: var(--ink); }
 html.paged .page-intro.fade { opacity: 1; transform: none; }   /* the painting does its own fading */
 @media (max-width: 760px) { .page-intro { align-items: end; } .intro-bg { object-position: 22% center; } .intro-card { justify-self: stretch; padding: 24px 22px 26px; } }
-@media (prefers-reduced-motion: reduce) { .intro-bg, .intro-card, .intro-card > * { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .intro-bg, .intro-card, .intro-card > *, .plane-banner span { animation: none; } }
 
 /* the little plane flies across Flying in, left to right, towing its banner */
 .page-flights { overflow: hidden; }
-.flights-plane { display: block; width: clamp(240px, 32vw, 360px); height: auto; aspect-ratio: 300 / 80; margin: 0 6% 10px auto; }
+.flights-plane { position: relative; width: clamp(300px, 44vw, 560px); aspect-ratio: 1200 / 255; margin: 0 4% 10px auto; }
+.plane-body { position: absolute; right: 0; top: 0; width: 47.37%; height: 100%; }
+/* the banner is cut into thin strips that rise and fall a beat apart, so a
+   ripple runs from the tow rope back to the tail */
+.plane-banner { position: absolute; left: 0; top: 0; width: 52.63%; height: 100%; }
+.plane-banner span {
+  position: absolute; top: 0; height: 100%; left: calc(var(--i) * 100% / var(--n)); width: calc(100% / var(--n));
+  background: url("../img/plane-banner.webp") no-repeat;
+  background-size: calc(var(--n) * 100%) 100%;
+  background-position: calc(var(--i) * 100% / (var(--n) - 1)) 0;
+  animation: flap 1.3s ease-in-out infinite;
+  animation-delay: calc(var(--d) * 0.045s - 3s);
+}
+@keyframes flap { 0%, 100% { transform: translateY(calc(var(--a) * -1px)); } 50% { transform: translateY(calc(var(--a) * 1px)); } }
 html.paged .flights-plane:not(.go) { opacity: 0; }
 html.paged .flights-plane.go { animation: fly-in 5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both, float 5s ease-in-out 5.3s infinite; }
 @keyframes fly-in { from { translate: -70vw 24px; } }
 @keyframes float { 50% { translate: 0 -6px; } }
-@media (max-width: 760px) { .flights-plane { width: 230px; margin: 0 16px 10px auto; } }
+@media (max-width: 760px) { .flights-plane { width: min(92%, 340px); margin: 0 16px 10px auto; } }
 
 /* Day trips: cream cards on the stripes, each with a perforated stamp
    holding a photo of the place, set at a slight tilt like stamps on a letter. */
@@ -751,10 +764,9 @@ html.paged .flights-plane.go { animation: fly-in 5s cubic-bezier(0.2, 0.7, 0.2, 
 }
 .note-kinds button[aria-pressed="true"] { background: var(--cobalt); border-color: var(--cobalt); color: #fff; }
 .notes-card textarea {
-  width: 100%; min-height: 140px; resize: vertical; padding: 14px 16px; border-radius: 12px;
-  font: 400 1rem/1.6 var(--body); color: var(--ink); background: #fffdf8; border: 1px solid var(--line);
-  background-image: repeating-linear-gradient(transparent 0 calc(1.6rem - 1px), rgba(125, 155, 230, 0.35) calc(1.6rem - 1px) 1.6rem);
-  background-position: 0 14px; background-attachment: local;
+  width: 100%; min-height: 130px; resize: vertical; padding: 16px 18px;
+  font: 400 1rem/1.6 var(--body); color: var(--ink); background: #fffdf8;
+  border: 1.5px solid var(--gold); border-radius: 16px;
 }
 .notes-card textarea:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px var(--cobalt-soft); }
 .notes-card .button { justify-self: center; min-width: 220px; }

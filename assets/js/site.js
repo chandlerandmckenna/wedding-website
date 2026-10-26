@@ -317,6 +317,16 @@ window.PAGES = [
     update();
   }
 
+  // The plane's banner, cut into strips that flap a beat apart (see styles.css).
+  document.querySelectorAll(".plane-banner").forEach(function (b) {
+    var n = 56, html = "";
+    for (var i = 0; i < n; i++) {
+      var d = n - 1 - i;                                // distance back from the tow rope
+      html += '<span style="--i:' + i + ";--n:" + n + ";--d:" + d + ";--a:" + (0.4 + d * 4.4 / (n - 1)).toFixed(2) + '"></span>';
+    }
+    b.innerHTML = html;
+  });
+
   // Moving between Save the date and Travel always starts at the top.
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   // jump straight there: the page's smooth scrolling would visibly race up
