@@ -339,7 +339,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   position: absolute; inset: 0;
   width: 100%; height: 100%; max-width: none;
   object-fit: cover;
-  object-position: 55% 35%;
+  object-position: 55% 26%;   /* a little more of the olive branches at the top */
   -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent);
   mask-image: linear-gradient(to bottom, #000 80%, transparent);
 }
@@ -879,4 +879,25 @@ html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
   .page-boat td:nth-child(2) { grid-column: 1 / -1; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lemon-deep); font-weight: 500; }
   .page-boat td:nth-child(4) { grid-column: 1 / -1; margin-top: 4px; color: var(--ink-soft); }
   .page-boat .table-scroll { overflow: visible; }
+}
+
+/* Wide computer screens: spread everything out sideways rather than
+   stacking it in a narrow, tall column */
+@media (min-width: 1100px) {
+  .wrap, .header-inner { max-width: 84rem; }
+  html.paged .page { padding-block: clamp(32px, calc(5 * var(--vh, 1vh)), 64px); }
+  html.paged .page-travel .page:not(.page-intro) { padding-block: clamp(40px, calc(6 * var(--vh, 1vh)), 72px); }
+  .page-hero { padding-top: clamp(40px, calc(8 * var(--vh, 1vh)), 96px); }
+  .story { grid-template-columns: min(440px, calc((calc(100 * var(--vh, 1svh)) - var(--head, 96px) - 110px) * 2 / 3)) minmax(0, 44rem); column-gap: clamp(64px, calc(8 * var(--vw, 1vw)), 140px); }
+  .story-lead { max-width: 40rem; }
+  .gallery { --gw: min(calc(94 * var(--vw, 1vw)), calc((calc(100 * var(--vh, 1svh)) - var(--head, 96px) - 320px) * 2.4 + 68px), 1500px); }
+  .gallery img { aspect-ratio: 4 / 5; }
+  .ticket { --stub: 250px; max-width: 1060px; }
+  .feel-panel { max-width: 720px; }
+  .postcard { max-width: 1180px; }
+  .notes-card { width: min(100%, 880px); }
+  .section-head { max-width: 72ch; }
+  /* the address fields pair up two to a row, so the postcard is shorter */
+  .postcard .address-grid .span-2 { grid-column: auto; }
+  .pc-to { padding-top: 132px; }
 }

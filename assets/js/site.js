@@ -5,7 +5,7 @@
  * HTML file and adding one line to PAGES.
  */
 /*
- * Big screens: the design is laid out for a window about 1300 x 850. On
+ * Big screens: the design is laid out for a window about 1440 x 760. On
  * computers we zoom the whole page so it fills the window the same way,
  * bigger on a large monitor and a little smaller on a short laptop
  * screen. --vw and --vh stand in for the vw/vh units in styles.css so
@@ -17,7 +17,7 @@
   function fit() {
     var w = window.innerWidth, h = window.innerHeight;
     var z = 1;
-    if (canZoom && w >= 1000) z = Math.max(0.8, Math.min(1.7, w / 1300, h / 850));
+    if (canZoom && w >= 1000) z = Math.max(0.85, Math.min(1.6, w / 1440, h / 760));
     z = Math.round(z * 100) / 100;
     html.style.zoom = z === 1 ? "" : z;
     html.style.setProperty("--vw", (w / z / 100) + "px");
@@ -362,7 +362,7 @@ window.PAGES = [
         var en = entries[0];
         if (en.intersectionRatio >= 0.9) el.classList.add("fanned");
         else if (!en.isIntersecting) { el.classList.remove("fanned"); tuck(); }
-      }, { threshold: [0, 0.9], rootMargin: "0px 0px -12% 0px" }).observe(el);
+      }, { threshold: [0, 0.9], rootMargin: "0px 0px -4% 0px" }).observe(el);
       // scrolling on down, the side photos slide back behind the middle one
       // step by step with the scroll
       var sides = [el.querySelector("figure:first-child"), el.querySelector("figure:last-child")];
