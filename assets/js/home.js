@@ -173,7 +173,19 @@
     // Returning guests (back from Travel, or a new visit) skip the cover but
     // still see the painting fade in and the title rise in, as on day one.
     window.jumpToTop();
-    book.classList.add("arriving");
+    book.classList.add("arriving", "waiting");
+    // Start once the painting is ready to show (or after 1.5s regardless).
+    var hero = book.querySelector(".hero-bg");
+    var ready = function () { book.classList.remove("waiting"); };
+    if (hero && !hero.complete) {
+      hero.addEventListener("load", ready);
+      hero.addEventListener("error", ready);
+      setTimeout(ready, 1500);
+    } else if (hero && hero.decode) {
+      hero.decode().then(ready, ready);
+    } else {
+      ready();
+    }
     if (animate) {
       cover.classList.add("opening");
       setTimeout(function () {
@@ -185,7 +197,7 @@
       cover.hidden = true;
       window.setupPageFades(book);
     }
-    setTimeout(function () { book.classList.remove("arriving"); }, 5200);
+    setTimeout(function () { book.classList.remove("arriving"); }, 6000);
   }
 
   /* ---------- Gut feeling: pick one, then send ---------- */
@@ -387,6 +399,20 @@
       img.tabIndex = 0;
       img.setAttribute("role", "button");
       img.addEventListener("click", function () { open(img); });
+      // Phones: open on the tap itself rather than waiting for a click,
+      // which some iPhone browsers never send for a photo.
+      var start = null;
+      img.addEventListener("touchstart", function (e) {
+        var t = e.touches[0];
+        start = e.touches.length === 1 ? { x: t.clientX, y: t.clientY, at: Date.now() } : null;
+      }, { passive: true });
+      img.addEventListener("touchend", function (e) {
+        var t = e.changedTouches[0];
+        if (!start || Math.abs(t.clientX - start.x) > 10 || Math.abs(t.clientY - start.y) > 10 || Date.now() - start.at > 600) return;
+        start = null;
+        e.preventDefault();   // no follow-up click, which would land on the open photo and close it
+        open(img);
+      });
       img.addEventListener("keydown", function (e) {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(img); }
       });
