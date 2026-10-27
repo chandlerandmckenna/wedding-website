@@ -120,6 +120,11 @@ window.PAGES = [
     }
   };
 
+  // "Angi & Kevin" for a household from the guest list, else the first name.
+  window.firstName = function (guest) {
+    return guest.first || String(guest.name || "").split(/[ &]/)[0];
+  };
+
   function call(action, payload) {
     if (!W.apiEndpoint) return null;
     // text/plain avoids a CORS preflight, which Apps Script can't answer.
@@ -228,7 +233,7 @@ window.PAGES = [
       '<a class="monogram" href="' + homeHref() + '">' + W.monogram + "</a>" +
       '<nav class="site-nav" aria-label="Main">' + links + "</nav>" +
       (guest ? feelButton(guest) : "") +
-      (guest ? '<p class="who">Ciao, ' + esc(guest.name.split(/[ &]/)[0]) +
+      (guest ? '<p class="who">Ciao, ' + esc(window.firstName(guest)) +
         ' <button type="button" class="link-button" id="sign-out">Not you?</button></p>' : "") +
       "</div>";
     var feel = document.getElementById("feel-jump");

@@ -307,7 +307,7 @@
   }
 
   function setupFeelings(guest) {
-    var first = guest.name.split(/[ &]/)[0];
+    var first = window.firstName(guest);
     document.getElementById("feel-hello").textContent = "Ciao, " + first + "!";
     saved = selected = guest.feeling || "";
     mark(selected);

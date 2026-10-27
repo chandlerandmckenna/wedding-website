@@ -3,11 +3,18 @@
  * bound to a Google Sheet.
  *
  * Sheet "Guests" (row 1 is headers):
- *   Phone | Name | Email | Group | Feeling | Updated | Street | Apt | City | State | ZIP | Country
+ *   Phone | Name | Email | Group | Feeling | Updated | Street | Apt | City | State | ZIP | Country | Household | People
  *   Phone is stored as a number with country code, e.g. 19259636950, and
  *   shown as +1 (925) 963-6950.
  *   Guests can sign in with either their phone or their email.
  *   Group is optional, e.g. "party" for the wedding party and families.
+ *   Household and People are filled in for guests found on the guest list.
+ *
+ * Guest list (GUEST_LIST below, a separate spreadsheet Chandler keeps):
+ *   Anyone whose phone is on it is recognised when they sign in, without
+ *   typing their name. People sharing a Household label answer together:
+ *   one row in Guests, one gut feeling for all of them, and any of their
+ *   phones signs them in. Columns are found by their header names.
  *
  * Sheet "Notes" (row 1 is headers), one row per note left on the site:
  *   Sent | Name | Phone | Email | Kind | Note
@@ -23,7 +30,7 @@
  * Put the web app URL in WEDDING.apiEndpoint in assets/js/site.js.
  */
 
-var COLS = { phone: 0, name: 1, email: 2, group: 3, feeling: 4, updated: 5, address: 6 };
+var COLS = { phone: 0, name: 1, email: 2, group: 3, feeling: 4, updated: 5, address: 6, household: 12, people: 13 };
 var ADDRESS = ["line1", "line2", "city", "state", "zip", "country"];
 var FEELINGS = { yes: true, maybe: true, no: true };
 
@@ -52,7 +59,7 @@ function doPost(e) {
 // Each tab is created with its header row the first time it's needed, so a
 // brand new, empty Google Sheet is all the setup this script needs.
 var HEADERS = {
-  "Guests": ["Phone", "Name", "Email", "Group", "Feeling", "Updated", "Street", "Apt", "City", "State", "ZIP", "Country"],
+  "Guests": ["Phone", "Name", "Email", "Group", "Feeling", "Updated", "Street", "Apt", "City", "State", "ZIP", "Country", "Household", "People"],
   "Notes": ["Sent", "Name", "Phone", "Email", "Kind", "Note"],
   "Private events": ["Group", "Date", "Time", "Title", "Place"]
 };
@@ -69,21 +76,33 @@ function tab(name) {
 }
 // Run once from the Apps Script editor to create all three tabs up front.
 function setup() {
-  Object.keys(HEADERS).forEach(tab);
+  Object.keys(HEADERS).forEach(function (name) {
+    tab(name).getRange(1, 1, 1, HEADERS[name].length).setValues([HEADERS[name]]);
+  });
 }
 
 function guests() {
   return tab("Guests");
 }
 
+// The guest's row in Guests. A phone on the guest list finds its household's
+// row, which is added the first time anyone in the household signs in.
 function findRow(id) {
-  var rows = guests().getDataRange().getValues();
+  var sheet = guests(), rows = sheet.getDataRange().getValues();
   for (var i = 1; i < rows.length; i++) {
     var phone = digits(rows[i][COLS.phone]);
     var email = String(rows[i][COLS.email]).trim().toLowerCase();
     if ((id.phone && phone === id.phone) || (id.email && email === id.email)) return { index: i + 1, row: rows[i] };
   }
-  return null;
+  var home = id.phone && household(id.phone);
+  if (!home) return null;
+  for (i = 1; i < rows.length; i++) {
+    if (rows[i][COLS.household] === home.key) return { index: i + 1, row: rows[i] };
+  }
+  var row = [phoneValue(id.phone), home.name, "", home.party ? "party" : "", "", new Date(),
+    "", "", "", "", "", "", home.key, home.size];
+  sheet.appendRow(row);
+  return { index: sheet.getLastRow(), row: row };
 }
 
 function lookup(id) {
@@ -93,6 +112,7 @@ function lookup(id) {
   return {
     phone: digits(r[COLS.phone]),
     name: r[COLS.name],
+    first: firstNames(r),
     email: r[COLS.email],
     feeling: r[COLS.feeling] || "",
     address: readAddress(r),
@@ -150,6 +170,64 @@ function saveNote(id, req) {
   return { ok: true };
 }
 
+// ---- Guest list ----------------------------------------------------------------
+
+var GUEST_LIST = {
+  id: "1qDTUEo1zvmuj-F8JfudauHMlELVLQ7j2_dbLiouZut8",
+  tab: "Full Invite",
+  skip: "No"   // rows whose "Italy Invite?" is this aren't recognised
+};
+// Anyone with a title (Bride, Best man...) or in these relationships sees the
+// private events, along with the rest of their household.
+var PARTY_RELATIONSHIPS = ["BETROTHED", "M Family", "C Family"];
+
+// The household of the guest-list person with this phone, or null.
+function household(phone) {
+  var values = SpreadsheetApp.openById(GUEST_LIST.id).getSheetByName(GUEST_LIST.tab).getDataRange().getValues();
+  var h = -1;
+  for (var i = 0; i < values.length && h < 0; i++) {
+    if (values[i].indexOf("Person") >= 0 && values[i].indexOf("Phone") >= 0) h = i;
+  }
+  if (h < 0) return null;
+  var head = values[h];
+  var col = function (name) { return head.indexOf(name); };
+  var c = { person: col("Person"), title: col("Title (if Applicable)"), rel: col("Relationship"),
+    invite: col("Italy Invite?"), phone: col("Phone"), home: col("Household") };
+  var people = values.slice(h + 1).filter(function (r) {
+    return String(r[c.person]).trim() && (c.invite < 0 || r[c.invite] !== GUEST_LIST.skip);
+  });
+  var me = people.filter(function (r) { return digits(r[c.phone]) === phone; })[0];
+  if (!me) return null;
+  var label = c.home >= 0 ? String(me[c.home]).trim() : "";
+  var members = label ? people.filter(function (r) { return String(r[c.home]).trim() === label; }) : [me];
+  var names = members.map(function (r) { return String(r[c.person]).trim(); });
+  return {
+    key: label || names[0],
+    name: joinNames(names),
+    size: members.length,
+    party: members.some(function (r) {
+      return (c.title >= 0 && String(r[c.title]).trim()) || PARTY_RELATIONSHIPS.indexOf(r[c.rel]) >= 0;
+    })
+  };
+}
+
+// ["Angi Queenan", "Kevin Queenan"] -> "Angi & Kevin Queenan"
+function joinNames(names) {
+  var last = names.map(function (n) { return n.split(" ").slice(1).join(" "); });
+  var same = names.length > 1 && last[0] && last.every(function (l) { return l === last[0]; });
+  var parts = same ? names.map(function (n) { return n.split(" ")[0]; }) : names;
+  var joined = parts.length > 1 ? parts.slice(0, -1).join(", ") + " & " + parts[parts.length - 1] : parts[0];
+  return same ? joined + " " + last[0] : joined;
+}
+
+// "Angi & Kevin" for a household, used to greet them on the site.
+function firstNames(r) {
+  var name = String(r[COLS.name]);
+  if (name.indexOf(" & ") < 0) return "";
+  var parts = name.split(/, | & /).map(function (n) { return n.trim().split(" ")[0]; });
+  return parts.slice(0, -1).join(", ") + " & " + parts[parts.length - 1];
+}
+
 // Digits only, with the US country code added to plain 10-digit numbers, so a
 // phone typed into the sheet as (925) 963-6950 matches one entered on the site.
 function digits(value) {
@@ -178,7 +256,7 @@ var FEEL_TEXT = { yes: "Count me in!", maybe: "Still thinking", no: "Likely not"
 var NOTE_KINDS = ["Advice", "Well wishes", "Song request", "Italy tip", "Honeymoon rec", "Memory"];
 
 var WIDTHS = {
-  "Guests": [150, 170, 220, 90, 110, 160, 200, 80, 120, 70, 80, 110],
+  "Guests": [150, 200, 220, 90, 110, 160, 200, 80, 120, 70, 80, 110, 150, 70],
   "Notes": [160, 160, 150, 210, 120, 460],
   "Private events": [100, 130, 100, 220, 220]
 };
@@ -259,21 +337,24 @@ function overview() {
   book.setActiveSheet(sheet);
   book.moveActiveSheet(1);
 
-  var signed = "SUMPRODUCT(--(LEN(Guests!A2:A&Guests!B2:B&Guests!C2:C)>0))";
+  // Households count each person in them (the People column).
+  var people = "(1+(Guests!N2:N<>\"\")*(Guests!N2:N-1))";
+  var signed = "SUMPRODUCT((LEN(Guests!A2:A&Guests!B2:B&Guests!C2:C)>0)*" + people + ")";
+  var feeling = function (f) { return "=SUMPRODUCT((Guests!E2:E=\"" + f + "\")*" + people + ")"; };
   var rows = [
     ["McKenna & Chandler · Save the Date", "", ""],
     ["Updates live as guests answer on the site.", "", ""],
     ["", "", ""],
-    ["Gut feeling", "Guests", "Share"],
-    [FEEL_TEXT.yes, '=COUNTIF(Guests!E2:E,"yes")', ""],
-    [FEEL_TEXT.maybe, '=COUNTIF(Guests!E2:E,"maybe")', ""],
-    [FEEL_TEXT.no, '=COUNTIF(Guests!E2:E,"no")', ""],
+    ["Gut feeling", "People", "Share"],
+    [FEEL_TEXT.yes, feeling("yes"), ""],
+    [FEEL_TEXT.maybe, feeling("maybe"), ""],
+    [FEEL_TEXT.no, feeling("no"), ""],
     ["No answer yet", "=" + signed + "-SUM(B5:B7)", ""],
     ["Total signed in", "=" + signed, ""],
     ["", "", ""],
-    ["Mailing addresses", "Guests", "Share"],
+    ["Mailing addresses", "Households", "Share"],
     ["Address received", "=COUNTA(Guests!G2:G)", ""],
-    ["Still needed", "=B9-B12", ""],
+    ["Still needed", "=SUMPRODUCT(--(LEN(Guests!A2:A&Guests!B2:B&Guests!C2:C)>0))-B12", ""],
     ["", "", ""],
     ["Notes for the couple", "Notes", "Share"]
   ];
@@ -284,7 +365,7 @@ function overview() {
 
   // Shares
   [5, 6, 7, 8].forEach(function (r) { sheet.getRange(r, 3).setFormula("=IFERROR(B" + r + "/$B$9,0)"); });
-  [12, 13].forEach(function (r) { sheet.getRange(r, 3).setFormula("=IFERROR(B" + r + "/$B$9,0)"); });
+  [12, 13].forEach(function (r) { sheet.getRange(r, 3).setFormula("=IFERROR(B" + r + "/($B$12+$B$13),0)"); });
   for (var r = 16; r < notesTotal; r++) sheet.getRange(r, 3).setFormula("=IFERROR(B" + r + "/$B$" + notesTotal + ",0)");
   sheet.getRange(1, 3, rows.length, 1).setNumberFormat("0%");
 
