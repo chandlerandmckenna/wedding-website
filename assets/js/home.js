@@ -1,5 +1,5 @@
 /* Home page: sign-in on the cover (phone, or email as a fallback), the
-   cover washing away into the title page, the "Have a gut feeling?" answer and the guest's
+   cover fading into the title page, the "Have a gut feeling?" answer and the guest's
    mailing address. */
 (function () {
   var cover = document.getElementById("cover");
@@ -142,8 +142,8 @@
     openBook(true);
   }
 
-  // The cover melts away, the painting washes open through blooms of
-  // watercolor, then the title rises in line by line.
+  // The cover melts away, the painting fades in, then the title rises in
+  // line by line.
   function openBook(animate) {
     var guest = window.Guest.current();
     window.renderHeader();
@@ -171,111 +171,21 @@
       return;
     }
     // Returning guests (back from Travel, or a new visit) skip the cover but
-    // still see the painting wash open and the title rise in, as on day one.
+    // still see the painting fade in and the title rise in, as on day one.
     window.jumpToTop();
-    var wash = washReveal();
     book.classList.add("arriving");
     if (animate) {
       cover.classList.add("opening");
       setTimeout(function () {
         cover.hidden = true;
         cover.classList.remove("opening");
-        wash.start();
         window.setupPageFades(book);
       }, 700);
     } else {
       cover.hidden = true;
-      wash.start();
       window.setupPageFades(book);
     }
     setTimeout(function () { book.classList.remove("arriving"); }, 5200);
-  }
-
-  /* A sheet of cream paper over the title page that washes away in
-     spreading watercolor blooms, each with a faint blue wet edge. */
-  function washReveal() {
-    var canvas = document.createElement("canvas");
-    canvas.className = "wash-reveal";
-    canvas.setAttribute("aria-hidden", "true");
-    document.body.appendChild(canvas);
-    var S = 0.5;   // draw at half size: the edges are soft anyway
-    var W = window.innerWidth, H = window.innerHeight;
-    canvas.width = Math.ceil(W * S);
-    canvas.height = Math.ceil(H * S);
-    var ctx = canvas.getContext("2d");
-    ctx.scale(S, S);
-    var diag = Math.sqrt(W * W + H * H);
-    var PAPER = "#fcefdf";
-
-    function rnd(a, b) { return a + Math.random() * (b - a); }
-    function bloom(x, y, delay, reach) {
-      var waves = [];
-      for (var i = 0; i < 5; i++) waves.push({ k: 2 + Math.floor(rnd(0, 6)), amp: rnd(0.03, 0.09), ph: rnd(0, 6.3) });
-      return { x: x, y: y, delay: delay, reach: reach, waves: waves };
-    }
-    var blooms = [
-      bloom(W * 0.5, H * 0.42, 0, diag * 0.42),
-      bloom(W * rnd(0.05, 0.25), H * rnd(0.1, 0.3), 0.25, diag * 0.55),
-      bloom(W * rnd(0.75, 0.95), H * rnd(0.15, 0.35), 0.4, diag * 0.55),
-      bloom(W * rnd(0.15, 0.35), H * rnd(0.75, 0.95), 0.55, diag * 0.6),
-      bloom(W * rnd(0.65, 0.9), H * rnd(0.7, 0.95), 0.7, diag * 0.6)
-    ];
-    var DUR = 2.2;
-
-    function shape(b, r, t) {
-      ctx.beginPath();
-      for (var a = 0; a <= 64; a++) {
-        var th = a / 64 * Math.PI * 2, f = 1;
-        b.waves.forEach(function (w) { f += w.amp * Math.sin(w.k * th + w.ph + t * 0.8); });
-        var px = b.x + Math.cos(th) * r * f, py = b.y + Math.sin(th) * r * f;
-        if (a) ctx.lineTo(px, py); else ctx.moveTo(px, py);
-      }
-      ctx.closePath();
-    }
-
-    function draw(t) {
-      ctx.globalCompositeOperation = "source-over";
-      ctx.filter = "none";
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = PAPER;
-      ctx.fillRect(0, 0, W, H);
-      var done = true;
-      blooms.forEach(function (b) {
-        var p = Math.max(0, Math.min(1, (t - b.delay) / DUR));
-        if (p < 1) done = false;
-        if (!p) return;
-        var r = b.reach * (1 - Math.pow(1 - p, 3));
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.filter = "blur(10px)";
-        shape(b, r, t);
-        ctx.fill();
-        // the wet edge where pigment gathers as the wash spreads
-        ctx.globalCompositeOperation = "source-over";
-        ctx.filter = "blur(4px)";
-        ctx.lineWidth = 14;
-        ctx.strokeStyle = "rgba(29, 63, 189, " + (0.22 * (1 - p)).toFixed(3) + ")";
-        shape(b, r * 0.98, t);
-        ctx.stroke();
-        ctx.lineWidth = 26;
-        ctx.strokeStyle = "rgba(125, 155, 230, " + (0.16 * (1 - p)).toFixed(3) + ")";
-        shape(b, r * 0.94, t);
-        ctx.stroke();
-      });
-      return done;
-    }
-
-    draw(0);
-    return {
-      start: function () {
-        var t0 = null;
-        function frame(now) {
-          if (t0 === null) t0 = now;
-          if (draw((now - t0) / 1000)) { canvas.remove(); return; }
-          requestAnimationFrame(frame);
-        }
-        requestAnimationFrame(frame);
-      }
-    };
   }
 
   /* ---------- Gut feeling: pick one, then send ---------- */
