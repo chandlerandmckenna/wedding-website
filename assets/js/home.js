@@ -338,7 +338,7 @@
       email.innerHTML = '<label for="addr-email-' + i + '">' + first + "\u2019s email</label>" +
         '<input type="email" id="addr-email-' + i + '" autocomplete="' + (m.me ? "email" : "off") + '" autocapitalize="none" spellcheck="false" placeholder="' + (i ? "them" : "you") + '@example.com">';
       var phone = document.createElement("div");
-      phone.className = "field span-2 pc-person";
+      phone.className = email.className;
       phone.innerHTML = '<label for="addr-phone-' + i + '">' + first + "\u2019s mobile number</label>" +
         '<input type="tel" id="addr-phone-' + i + '" inputmode="tel" autocomplete="' + (m.me ? "tel-national" : "off") + '" placeholder="(555) 123-4567">';
       phoneFieldEl.parentNode.appendChild(email);
