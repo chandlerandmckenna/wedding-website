@@ -368,6 +368,10 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   line-height: 1.05;
   white-space: nowrap;
   color: var(--cobalt);
+  /* room for the script's swashes, which reach past the letters' box: iPhone
+     browsers cut off anything outside it while the line fades in */
+  padding: 0.12em 0.3em;
+  margin: -0.12em -0.3em;
 }
 .hero-place {
   margin-top: 6px;
@@ -382,6 +386,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   font-family: var(--script); font-weight: 400;
   font-size: clamp(2.4rem, calc(8 * var(--vw, 1vw)), 4.2rem); line-height: 1.1;
   color: var(--cobalt);
+  padding: 0 0.25em; margin: 0 -0.25em;   /* room for the swashes, as above */
 }
 .hero-date .swash { width: 88%; height: 20px; left: 6%; margin-left: 0; bottom: 0; }
 .hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.45rem, calc(4.4 * var(--vw, 1vw)), 1.9rem); color: var(--gold); text-shadow: 0 1px 3px rgba(255, 250, 240, 0.9); font-variant-numeric: lining-nums; }
