@@ -498,6 +498,20 @@
 
   window.addEventListener("pageshow", function (e) { if (e.persisted) location.reload(); });
 
-  // Returning guests skip the cover.
-  if (window.Guest.current()) openBook(false);
+  // Returning guests skip the cover. Their saved details are then refreshed
+  // from the guest list, so changes (a household's answers, a new feature)
+  // show up without signing in again.
+  var returning = window.Guest.current();
+  if (returning) {
+    openBook(false);
+    var id = returning.phone ? { phone: returning.phone } : { email: returning.email };
+    if (!window.GuestAPI.preview && (id.phone || id.email)) window.GuestAPI.lookup(id).then(function (fresh) {
+      if (!fresh) return;
+      window.Guest.save(fresh);
+      window.renderHeader();
+      window.renderSchedule();
+      setupFeelings(fresh);
+      fillAddress(fresh);
+    }).catch(function () { /* keep what we have */ });
+  }
 })();
