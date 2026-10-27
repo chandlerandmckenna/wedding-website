@@ -456,6 +456,38 @@ html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25
 .gallery figure { position: relative; min-width: 0; }
 .gallery .g-main { z-index: 1; }
 .gallery img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; display: block; }
+.gallery img { cursor: zoom-in; }
+.gallery img:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* Tapping a venue photo opens it big over a dimmed page; any tap closes it. */
+.lightbox {
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: rgba(16, 26, 70, 0.88);
+  cursor: zoom-out;
+  opacity: 0; transition: opacity 0.25s ease;
+}
+.lightbox[hidden] { display: none; }
+.lightbox.shown { opacity: 1; }
+.lightbox-frame {
+  margin: 0; line-height: 0;
+  outline: 2px solid var(--gold); outline-offset: 8px;
+  transform: scale(0.94); transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.lightbox.shown .lightbox-frame { transform: none; }
+.lightbox-frame img {
+  display: block; width: auto; height: auto;
+  max-width: calc(100 * var(--vw, 1vw) - 64px);
+  max-height: calc(100 * var(--vh, 1vh) - 96px);
+}
+.lightbox-close {
+  position: absolute; top: max(14px, env(safe-area-inset-top)); right: 16px;
+  width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14); color: #fff;
+  font: 300 30px/44px var(--body); cursor: pointer;
+}
+html.lightbox-open, html.lightbox-open body { overflow: hidden; }
 /* a square gold frame set a little off each photo, like the one around ours */
 .gallery figure { outline: 2px solid var(--gold); outline-offset: var(--frame); background: var(--ivory-2); }
 /* the middle photo settles first, then the outer two fan out slowly from behind it */

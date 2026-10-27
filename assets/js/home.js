@@ -350,6 +350,51 @@
 
   // Coming back with the browser's Back button restores a frozen page; load
   // it fresh instead so the title page plays its opening again.
+  /* ---------- Venue photos: tap one to see it big, tap again to close ---------- */
+  (function () {
+    var photos = Array.prototype.slice.call(document.querySelectorAll(".gallery img"));
+    if (!photos.length) return;
+    var box = document.createElement("div");
+    box.className = "lightbox";
+    box.hidden = true;
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-modal", "true");
+    box.setAttribute("aria-label", "Photo");
+    box.innerHTML = '<figure class="lightbox-frame"><img alt=""></figure>' +
+      '<button type="button" class="lightbox-close" aria-label="Close">&times;</button>';
+    document.body.appendChild(box);
+    var big = box.querySelector("img");
+    var opener = null;
+
+    function open(img) {
+      opener = img;
+      big.src = img.currentSrc || img.src;
+      big.alt = img.alt;
+      box.hidden = false;
+      document.documentElement.classList.add("lightbox-open");
+      requestAnimationFrame(function () { box.classList.add("shown"); });
+      box.querySelector(".lightbox-close").focus({ preventScroll: true });
+    }
+    function close() {
+      if (box.hidden) return;
+      box.classList.remove("shown");
+      document.documentElement.classList.remove("lightbox-open");
+      setTimeout(function () { box.hidden = true; }, 250);
+      if (opener) opener.focus({ preventScroll: true });
+    }
+
+    photos.forEach(function (img) {
+      img.tabIndex = 0;
+      img.setAttribute("role", "button");
+      img.addEventListener("click", function () { open(img); });
+      img.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(img); }
+      });
+    });
+    box.addEventListener("click", close);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+  })();
+
   window.addEventListener("pageshow", function (e) { if (e.persisted) location.reload(); });
 
   // Returning guests skip the cover.
