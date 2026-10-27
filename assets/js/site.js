@@ -355,14 +355,23 @@ window.PAGES = [
     update();
   }
 
-  // Scalloped cards: size the scallops so a whole number fits each edge.
-  // Safari doesn't stretch "round" mask tiles, which left a cut-off row.
+  // Scalloped cards: draw the whole scalloped outline as one SVG at the
+  // card's exact size and use it as the card's mask. Repeating mask tiles
+  // drift in Safari and cut off the scallops on the right and bottom.
   function fitScallops(el) {
     var d = 2 * (parseFloat(getComputedStyle(el).getPropertyValue("--r")) || 13);
     var w = el.offsetWidth, h = el.offsetHeight;
     if (!w || !h) return;
-    el.style.setProperty("--sx", w / Math.max(1, Math.round(w / d)) + "px");
-    el.style.setProperty("--sy", h / Math.max(1, Math.round(h / d)) + "px");
+    var nx = Math.max(1, Math.round(w / d)), ny = Math.max(1, Math.round(h / d));
+    var sx = w / nx, sy = h / ny, rad = Math.min(sx, sy) / 2;
+    var c = "", i;
+    function dot(x, y) { c += "M" + (x - rad).toFixed(2) + " " + y.toFixed(2) + "a" + rad.toFixed(2) + " " + rad.toFixed(2) + " 0 1 0 " + (2 * rad).toFixed(2) + " 0a" + rad.toFixed(2) + " " + rad.toFixed(2) + " 0 1 0 " + (-2 * rad).toFixed(2) + " 0"; }
+    for (i = 0; i < nx; i++) { dot(sx * (i + 0.5), sy / 2); dot(sx * (i + 0.5), h - sy / 2); }
+    for (i = 1; i < ny - 1; i++) { dot(sx / 2, sy * (i + 0.5)); dot(w - sx / 2, sy * (i + 0.5)); }
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + " " + h + '">' +
+      '<rect x="' + (sx / 2).toFixed(2) + '" y="' + (sy / 2).toFixed(2) + '" width="' + (w - sx).toFixed(2) + '" height="' + (h - sy).toFixed(2) + '"/>' +
+      '<path d="' + c + '"/></svg>';
+    el.style.setProperty("--scallop", 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")');
   }
   window.fitScallops = function () { document.querySelectorAll(".scallop").forEach(fitScallops); };
   if ("ResizeObserver" in window) {

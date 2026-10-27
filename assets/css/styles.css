@@ -104,12 +104,10 @@ p, figure { margin: 0; }
 .scallop::before {
   inset: 0;
   background: var(--card);
-  -webkit-mask:
-    linear-gradient(#000 0 0) center / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat,
-    radial-gradient(circle closest-side, #000 97%, #0000) 0 0 / var(--sx, calc(2 * var(--r))) var(--sy, calc(2 * var(--r))) round;
-  mask:
-    linear-gradient(#000 0 0) center / calc(100% - 2 * var(--r)) calc(100% - 2 * var(--r)) no-repeat,
-    radial-gradient(circle closest-side, #000 97%, #0000) 0 0 / var(--sx, calc(2 * var(--r))) var(--sy, calc(2 * var(--r))) round;
+  /* site.js draws the scalloped outline at the card's size (--scallop);
+     until it runs the card is a plain rectangle */
+  -webkit-mask: var(--scallop, linear-gradient(#000 0 0)) 0 0 / 100% 100% no-repeat;
+  mask: var(--scallop, linear-gradient(#000 0 0)) 0 0 / 100% 100% no-repeat;
 }
 .scallop::after { inset: calc(var(--r) * 2 + 6px); border: 2px solid var(--gold); border-radius: 14px; }
 /* the gold bow tied on the bottom of the frame */
@@ -839,4 +837,22 @@ html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
 .inline-field .phone-field input:focus { box-shadow: none; }
 @media (max-width: 420px) {
   .inline-field .button { padding-inline: 18px; }
+}
+
+/* Phones: the airport table becomes a stack of short entries (option and
+   time on top, then where from and the note) so nothing runs off the edge,
+   and the boat sits tucked over the heading */
+@media (max-width: 760px) {
+  html.paged .page-travel .page-boat:not(.page-intro) { padding-block: 28px 44px; }
+  .ferry-boat { width: min(44%, 170px); margin: 0 -4px -14px auto; }
+  .page-boat .section-head { margin-bottom: 22px; gap: 6px; }
+  .page-boat table { min-width: 0; }
+  .page-boat thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .page-boat tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; row-gap: 2px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .page-boat td { display: block; padding: 0; border: 0; }
+  .page-boat td:nth-child(1) { grid-column: 1; grid-row: 1; font-weight: 600; color: var(--cobalt); font-size: 1.05rem; }
+  .page-boat td.num { grid-column: 2; grid-row: 1; align-self: center; color: var(--ink); }
+  .page-boat td:nth-child(2) { grid-column: 1 / -1; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lemon-deep); font-weight: 500; }
+  .page-boat td:nth-child(4) { grid-column: 1 / -1; margin-top: 4px; color: var(--ink-soft); }
+  .page-boat .table-scroll { overflow: visible; }
 }
