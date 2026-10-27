@@ -45,9 +45,9 @@ window.WEDDING = {
   showSchedule: false
 };
 
-// The developer site (dev.….pages.dev or dev--….netlify.app, built from the dev branch) runs in
+// The developer site (dev-….workers.dev, dev.….pages.dev or dev--….netlify.app, built from the dev branch) runs in
 // preview mode so testing there never touches the real guest Sheet.
-if (/^dev(--|\.)/.test(location.hostname)) window.WEDDING.apiEndpoint = "";
+if (/^dev(--?|\.)/.test(location.hostname)) window.WEDDING.apiEndpoint = "";
 
 // Events every guest sees. Private events (rehearsal, rehearsal dinner) are
 // not listed here: they live in the guest list backend and are sent only to
