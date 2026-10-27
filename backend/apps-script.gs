@@ -98,12 +98,28 @@ function findRow(id, name) {
   for (var i = 1; i < rows.length; i++) {
     var phone = digits(rows[i][COLS.phone]);
     var email = String(rows[i][COLS.email]).trim().toLowerCase();
-    if ((id.phone && phone === id.phone) || (id.email && email === id.email)) return fillIn(sheet, i + 1, rows[i], id);
+    if ((id.phone && phone === id.phone) || (id.email && email === id.email)) {
+      if (Number(rows[i][COLS.people]) > 1) return splitRow(sheet, rows[i], id);
+      return fillIn(sheet, i + 1, rows[i], id);
+    }
   }
   var home = household(id, name);
   if (!home) return null;
   rows = householdRows(sheet, home);
   var mine = rows.filter(function (r) { return simple(r.row[COLS.name]) === simple(home.me.name); })[0] || rows[0];
+  return fillIn(sheet, mine.index, mine.row, id);
+}
+
+// A household saved on one row before people had their own rows: give
+// everyone their own row and return the signed-in guest's.
+function splitRow(sheet, row, id) {
+  var home = household(id, "", row[COLS.household]);
+  if (!home) return null;
+  var rows = householdRows(sheet, home);
+  var mine = rows.filter(function (r) {
+    return (id.phone && digits(r.row[COLS.phone]) === id.phone) ||
+      (id.email && String(r.row[COLS.email]).trim().toLowerCase() === id.email);
+  })[0] || rows[0];
   return fillIn(sheet, mine.index, mine.row, id);
 }
 
@@ -324,8 +340,9 @@ function testGuestList() {
   if (withPhone.length) Logger.log("First phone's household: " + JSON.stringify(household({ phone: digits(withPhone[0][list.c.phone]) })));
 }
 
-// The household of the guest-list person with this phone, email or name.
-function household(id, name) {
+// The household of the guest-list person with this phone, email or name, or
+// else the household with this label.
+function household(id, name, label) {
   var list = guestList();
   if (!list) return null;
   var c = list.c, people = list.people;
@@ -333,9 +350,9 @@ function household(id, name) {
     return (id.phone && digits(r[c.phone]) === id.phone) ||
       (id.email && c.email >= 0 && String(r[c.email]).trim().toLowerCase() === id.email) ||
       (name && simple(r[c.person]) === simple(name));
-  })[0];
+  })[0] || (label && c.home >= 0 && people.filter(function (r) { return String(r[c.home]).trim() === label; })[0]);
   if (!me) return null;
-  var label = c.home >= 0 ? String(me[c.home]).trim() : "";
+  label = c.home >= 0 ? String(me[c.home]).trim() : "";
   var members = label ? people.filter(function (r) { return String(r[c.home]).trim() === label; }) : [me];
   var person = function (r) {
     return {
