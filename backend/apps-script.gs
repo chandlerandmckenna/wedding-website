@@ -181,21 +181,39 @@ var GUEST_LIST = {
 // private events, along with the rest of their household.
 var PARTY_RELATIONSHIPS = ["BETROTHED", "M Family", "C Family", "Groomsmen", "Groomsman", "Bridesmaid", "Bridesmaids"];
 
-// The household of the guest-list person with this phone, or null.
-function household(phone) {
+// The guest list's rows (skipping uninvited ones) and where each column is.
+function guestList() {
   var values = SpreadsheetApp.openById(GUEST_LIST.id).getSheetByName(GUEST_LIST.tab).getDataRange().getValues();
-  var h = -1;
-  for (var i = 0; i < values.length && h < 0; i++) {
-    if (values[i].indexOf("Person") >= 0 && values[i].indexOf("Phone") >= 0) h = i;
+  for (var h = 0; h < values.length; h++) {
+    var head = values[h].map(function (v) { return String(v).trim(); });
+    if (head.indexOf("Person") >= 0 && head.indexOf("Phone") >= 0) break;
   }
-  if (h < 0) return null;
-  var head = values[h];
+  if (h === values.length) return null;
   var col = function (name) { return head.indexOf(name); };
   var c = { person: col("Person"), title: col("Title (if Applicable)"), rel: col("Relationship"),
     invite: col("Italy Invite?"), phone: col("Phone"), home: col("Household") };
   var people = values.slice(h + 1).filter(function (r) {
-    return String(r[c.person]).trim() && (c.invite < 0 || r[c.invite] !== GUEST_LIST.skip);
+    return String(r[c.person]).trim() && (c.invite < 0 || String(r[c.invite]).trim() !== GUEST_LIST.skip);
   });
+  return { c: c, people: people };
+}
+
+// Run from the Apps Script editor, then open View > Logs (or the Execution
+// log below the code) to see whether the guest list is being read.
+function testGuestList() {
+  var list = guestList();
+  if (!list) return Logger.log("Couldn't find a header row with Person and Phone in the '" + GUEST_LIST.tab + "' tab.");
+  var withPhone = list.people.filter(function (r) { return digits(r[list.c.phone]); });
+  Logger.log("Columns found: " + JSON.stringify(list.c));
+  Logger.log(list.people.length + " invited people, " + withPhone.length + " with a phone.");
+  if (withPhone.length) Logger.log("First phone signs in as: " + JSON.stringify(household(digits(withPhone[0][list.c.phone]))));
+}
+
+// The household of the guest-list person with this phone, or null.
+function household(phone) {
+  var list = guestList();
+  if (!list) return null;
+  var c = list.c, people = list.people;
   var me = people.filter(function (r) { return digits(r[c.phone]) === phone; })[0];
   if (!me) return null;
   var label = c.home >= 0 ? String(me[c.home]).trim() : "";
