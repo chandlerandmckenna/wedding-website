@@ -179,7 +179,7 @@ var GUEST_LIST = {
 };
 // Anyone with a title (Bride, Best man...) or in these relationships sees the
 // private events, along with the rest of their household.
-var PARTY_RELATIONSHIPS = ["BETROTHED", "M Family", "C Family"];
+var PARTY_RELATIONSHIPS = ["BETROTHED", "M Family", "C Family", "Groomsmen", "Groomsman", "Bridesmaid", "Bridesmaids"];
 
 // The household of the guest-list person with this phone, or null.
 function household(phone) {
