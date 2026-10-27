@@ -33,8 +33,8 @@
   --step-0: 1.0625rem;
   --step-1: 1.3rem;
   --step-2: 1.75rem;
-  --step-3: clamp(2rem, 5vw, 2.7rem);
-  --step-4: clamp(2.9rem, 8vw, 5.4rem);
+  --step-3: clamp(2rem, calc(5 * var(--vw, 1vw)), 2.7rem);
+  --step-4: clamp(2.9rem, calc(8 * var(--vw, 1vw)), 5.4rem);
 
   --measure: 60ch;
 }
@@ -59,7 +59,7 @@ a { color: var(--cobalt); text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--cobalt); outline-offset: 3px; }
 h1, h2, h3 { font-weight: 400; line-height: 1.12; text-wrap: balance; margin: 0; }
 h1, h2 { font-family: var(--script); color: var(--cobalt); }
-h2 { font-size: clamp(2.3rem, 6vw, 3.3rem); line-height: 1.15; }
+h2 { font-size: clamp(2.3rem, calc(6 * var(--vw, 1vw)), 3.3rem); line-height: 1.15; }
 h3 { font-family: var(--body); font-weight: 500; font-size: var(--step-1); }
 p, figure { margin: 0; }
 
@@ -77,7 +77,7 @@ p, figure { margin: 0; }
   color: var(--cobalt);
   font-weight: 500;
 }
-.script { font-family: var(--script); font-weight: 400; font-size: clamp(2rem, 5vw, 2.7rem); line-height: 1.15; color: var(--cobalt); }
+.script { font-family: var(--script); font-weight: 400; font-size: clamp(2rem, calc(5 * var(--vw, 1vw)), 2.7rem); line-height: 1.15; color: var(--cobalt); }
 .hint { font-size: var(--step--1); color: var(--ink-soft); }
 .soft { color: var(--ink-soft); }
 .error { color: #a4312a; font-size: var(--step--1); font-weight: 500; }
@@ -98,7 +98,7 @@ p, figure { margin: 0; }
   --r: 13px;
   position: relative;
   isolation: isolate;
-  padding: calc(var(--r) * 2 + clamp(26px, 5vw, 44px)) calc(var(--r) * 2 + clamp(18px, 5vw, 44px));
+  padding: calc(var(--r) * 2 + clamp(26px, calc(5 * var(--vw, 1vw)), 44px)) calc(var(--r) * 2 + clamp(18px, calc(5 * var(--vw, 1vw)), 44px));
 }
 .scallop::before, .scallop::after { content: ""; position: absolute; z-index: -1; pointer-events: none; }
 .scallop::before {
@@ -112,7 +112,7 @@ p, figure { margin: 0; }
 .scallop::after { inset: calc(var(--r) * 2 + 6px); border: 2px solid var(--gold); border-radius: 14px; }
 /* the gold bow tied on the bottom of the frame */
 .scallop > svg.bow { position: absolute; left: 50%; bottom: calc(var(--r) * 2 + 6px - 17px); width: 96px; height: 32px; margin-left: -48px; overflow: visible; pointer-events: none; }
-.cover > .tile-band { height: clamp(24px, 5vh, 56px); }
+.cover > .tile-band { height: clamp(24px, calc(5 * var(--vh, 1vh)), 56px); }
 .sprig { position: absolute; pointer-events: none; overflow: visible; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
@@ -178,7 +178,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   z-index: 1;
   display: grid;
   place-items: center;
-  padding-block: clamp(16px, 3vh, 40px);
+  padding-block: clamp(16px, calc(3 * var(--vh, 1vh)), 40px);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
@@ -188,18 +188,18 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
   justify-items: center;
   gap: 4px;
   text-align: center;
-  padding-bottom: calc(var(--r) * 2 + clamp(34px, 5vh, 48px));
+  padding-bottom: calc(var(--r) * 2 + clamp(34px, calc(5 * var(--vh, 1vh)), 48px));
 }
 .cover > .tile-band { visibility: hidden; height: 0; }
 .cover-card > * { width: 100%; }
 .cover-eyebrow {
-  font-family: var(--script); font-size: clamp(2.6rem, min(12vw, 8vh), 4.2rem); line-height: 1.05; color: var(--cobalt);
+  font-family: var(--script); font-size: clamp(2.6rem, min(calc(12 * var(--vw, 1vw)), calc(8 * var(--vh, 1vh))), 4.2rem); line-height: 1.05; color: var(--cobalt);
 }
-.cover-card > .cover-sprig { width: min(44%, 170px, 21vh); aspect-ratio: 240 / 170; height: auto; margin: 4px auto 2px; }
-.cover-names { font-family: var(--script); font-weight: 400; font-size: clamp(2rem, min(8vw, 5.2vh), 2.7rem); line-height: 1.1; margin-bottom: 10px; color: var(--cobalt); }
+.cover-card > .cover-sprig { width: min(44%, 170px, calc(21 * var(--vh, 1vh))); aspect-ratio: 240 / 170; height: auto; margin: 4px auto 2px; }
+.cover-names { font-family: var(--script); font-weight: 400; font-size: clamp(2rem, min(calc(8 * var(--vw, 1vw)), calc(5.2 * var(--vh, 1vh))), 2.7rem); line-height: 1.1; margin-bottom: 10px; color: var(--cobalt); }
 .cover-names .amp { font-size: 0.8em; }
 .cover-names .surname { display: block; }
-.cover-date { display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 4px; font-family: var(--body); font-weight: 500; font-size: clamp(1.15rem, 4.8vw, 1.6rem); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; color: var(--cobalt); }
+.cover-date { display: flex; justify-content: center; align-items: center; gap: 6px; margin-bottom: 4px; font-family: var(--body); font-weight: 500; font-size: clamp(1.15rem, calc(4.8 * var(--vw, 1vw)), 1.6rem); letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; color: var(--cobalt); }
 .cover-date i { font-style: normal; color: var(--gold); font-size: 1.3em; line-height: 1; }
 .cover-card .cover-form { width: min(100%, 420px); margin-top: 12px; }
 .cover-form { display: grid; gap: 12px; margin-top: 8px; padding-top: 20px; border-top: 1px dashed var(--gold); text-align: left; }
@@ -302,7 +302,7 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
 .who { font-size: var(--step--1); color: var(--ink-soft); display: flex; gap: 8px; align-items: baseline; }
 
 /* ---------- Pages ---------- */
-.page { position: relative; padding-block: clamp(64px, 10vw, 120px); }
+.page { position: relative; padding-block: clamp(64px, calc(10 * var(--vw, 1vw)), 120px); }
 .page + .page::before {
   content: "";
   position: absolute; top: 0; left: 50%;
@@ -317,9 +317,9 @@ input:focus { border-color: var(--cobalt); outline: none; box-shadow: 0 0 0 3px 
    fades out while the next fades in (see setupPageFades in site.js). */
 /* each section fills the screen; scrolling is the browser's own, no snapping */
 /* the travel guide reads as one page: sections are only as tall as their content */
-html.paged .page-travel .page:not(.page-intro) { min-height: 0; padding-block: clamp(56px, 9vh, 96px); }
-html.paged .page, html.paged .page-hero { min-height: calc(100svh - var(--head, 96px)); }
-html.paged .page { display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; padding-block: clamp(40px, 7vh, 80px); }
+html.paged .page-travel .page:not(.page-intro) { min-height: 0; padding-block: clamp(56px, calc(9 * var(--vh, 1vh)), 96px); }
+html.paged .page, html.paged .page-hero { min-height: calc(calc(100 * var(--vh, 1svh)) - var(--head, 96px)); }
+html.paged .page { display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; padding-block: clamp(40px, calc(7 * var(--vh, 1vh)), 80px); }
 html.paged .page-hero { align-content: start; }
 html.paged .fade { opacity: 0.08; transform: translateY(18px); transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1), transform 1.8s cubic-bezier(0.2, 0.6, 0.2, 1); }
 html.paged .fade.shown { opacity: 1; transform: none; }
@@ -332,8 +332,8 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   display: grid;
   align-content: start;
   justify-items: center;
-  min-height: calc(100svh - var(--head, 96px));
-  padding: clamp(56px, 11vh, 120px) max(16px, env(safe-area-inset-right, 0px)) 120px max(16px, env(safe-area-inset-left, 0px));
+  min-height: calc(calc(100 * var(--vh, 1svh)) - var(--head, 96px));
+  padding: clamp(56px, calc(11 * var(--vh, 1vh)), 120px) max(16px, env(safe-area-inset-right, 0px)) 120px max(16px, env(safe-area-inset-left, 0px));
 }
 .hero-bg {
   position: absolute; inset: 0;
@@ -352,7 +352,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   gap: 6px;
   text-align: center;
   max-width: 100%;
-  padding: 28px clamp(8px, 4vw, 56px) 32px;
+  padding: 28px clamp(8px, calc(4 * var(--vw, 1vw)), 56px) 32px;
 }
 /* a soft pool of light behind the words, so they read on any part of the painting */
 .hero-text::before {
@@ -365,7 +365,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .hero-title {
   font-family: var(--script);
   font-weight: 400;
-  font-size: clamp(3.4rem, 13vw, 7.4rem);
+  font-size: clamp(3.4rem, calc(13 * var(--vw, 1vw)), 7.4rem);
   line-height: 1.05;
   white-space: nowrap;
   color: var(--cobalt);
@@ -373,7 +373,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .hero-place {
   margin-top: 6px;
   font-family: var(--body); font-weight: 500;
-  font-size: clamp(1.05rem, 3.8vw, 1.5rem);
+  font-size: clamp(1.05rem, calc(3.8 * var(--vw, 1vw)), 1.5rem);
   letter-spacing: 0.24em; padding-left: 0.24em; text-transform: uppercase;
   color: var(--cobalt);
 }
@@ -381,16 +381,16 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .hero-date b {
   position: relative; z-index: 1;
   font-family: var(--script); font-weight: 400;
-  font-size: clamp(2.4rem, 8vw, 4.2rem); line-height: 1.1;
+  font-size: clamp(2.4rem, calc(8 * var(--vw, 1vw)), 4.2rem); line-height: 1.1;
   color: var(--cobalt);
 }
 .hero-date .swash { width: 88%; height: 20px; left: 6%; margin-left: 0; bottom: 0; }
-.hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.45rem, 4.4vw, 1.9rem); color: var(--gold); text-shadow: 0 1px 3px rgba(255, 250, 240, 0.9); font-variant-numeric: lining-nums; }
+.hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.45rem, calc(4.4 * var(--vw, 1vw)), 1.9rem); color: var(--gold); text-shadow: 0 1px 3px rgba(255, 250, 240, 0.9); font-variant-numeric: lining-nums; }
 .hero-place .dot { color: var(--gold); font-weight: 700; }
 .hero-family {
   margin-top: 14px;
   font-family: var(--body); font-weight: 500;   /* same spaced capitals as SORRENTO · ITALY, set larger */
-  font-size: clamp(1.8rem, 7.6vw, 3.4rem);
+  font-size: clamp(1.8rem, calc(7.6 * var(--vw, 1vw)), 3.4rem);
   letter-spacing: 0.24em; padding-left: 0.24em; text-transform: uppercase;
   line-height: 1.15;
   color: var(--cobalt);
@@ -413,7 +413,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .story { display: grid; gap: 16px; justify-items: center; text-align: center; }
 .story-lead {
   font-family: var(--body); font-weight: 400;
-  font-size: clamp(1.25rem, 2.8vw, 1.6rem); line-height: 1.45;
+  font-size: clamp(1.25rem, calc(2.8 * var(--vw, 1vw)), 1.6rem); line-height: 1.45;
   max-width: 26ch; text-wrap: balance; color: var(--ink);
 }
 .story-note { max-width: 46ch; color: var(--ink-soft); text-wrap: balance; }
@@ -425,7 +425,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .date-en { font-family: var(--italic); font-style: italic; color: var(--ink-soft); }
 .date-rule { width: 2px; height: 104px; background: var(--gold); opacity: 0.6; }
 
-.story-title { font-size: clamp(3rem, 6.5vw, 4.4rem); line-height: 1.05; }
+.story-title { font-size: clamp(3rem, calc(6.5 * var(--vw, 1vw)), 4.4rem); line-height: 1.05; }
 /* little Amalfi touches: the two of us driving in, testa di moro vases, spritzes */
 .doodle { display: block; overflow: visible; pointer-events: none; }
 .story-road { width: min(100%, 300px); display: flex; justify-content: center; border-bottom: 2px dashed var(--gold); margin-top: 2px; }
@@ -435,8 +435,8 @@ html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25
 @keyframes drive-in { from { translate: -260px 0; opacity: 0; } 15% { opacity: 1; } }
 /* a soft rocking ride; it uses transform so nothing around the scooter moves */
 @keyframes putt { 0%, 100% { transform: none; } 30% { transform: translateY(-1.5px) rotate(-0.6deg); } 70% { transform: translateY(0.5px) rotate(0.4deg); } }
-.venue-title { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 3vw, 28px); }
-.moor { flex: none; width: clamp(48px, 7vw, 76px); height: auto; aspect-ratio: 100 / 140; }
+.venue-title { display: flex; align-items: center; justify-content: center; gap: clamp(10px, calc(3 * var(--vw, 1vw)), 28px); }
+.moor { flex: none; width: clamp(48px, calc(7 * var(--vw, 1vw)), 76px); height: auto; aspect-ratio: 100 / 140; }
 .moor-right { transform: scaleX(-1); }
 @media (min-width: 700px) { .venue-title h2 { white-space: nowrap; } }
 @media (min-width: 1000px) { .page-venue .section-head { max-width: none; margin-bottom: 32px; } .page-venue .section-head p:last-child { white-space: nowrap; } }
@@ -446,7 +446,7 @@ html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25
 /* three portrait photos in a row, sized so the row fits on one screen; the
    middle one shows first and the other two drift out from behind it */
 .gallery {
-  --gw: min(96vw, calc((100svh - var(--head, 96px) - 330px) * 2.25 + 32px), 1200px);   /* photos fit under the heading on one screen */
+  --gw: min(calc(96 * var(--vw, 1vw)), calc((calc(100 * var(--vh, 1svh)) - var(--head, 96px) - 330px) * 2.25 + 32px), 1200px);   /* photos fit under the heading on one screen */
   display: grid;
   --gg: 34px;                /* room for each photo's gold frame */
   --frame: 8px;
@@ -472,9 +472,9 @@ html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(
 /* on wide screens the photo sits beside the story and the venue photos line
    up in one row, so each section fits on one screen */
 @media (min-width: 900px) {
-  .story { grid-template-columns: min(400px, calc((100svh - var(--head, 96px) - 124px) * 2 / 3)) minmax(0, 38rem); justify-content: center; column-gap: clamp(48px, 6vw, 80px); row-gap: 22px; align-items: center; align-content: center; }
+  .story { grid-template-columns: min(400px, calc((calc(100 * var(--vh, 1svh)) - var(--head, 96px) - 124px) * 2 / 3)) minmax(0, 38rem); justify-content: center; column-gap: clamp(48px, calc(6 * var(--vw, 1vw)), 80px); row-gap: 22px; align-items: center; align-content: center; }
   .story .arch-wrap { grid-row: 1 / span 5; width: 100%; margin-bottom: 0; align-self: center; }
-  .story-lead { max-width: 36rem; font-size: clamp(1.25rem, 1.9vw, 1.45rem); }
+  .story-lead { max-width: 36rem; font-size: clamp(1.25rem, calc(1.9 * var(--vw, 1vw)), 1.45rem); }
   .story .dates { margin-block: 0; }
 }
 
@@ -511,7 +511,7 @@ html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(
 .stub-route i { font-style: normal; color: var(--gold); }
 .stub-date { font-size: 0.95rem; letter-spacing: 0.16em; padding: 4px 10px; border: 1.5px solid var(--cobalt); border-radius: 4px; }
 .stub-no { color: var(--ink-soft); font-size: 0.68rem; }
-.ticket .feel-panel { padding: clamp(28px, 5vw, 48px) clamp(22px, 5vw, 52px); max-width: none; }
+.ticket .feel-panel { padding: clamp(28px, calc(5 * var(--vw, 1vw)), 48px) clamp(22px, calc(5 * var(--vw, 1vw)), 52px); max-width: none; }
 .ticket .spritz { width: 120px; height: 76px; margin: 2px 0; }
 @media (max-width: 700px) {
   .ticket {
@@ -543,8 +543,8 @@ html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(
 }
 .feel-panel > :not(.sprig) { position: relative; }
 .feel-sub { color: var(--ink-soft); margin-bottom: 18px; }
-.feel-panel #feel-hello { font-size: clamp(1.35rem, 3vw, 1.7rem); color: var(--ink-soft); margin-bottom: -6px; }
-.feel-panel h2 { font-size: clamp(2.8rem, 7vw, 4.2rem); line-height: 1.05; }
+.feel-panel #feel-hello { font-size: clamp(1.35rem, calc(3 * var(--vw, 1vw)), 1.7rem); color: var(--ink-soft); margin-bottom: -6px; }
+.feel-panel h2 { font-size: clamp(2.8rem, calc(7 * var(--vw, 1vw)), 4.2rem); line-height: 1.05; }
 .feel-options { display: grid; gap: 12px; }
 .feel {
   display: flex; align-items: center; gap: 16px;
@@ -602,11 +602,11 @@ html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(
   border-image: repeating-linear-gradient(135deg, var(--cobalt) 0 16px, var(--card) 16px 24px, var(--gold) 24px 40px, var(--card) 40px 48px) 12;
   box-shadow: 0 2px 4px rgba(23, 36, 90, 0.08), 0 22px 44px rgba(23, 36, 90, 0.16);
 }
-.pc-note { display: grid; gap: 12px; align-content: center; padding: clamp(28px, 5vw, 52px); }
-.pc-note h2 { font-size: clamp(2rem, 4.4vw, 2.8rem); }
+.pc-note { display: grid; gap: 12px; align-content: center; padding: clamp(28px, calc(5 * var(--vw, 1vw)), 52px); }
+.pc-note h2 { font-size: clamp(2rem, calc(4.4 * var(--vw, 1vw)), 2.8rem); }
 .pc-note .feel-sub { margin: 0; }
 .pc-sign { font-family: var(--script); font-size: 1.6rem; line-height: 1.2; color: var(--cobalt); margin-top: 6px; }
-.pc-to { position: relative; display: grid; gap: 12px; align-content: start; padding: clamp(28px, 4vw, 44px); padding-top: 140px; border-left: 2px solid var(--line); }
+.pc-to { position: relative; display: grid; gap: 12px; align-content: start; padding: clamp(28px, calc(4 * var(--vw, 1vw)), 44px); padding-top: 140px; border-left: 2px solid var(--line); }
 /* a perforated stamp in the corner: the sun setting over the bay */
 .pc-stamp {
   --r: 4px;
@@ -668,7 +668,7 @@ html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(
 .event .private { justify-self: start; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; padding: 2px 8px; background: var(--lemon-soft); color: #7a5a00; }
 
 /* ---------- Travel page ---------- */
-.page-intro { padding-block: clamp(40px, 7vw, 80px) clamp(48px, 8vw, 96px); }
+.page-intro { padding-block: clamp(40px, calc(7 * var(--vw, 1vw)), 80px) clamp(48px, calc(8 * var(--vw, 1vw)), 96px); }
 .page-intro .section-head { margin-bottom: 0; }
 .page-title { font-size: var(--step-4); color: var(--cobalt); }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
@@ -707,7 +707,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
 /* the welcome sits on Chandler's watercolor of the coast: the painting
    blooms in when the page opens and fades away as you scroll on, with a
    see-through cream card on the right so the town still shows */
-.page-intro { display: grid; align-items: center; min-height: min(86svh, 820px); overflow: hidden; }
+.page-intro { display: grid; align-items: center; min-height: min(calc(86 * var(--vh, 1svh)), 820px); overflow: hidden; }
 .intro-bg {
   position: absolute; inset: 0; width: 100%; height: 100%; max-width: none;
   object-fit: cover; object-position: 30% 42%;
@@ -736,7 +736,7 @@ html.paged .page-intro.fade { opacity: 1; transform: none; }   /* the painting d
 
 /* the little plane flies across Flying in, left to right, towing its banner */
 .page-flights { overflow: hidden; }
-.flights-plane { position: relative; width: clamp(300px, 44vw, 560px); aspect-ratio: 1200 / 255; margin: 0 4% 10px auto; }
+.flights-plane { position: relative; width: clamp(300px, calc(44 * var(--vw, 1vw)), 560px); aspect-ratio: 1200 / 255; margin: 0 4% 10px auto; }
 .plane-body { position: absolute; right: 0; top: 0; width: 47.37%; height: 100%; }
 /* the banner is cut into thin strips that rise and fall a beat apart, so a
    ripple runs from the tow rope back to the tail */
@@ -755,12 +755,12 @@ html.paged .flights-plane.go { animation: fly-in 5s cubic-bezier(0.2, 0.7, 0.2, 
 /* a little wooden launch rocking on the swell above the ferry table */
 .page-boat { overflow: hidden; }
 .page-boat .wrap { position: relative; }
-.ferry-boat { position: absolute; right: 0; top: -30px; width: clamp(170px, 19vw, 250px); height: auto; transition: opacity 1.4s ease; }
+.ferry-boat { position: absolute; right: 0; top: -30px; width: clamp(170px, calc(19 * var(--vw, 1vw)), 250px); height: auto; transition: opacity 1.4s ease; }
 html.paged .ferry-boat:not(.go) { opacity: 0; }
 html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
 @keyframes rock { 50% { transform: translateY(-3px) rotate(-1.5deg); } }
 @media (max-width: 900px) { .ferry-boat { position: relative; top: 0; display: block; width: min(52%, 200px); margin: 0 0 8px auto; } }
-@keyframes fly-in { from { translate: -70vw 24px; } }
+@keyframes fly-in { from { translate: calc(-70 * var(--vw, 1vw)) 24px; } }
 @keyframes float { 50% { translate: 0 -6px; } }
 @media (max-width: 760px) { .flights-plane { width: min(92%, 340px); margin: 0 16px 10px auto; } }
 
@@ -768,8 +768,8 @@ html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
    holding a photo of the place, set at a slight tilt like stamps on a letter. */
 .explore-head { max-width: 40rem; margin: 0 auto 36px; padding: 22px 28px 26px; text-align: center; display: grid; gap: 4px; background: var(--card); border-radius: 18px; }
 .explore-head p:last-child { color: var(--ink-soft); }
-.explore-head .script { font-size: clamp(1.35rem, 3vw, 1.7rem); color: var(--ink-soft); }
-.explore-head h2 { font-size: clamp(2.8rem, 7vw, 4.2rem); line-height: 1.05; }
+.explore-head .script { font-size: clamp(1.35rem, calc(3 * var(--vw, 1vw)), 1.7rem); color: var(--ink-soft); }
+.explore-head h2 { font-size: clamp(2.8rem, calc(7 * var(--vw, 1vw)), 4.2rem); line-height: 1.05; }
 .trips { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 26px; }
 .trip {
   position: relative; display: grid; gap: 6px; align-content: start;
@@ -804,7 +804,7 @@ html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
    the sign-in card. A row of prompts fills in an idea; the note is free text. */
 .page-notes .wrap { display: grid; justify-items: center; }
 .notes-card { width: min(100%, 620px); display: grid; gap: 14px; text-align: center; }
-.notes-card .script { font-size: clamp(2.4rem, 6vw, 3.2rem); line-height: 1.05; color: var(--cobalt); }
+.notes-card .script { font-size: clamp(2.4rem, calc(6 * var(--vw, 1vw)), 3.2rem); line-height: 1.05; color: var(--cobalt); }
 .notes-card .lede { color: var(--ink-soft); max-width: 34rem; margin-inline: auto; }
 .note-kinds { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 4px; }
 .note-kinds button {
@@ -833,13 +833,13 @@ html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
 .footer-sail { display: block; width: min(220px, 60%); height: 34px; margin-bottom: 6px; overflow: visible; }
 .footer-sail .sail { animation: bob 4s ease-in-out infinite; transform-origin: 110px 30px; }
 @keyframes bob { 50% { transform: translateY(-2px) rotate(-3deg); } }
-.footer-inner > .script { font-size: clamp(1.4rem, 3vw, 1.75rem); color: var(--ink-soft); }
-.footer-names { font-family: var(--script); font-size: clamp(2.8rem, 7vw, 3.8rem); line-height: 1.05; color: var(--cobalt); }
+.footer-inner > .script { font-size: clamp(1.4rem, calc(3 * var(--vw, 1vw)), 1.75rem); color: var(--ink-soft); }
+.footer-names { font-family: var(--script); font-size: clamp(2.8rem, calc(7 * var(--vw, 1vw)), 3.8rem); line-height: 1.05; color: var(--cobalt); }
 
 @media (max-width: 760px) {
   /* the title page fills the phone screen; the next section fades in below */
   .hero-bg { object-position: 62% 50%; }
-  .page-hero { padding-top: clamp(120px, 20vh, 170px); }
+  .page-hero { padding-top: clamp(120px, calc(20 * var(--vh, 1vh)), 170px); }
   /* on phones the three portraits stay in a row, a little closer together */
   .gallery { --gg: 14px; --frame: 4px; width: calc(100% - 8px); margin-inline: 4px; }
   .gallery figure { outline-width: 1.5px; }

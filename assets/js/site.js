@@ -4,6 +4,30 @@
  * Edit WEDDING to change details everywhere. Add a page by creating the
  * HTML file and adding one line to PAGES.
  */
+/*
+ * Big screens: the design is laid out for a window about 1300 x 850. On
+ * computers we zoom the whole page so it fills the window the same way,
+ * bigger on a large monitor and a little smaller on a short laptop
+ * screen. --vw and --vh stand in for the vw/vh units in styles.css so
+ * they still mean the real window once the page is zoomed.
+ */
+(function () {
+  var html = document.documentElement;
+  var canZoom = window.CSS && CSS.supports && CSS.supports("zoom", "1.5");
+  function fit() {
+    var w = window.innerWidth, h = window.innerHeight;
+    var z = 1;
+    if (canZoom && w >= 1000) z = Math.max(0.8, Math.min(1.7, w / 1300, h / 850));
+    z = Math.round(z * 100) / 100;
+    html.style.zoom = z === 1 ? "" : z;
+    html.style.setProperty("--vw", (w / z / 100) + "px");
+    html.style.setProperty("--vh", (h / z / 100) + "px");
+    window.pageZoom = z;
+  }
+  fit();
+  window.addEventListener("resize", fit);
+})();
+
 window.WEDDING = {
   coupleA: "McKenna",
   coupleB: "Chandler",
@@ -180,9 +204,12 @@ window.PAGES = [
     var el = document.getElementById("reply");
     if (!el) return;
     var head = document.getElementById("site-header");
-    var y = 0;   // layout position, ignoring the section's fade-in nudge
-    for (var n = el; n; n = n.offsetParent) y += n.offsetTop;
-    y -= head ? head.offsetHeight : 0;
+    // show the section at once so its fade-in nudge doesn't throw off where it is
+    el.style.transition = "none";
+    el.classList.add("shown");
+    var y = el.getBoundingClientRect().top + window.scrollY - (head ? head.getBoundingClientRect().height : 0);
+    el.offsetHeight;   // apply before the transition comes back
+    el.style.transition = "";
     window.scrollTo({ top: Math.max(0, y), behavior: smooth ? "smooth" : "auto" });
   };
 
