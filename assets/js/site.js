@@ -163,6 +163,29 @@ window.PAGES = [
   }
   window.esc = esc;
 
+  // A pill in the header that leads to the gut-feeling question, so nobody
+  // misses it. Once answered it shows the guest's answer instead.
+  var FEEL_LABELS = {
+    yes: '<span aria-hidden="true">✓</span> Count me in!',
+    maybe: '<span aria-hidden="true">…</span> Still thinking',
+    no: '<span aria-hidden="true">✕</span> Likely not'
+  };
+  function feelButton(guest) {
+    var answer = FEEL_LABELS[guest.feeling];
+    return '<a class="feel-jump' + (answer ? " answered is-" + guest.feeling : "") + '" id="feel-jump" href="' + homeHref() + '#reply"' +
+      (answer ? ' aria-label="Your gut feeling: ' + guest.feeling + '. Change it"' : "") + ">" +
+      (answer || "Have a gut feeling?") + "</a>";
+  }
+  window.goToFeeling = function (smooth) {
+    var el = document.getElementById("reply");
+    if (!el) return;
+    var head = document.getElementById("site-header");
+    var y = 0;   // layout position, ignoring the section's fade-in nudge
+    for (var n = el; n; n = n.offsetParent) y += n.offsetTop;
+    y -= head ? head.offsetHeight : 0;
+    window.scrollTo({ top: Math.max(0, y), behavior: smooth ? "smooth" : "auto" });
+  };
+
   window.renderHeader = function () {
     var el = document.getElementById("site-header");
     if (!el) return;
@@ -177,9 +200,16 @@ window.PAGES = [
       '<div class="header-inner">' +
       '<a class="monogram" href="' + homeHref() + '">' + W.monogram + "</a>" +
       '<nav class="site-nav" aria-label="Main">' + links + "</nav>" +
+      (guest ? feelButton(guest) : "") +
       (guest ? '<p class="who">Ciao, ' + esc(guest.name.split(/[ &]/)[0]) +
         ' <button type="button" class="link-button" id="sign-out">Not you?</button></p>' : "") +
       "</div>";
+    var feel = document.getElementById("feel-jump");
+    if (feel) feel.addEventListener("click", function (e) {
+      if (!document.getElementById("reply")) return;   // on Travel: follow the link home
+      e.preventDefault();
+      window.goToFeeling(true);
+    });
     var out = document.getElementById("sign-out");
     if (out) out.addEventListener("click", function () {
       window.Guest.signOut();

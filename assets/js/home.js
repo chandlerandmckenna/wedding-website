@@ -154,6 +154,19 @@
       window.setupPageFades(book);
       return;
     }
+    // Coming from the header's gut-feeling pill on Travel: go straight there.
+    if (!animate && location.hash === "#reply") {
+      cover.hidden = true;
+      window.setupPageFades(book);
+      history.replaceState(null, "", location.pathname + location.search);
+      // again once the page has loaded: fonts and the jump-to-top on load
+      // can move things after the first try
+      function go() { window.goToFeeling(false); }
+      requestAnimationFrame(go);
+      if (document.readyState === "complete") setTimeout(go, 150);
+      else window.addEventListener("load", function () { setTimeout(go, 150); });
+      return;
+    }
     // Returning guests (back from Travel, or a new visit) skip the cover but
     // still see the painting wash open and the title rise in, as on day one.
     window.jumpToTop();
@@ -320,6 +333,7 @@
     window.GuestAPI.reply(guest, value).then(function () {
       guest.feeling = value;
       window.Guest.save(guest);
+      window.renderHeader();   // the header pill now shows their answer
       saved = value;
       statusEl.textContent = MESSAGES[value];
       refreshSend();
