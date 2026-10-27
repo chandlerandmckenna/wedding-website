@@ -112,10 +112,20 @@ window.PAGES = [
     return keys;
   }
 
+  // Preview mode: Chandler's mom's number (kept as a fingerprint, not the
+  // number itself, since this file is public) signs in as her household, to
+  // try the household version without the guest list.
+  function sample(id) {
+    var h = 5381;
+    String(id.phone || "").split("").forEach(function (c) { h = (h * 33 + c.charCodeAt(0)) >>> 0; });
+    if (h !== 1491194378) return null;
+    return demo.put(demoHousehold({ phone: id.phone, email: "", name: "Angi & Kevin Queenan", feeling: "" }));
+  }
+
   // Preview mode keeps a small guest book in this browser only.
   var demo = {
     all: function () { return read(DEMO_KEY) || {}; },
-    find: function (id) { return demo.all()[keysFor(id)[0]] || null; },
+    find: function (id) { return demo.all()[keysFor(id)[0]] || sample(id); },
     put: function (g) {
       var all = demo.all();
       keysFor(g).forEach(function (k) { all[k] = g; });
