@@ -85,28 +85,46 @@ function guests() {
   return tab("Guests");
 }
 
-// The guest's row in Guests. A phone on the guest list finds its household's
-// row, which is added the first time anyone in the household signs in.
-function findRow(id) {
+// The guest's row in Guests. Someone on the guest list (by phone, by email if
+// the list has an Email column, or by their name when they first sign up)
+// gets their household's row, which is added the first time anyone in the
+// household signs in, so a household is never counted twice.
+function findRow(id, name) {
   var sheet = guests(), rows = sheet.getDataRange().getValues();
   for (var i = 1; i < rows.length; i++) {
     var phone = digits(rows[i][COLS.phone]);
     var email = String(rows[i][COLS.email]).trim().toLowerCase();
-    if ((id.phone && phone === id.phone) || (id.email && email === id.email)) return { index: i + 1, row: rows[i] };
+    if ((id.phone && phone === id.phone) || (id.email && email === id.email)) return fillIn(sheet, i + 1, rows[i], id);
   }
-  var home = id.phone && household(id.phone);
+  var home = household(id, name);
   if (!home) return null;
   for (i = 1; i < rows.length; i++) {
-    if (rows[i][COLS.household] === home.key) return { index: i + 1, row: rows[i] };
+    if (rows[i][COLS.household] === home.key) return fillIn(sheet, i + 1, rows[i], id);
   }
-  var row = [phoneValue(id.phone), home.name, "", home.party ? "party" : "", "", new Date(),
+  var row = [phoneValue(id.phone), home.name, id.email || "", home.party ? "party" : "", "", new Date(),
     "", "", "", "", "", "", home.key, home.size];
   sheet.appendRow(row);
   return { index: sheet.getLastRow(), row: row };
 }
 
+// Save a phone or email the row doesn't have yet, so either signs in next time.
+function fillIn(sheet, index, row, id) {
+  if (id.phone && !digits(row[COLS.phone])) {
+    row[COLS.phone] = phoneValue(id.phone);
+    sheet.getRange(index, COLS.phone + 1).setValue(row[COLS.phone]);
+  }
+  if (id.email && !String(row[COLS.email]).trim()) {
+    row[COLS.email] = id.email;
+    sheet.getRange(index, COLS.email + 1).setValue(id.email);
+  }
+  return { index: index, row: row };
+}
+
 function lookup(id) {
-  var hit = findRow(id);
+  return describe(findRow(id));
+}
+
+function describe(hit) {
   if (!hit) return null;
   var r = hit.row;
   return {
@@ -129,7 +147,8 @@ function privateEvents(group) {
 }
 
 function register(id, req) {
-  if (findRow(id)) return lookup(id);
+  var hit = findRow(id, req.name);
+  if (hit) return describe(hit);
   guests().appendRow([phoneValue(id.phone), String(req.name || "").slice(0, 200), id.email || String(req.email || "").slice(0, 200), "", "", new Date()]);
   return lookup(id);
 }
@@ -191,7 +210,7 @@ function guestList() {
   if (h === values.length) return null;
   var col = function (name) { return head.indexOf(name); };
   var c = { person: col("Person"), title: col("Title (if Applicable)"), rel: col("Relationship"),
-    invite: col("Italy Invite?"), phone: col("Phone"), home: col("Household") };
+    invite: col("Italy Invite?"), phone: col("Phone"), email: col("Email"), home: col("Household") };
   var people = values.slice(h + 1).filter(function (r) {
     return String(r[c.person]).trim() && (c.invite < 0 || String(r[c.invite]).trim() !== GUEST_LIST.skip);
   });
@@ -206,15 +225,19 @@ function testGuestList() {
   var withPhone = list.people.filter(function (r) { return digits(r[list.c.phone]); });
   Logger.log("Columns found: " + JSON.stringify(list.c));
   Logger.log(list.people.length + " invited people, " + withPhone.length + " with a phone.");
-  if (withPhone.length) Logger.log("First phone signs in as: " + JSON.stringify(household(digits(withPhone[0][list.c.phone]))));
+  if (withPhone.length) Logger.log("First phone signs in as: " + JSON.stringify(household({ phone: digits(withPhone[0][list.c.phone]) })));
 }
 
-// The household of the guest-list person with this phone, or null.
-function household(phone) {
+// The household of the guest-list person with this phone, email or name.
+function household(id, name) {
   var list = guestList();
   if (!list) return null;
   var c = list.c, people = list.people;
-  var me = people.filter(function (r) { return digits(r[c.phone]) === phone; })[0];
+  var me = people.filter(function (r) {
+    return (id.phone && digits(r[c.phone]) === id.phone) ||
+      (id.email && c.email >= 0 && String(r[c.email]).trim().toLowerCase() === id.email) ||
+      (name && simple(r[c.person]) === simple(name));
+  })[0];
   if (!me) return null;
   var label = c.home >= 0 ? String(me[c.home]).trim() : "";
   var members = label ? people.filter(function (r) { return String(r[c.home]).trim() === label; }) : [me];
@@ -227,6 +250,11 @@ function household(phone) {
       return (c.title >= 0 && String(r[c.title]).trim()) || PARTY_RELATIONSHIPS.indexOf(r[c.rel]) >= 0;
     })
   };
+}
+
+// "  chandler  QUEENAN." -> "chandler queenan", for matching typed names.
+function simple(name) {
+  return String(name || "").toLowerCase().replace(/[^a-z ]/g, "").replace(/\s+/g, " ").trim();
 }
 
 // ["Angi Queenan", "Kevin Queenan"] -> "Angi & Kevin Queenan"
