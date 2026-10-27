@@ -30,7 +30,7 @@ var FEELINGS = { yes: true, maybe: true, no: true };
 function doPost(e) {
   var req = JSON.parse(e.postData.contents || "{}");
   var id = {
-    phone: String(req.phone || "").replace(/\D/g, ""),
+    phone: digits(req.phone),
     email: String(req.email || "").trim().toLowerCase()
   };
   if (!id.phone && !id.email) return json({ error: "phone or email required" });
@@ -79,7 +79,7 @@ function guests() {
 function findRow(id) {
   var rows = guests().getDataRange().getValues();
   for (var i = 1; i < rows.length; i++) {
-    var phone = String(rows[i][COLS.phone]).replace(/\D/g, "");
+    var phone = digits(rows[i][COLS.phone]);
     var email = String(rows[i][COLS.email]).trim().toLowerCase();
     if ((id.phone && phone === id.phone) || (id.email && email === id.email)) return { index: i + 1, row: rows[i] };
   }
@@ -91,7 +91,7 @@ function lookup(id) {
   if (!hit) return null;
   var r = hit.row;
   return {
-    phone: String(r[COLS.phone]).replace(/\D/g, ""),
+    phone: digits(r[COLS.phone]),
     name: r[COLS.name],
     email: r[COLS.email],
     feeling: r[COLS.feeling] || "",
@@ -148,6 +148,13 @@ function saveNote(id, req) {
     String(req.kind || "").slice(0, 40), note
   ]);
   return { ok: true };
+}
+
+// Digits only, with the US country code added to plain 10-digit numbers, so a
+// phone typed into the sheet as (925) 963-6950 matches one entered on the site.
+function digits(value) {
+  var d = String(value || "").replace(/\D/g, "");
+  return d.length === 10 ? "1" + d : d;
 }
 
 // Phones are stored as numbers so the sheet can show them formatted.
@@ -239,7 +246,7 @@ function phonesToNumbers(sheet, col) {
   if (last < 2) return;
   var range = sheet.getRange(2, col, last - 1, 1);
   range.setValues(range.getValues().map(function (r) {
-    var d = String(r[0]).replace(/\D/g, "");
+    var d = digits(r[0]);
     return [d ? Number(d) : ""];
   }));
 }
