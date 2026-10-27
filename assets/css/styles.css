@@ -414,9 +414,10 @@ html.paged .fade.shown { opacity: 1; transform: none; }
 .story-road { width: min(100%, 300px); display: flex; justify-content: center; border-bottom: 2px dashed var(--gold); margin-top: 2px; }
 .story-car { width: 230px; height: auto; margin-bottom: -2px; }
 html.paged .story-car:not(.go) { opacity: 0; }
-html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25, 1) 0.7s both, putt 0.45s ease-in-out 0.7s 9; }
+html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25, 1) 0.7s both, putt 1.05s ease-in-out 0.7s 4; }
 @keyframes drive-in { from { translate: -260px 0; opacity: 0; } 15% { opacity: 1; } }
-@keyframes putt { 50% { margin-bottom: -4px; } }
+/* a soft rocking ride; it uses transform so nothing around the scooter moves */
+@keyframes putt { 0%, 100% { transform: none; } 30% { transform: translateY(-1.5px) rotate(-0.6deg); } 70% { transform: translateY(0.5px) rotate(0.4deg); } }
 .venue-title { display: flex; align-items: center; justify-content: center; gap: clamp(10px, 3vw, 28px); }
 .moor { flex: none; width: clamp(48px, 7vw, 76px); height: auto; aspect-ratio: 100 / 140; }
 .moor-right { transform: scaleX(-1); }
