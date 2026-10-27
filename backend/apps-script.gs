@@ -15,6 +15,7 @@
  *   Group | Date | Time | Title | Place
  *   Date must match the site's schedule, e.g. "September 30".
  *
+ * The tabs are created automatically (run setup() once to make them now).
  * Deploy: Extensions > Apps Script, paste this file, then
  * Deploy > New deployment > Web app, execute as "Me", access "Anyone".
  * Put the web app URL in WEDDING.apiEndpoint in assets/js/site.js.
@@ -46,8 +47,32 @@ function doPost(e) {
   }
 }
 
+// Each tab is created with its header row the first time it's needed, so a
+// brand new, empty Google Sheet is all the setup this script needs.
+var HEADERS = {
+  "Guests": ["Phone", "Name", "Email", "Group", "Feeling", "Updated", "Street", "Apt", "City", "State", "ZIP", "Country"],
+  "Notes": ["Sent", "Name", "Phone", "Email", "Kind", "Note"],
+  "Private events": ["Group", "Date", "Time", "Title", "Place"]
+};
+function tab(name) {
+  var book = SpreadsheetApp.getActive();
+  var sheet = book.getSheetByName(name);
+  if (!sheet) {
+    sheet = book.insertSheet(name);
+    sheet.appendRow(HEADERS[name]);
+    sheet.setFrozenRows(1);
+    sheet.getRange(1, 1, 1, HEADERS[name].length).setFontWeight("bold");
+    sheet.getRange("A:A").setNumberFormat("@");   // keep phone numbers as text
+  }
+  return sheet;
+}
+// Run once from the Apps Script editor to create all three tabs up front.
+function setup() {
+  Object.keys(HEADERS).forEach(tab);
+}
+
 function guests() {
-  return SpreadsheetApp.getActive().getSheetByName("Guests");
+  return tab("Guests");
 }
 
 function findRow(id) {
@@ -76,8 +101,7 @@ function lookup(id) {
 
 function privateEvents(group) {
   if (!group) return [];
-  var sheet = SpreadsheetApp.getActive().getSheetByName("Private events");
-  if (!sheet) return [];
+  var sheet = tab("Private events");
   return sheet.getDataRange().getValues().slice(1)
     .filter(function (r) { return r[0] === group; })
     .map(function (r) { return { date: r[1], time: r[2], title: r[3], place: r[4] }; });
@@ -118,7 +142,7 @@ function saveNote(id, req) {
   if (!note) return { error: "note required" };
   var hit = findRow(id);
   if (!hit) return { error: "not found" };
-  SpreadsheetApp.getActive().getSheetByName("Notes").appendRow([
+  tab("Notes").appendRow([
     new Date(), String(hit.row[COLS.name] || req.name || ""), id.phone, id.email,
     String(req.kind || "").slice(0, 40), note
   ]);
