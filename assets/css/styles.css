@@ -88,6 +88,7 @@ p, figure { margin: 0; }
   background: url("../img/stripes.jpg") repeat-x 0 0 / 120px 240px;
   box-shadow: inset 0 -3px 0 var(--gold);
 }
+.site-footer .tile-band { box-shadow: inset 0 3px 0 var(--gold); }
 .stripes { background: var(--periwinkle) url("../img/stripes.jpg") repeat 0 0 / 120px 240px; }
 .page.stripes { box-shadow: inset 0 3px 0 var(--gold), inset 0 -3px 0 var(--gold); }
 /* A cream card with a scalloped edge and a thin gold frame inside it. The

@@ -304,8 +304,31 @@ window.PAGES = [
       new IntersectionObserver(function (entries) {
         var en = entries[0];
         if (en.intersectionRatio >= 0.9) el.classList.add("fanned");
-        else if (!en.isIntersecting) el.classList.remove("fanned");
+        else if (!en.isIntersecting) { el.classList.remove("fanned"); tuck(); }
       }, { threshold: [0, 0.9], rootMargin: "0px 0px -12% 0px" }).observe(el);
+      // scrolling on down, the side photos slide back behind the middle one
+      // step by step with the scroll
+      var sides = [el.querySelector("figure:first-child"), el.querySelector("figure:last-child")];
+      var ticking = false;
+      function tuck() {
+        ticking = false;
+        // starts once the photos' middle rises above 40% of the screen and
+        // is done as it reaches the top
+        var r = el.getBoundingClientRect();
+        var line = window.innerHeight * 0.4;
+        var t = Math.min(1, Math.max(0, (line - (r.top + r.height / 2)) / line));
+        sides.forEach(function (f, i) {
+          if (!f) return;
+          if (!t || !el.classList.contains("fanned")) { f.style.transform = f.style.opacity = f.style.transition = ""; return; }
+          var dir = i ? -1 : 1;
+          f.style.transition = "transform 0.25s ease-out, opacity 0.25s ease-out";
+          f.style.transform = "translateX(calc((100% + 16px) * " + (dir * t).toFixed(3) + ")) rotate(" + (dir * 4 * t).toFixed(2) + "deg) scale(" + (1 - 0.1 * t).toFixed(3) + ")";
+          f.style.opacity = (1 - t).toFixed(3);
+        });
+      }
+      window.addEventListener("scroll", function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(tuck); }
+      }, { passive: true });
     });
   };
 
