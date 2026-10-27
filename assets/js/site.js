@@ -129,6 +129,35 @@ window.PAGES = [
     return guest.first || String(guest.name || "").split(/[ &]/)[0];
   };
 
+  // A household (couples, families) lists everyone in it, the signed-in guest
+  // first: [{ name, email, phone, feeling, me }]. Singles have none.
+  window.householdOf = function (guest) {
+    return guest.household && guest.household.length > 1 ? guest.household : null;
+  };
+
+  // The one answer the header shows: the guest's own, or else the first one
+  // anyone in their household has given.
+  window.feelingOf = function (guest) {
+    var home = window.householdOf(guest);
+    if (guest.feeling || !home) return guest.feeling || "";
+    var answered = home.filter(function (m) { return m.feeling; })[0];
+    return answered ? answered.feeling : "";
+  };
+
+  // Preview mode: a name typed as "Angi & Kevin Queenan" signs in as a
+  // household of two, so the household version can be tried without the Sheet.
+  function demoHousehold(guest) {
+    var parts = String(guest.name || "").split(/\s*(?:,|&| and )\s*/i).filter(Boolean);
+    if (parts.length < 2) return guest;
+    var last = parts[parts.length - 1].split(" ").slice(1).join(" ");
+    var names = parts.map(function (n) { return n.indexOf(" ") < 0 && last ? n + " " + last : n; });
+    guest.household = names.map(function (n, i) {
+      return { name: n, email: i ? "" : guest.email || "", phone: i ? "" : guest.phone || "", feeling: "", me: !i };
+    });
+    guest.first = names.map(function (n) { return n.split(" ")[0]; }).join(" & ");
+    return guest;
+  }
+
   function call(action, payload) {
     if (!W.apiEndpoint) return null;
     // text/plain avoids a CORS preflight, which Apps Script can't answer.
@@ -142,31 +171,46 @@ window.PAGES = [
     });
   }
 
+  // Copies one field from [{ name, ... }] onto the guest and their household.
+  function apply(g, list, field) {
+    (list || []).forEach(function (a) {
+      if (!a[field]) return;
+      var m = (g.household || []).filter(function (h) { return h.name === a.name; })[0];
+      if (m) m[field] = a[field];
+      if (!m || m.me) g[field] = a[field];
+    });
+  }
+  window.applyAnswers = apply;
+
   window.GuestAPI = {
     preview: !W.apiEndpoint,
     // Resolves to the guest record, or null if we don't know them yet.
     lookup: function (id) {
       return call("lookup", id) || Promise.resolve(demo.find(id));
     },
+    // Resolves to the guest record as saved (a household gets its members).
     register: function (guest) {
-      return call("register", guest) || Promise.resolve(demo.put(guest));
+      var p = call("register", guest);
+      return p ? p.then(function (g) { return g || guest; }) : Promise.resolve(demo.put(demoHousehold(guest)));
     },
-    reply: function (guest, feeling) {
-      var p = call("reply", { phone: guest.phone, email: guest.email, feeling: feeling });
+    // answers is [{ name, feeling }], one for each person answering
+    reply: function (guest, answers) {
+      var p = call("reply", { phone: guest.phone, email: guest.email, feelings: answers });
       if (p) return p;
       var g = demo.find(guest);
-      if (g) { g.feeling = feeling; demo.put(g); }
+      if (g) { apply(g, answers, "feeling"); demo.put(g); }
       return Promise.resolve({ ok: true });
     },
-    // address is { line1, line2, city, state, zip, country }
-    address: function (guest, address, contact) {
-      var p = call("address", { phone: guest.phone, email: guest.email, address: address, contact: contact });
+    // address is { line1, line2, city, state, zip, country } for the household;
+    // contacts is [{ name, email, phone }], one for each person
+    address: function (guest, address, contacts) {
+      var p = call("address", { phone: guest.phone, email: guest.email, address: address, contacts: contacts });
       if (p) return p;
       var g = demo.find(guest);
       if (g) {
         if (address) g.address = address;
-        if (contact && contact.email) g.email = contact.email;
-        if (contact && contact.phone) g.phone = contact.phone;
+        apply(g, contacts, "email");
+        apply(g, contacts, "phone");
         demo.put(g);
       }
       return Promise.resolve({ ok: true });
@@ -209,9 +253,10 @@ window.PAGES = [
     no: '<span aria-hidden="true">✕</span> Likely not'
   };
   function feelButton(guest) {
-    var answer = FEEL_LABELS[guest.feeling];
-    return '<a class="feel-jump' + (answer ? " answered is-" + guest.feeling : "") + '" id="feel-jump" href="' + homeHref() + '#reply"' +
-      (answer ? ' aria-label="Your gut feeling: ' + guest.feeling + '. Change it"' : "") + ">" +
+    var feeling = window.feelingOf(guest);
+    var answer = FEEL_LABELS[feeling];
+    return '<a class="feel-jump' + (answer ? " answered is-" + feeling : "") + '" id="feel-jump" href="' + homeHref() + '#reply"' +
+      (answer ? ' aria-label="Your gut feeling: ' + feeling + '. Change it"' : "") + ">" +
       (answer || "Have a gut feeling?") + "</a>";
   }
   window.goToFeeling = function (smooth) {

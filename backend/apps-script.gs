@@ -8,13 +8,17 @@
  *   shown as +1 (925) 963-6950.
  *   Guests can sign in with either their phone or their email.
  *   Group is optional, e.g. "party" for the wedding party and families.
- *   Household and People are filled in for guests found on the guest list.
+ *   Household is filled in for guests found on the guest list; everyone in a
+ *   household gets their own row with the same Household value. People is
+ *   only used by rows saved before that (one row for a whole household).
  *
  * Guest list (GUEST_LIST below, a separate spreadsheet Chandler keeps):
  *   Anyone whose phone is on it is recognised when they sign in, without
- *   typing their name. People sharing a Household label answer together:
- *   one row in Guests, one gut feeling for all of them, and any of their
- *   phones signs them in. Columns are found by their header names.
+ *   typing their name. People sharing a Household label sign in together:
+ *   any of them sees everyone in the household on the site and can answer
+ *   the gut feeling and leave an email and phone for each person. Each
+ *   person has their own row in Guests; the mailing address is shared.
+ *   Columns are found by their header names.
  *
  * Sheet "Notes" (row 1 is headers), one row per note left on the site:
  *   Sent | Name | Phone | Email | Kind | Note
@@ -47,8 +51,8 @@ function doPost(e) {
   try {
     if (req.action === "lookup") return json(lookup(id));
     if (req.action === "register") return json(register(id, req));
-    if (req.action === "reply") return json(reply(id, req.feeling));
-    if (req.action === "address") return json(saveAddress(id, req.address, req.contact));
+    if (req.action === "reply") return json(reply(id, req));
+    if (req.action === "address") return json(saveAddress(id, req));
     if (req.action === "note") return json(saveNote(id, req));
     return json({ error: "unknown action" });
   } finally {
@@ -87,8 +91,8 @@ function guests() {
 
 // The guest's row in Guests. Someone on the guest list (by phone, by email if
 // the list has an Email column, or by their name when they first sign up)
-// gets their household's row, which is added the first time anyone in the
-// household signs in, so a household is never counted twice.
+// gets their own row, and the first time anyone in a household signs in a
+// row is added for everyone in it, so nobody is counted twice.
 function findRow(id, name) {
   var sheet = guests(), rows = sheet.getDataRange().getValues();
   for (var i = 1; i < rows.length; i++) {
@@ -98,13 +102,45 @@ function findRow(id, name) {
   }
   var home = household(id, name);
   if (!home) return null;
-  for (i = 1; i < rows.length; i++) {
-    if (rows[i][COLS.household] === home.key) return fillIn(sheet, i + 1, rows[i], id);
+  rows = householdRows(sheet, home);
+  var mine = rows.filter(function (r) { return simple(r.row[COLS.name]) === simple(home.me.name); })[0] || rows[0];
+  return fillIn(sheet, mine.index, mine.row, id);
+}
+
+// Rows in Guests for everyone in the household, adding any that are missing.
+// A household saved before people had their own rows ("Angi & Kevin
+// Queenan" on one row) is split into one row each, keeping its answer and
+// address.
+function householdRows(sheet, home) {
+  var rows = sheet.getDataRange().getValues(), found = [];
+  for (var i = 1; i < rows.length; i++) {
+    if (rows[i][COLS.household] === home.key) found.push({ index: i + 1, row: rows[i] });
   }
-  var row = [phoneValue(id.phone), home.name, id.email || "", home.party ? "party" : "", "", new Date(),
-    "", "", "", "", "", "", home.key, home.size];
-  sheet.appendRow(row);
-  return { index: sheet.getLastRow(), row: row };
+  var shared = found[0] ? found[0].row : null;
+  var old = found.filter(function (r) { return Number(r.row[COLS.people]) > 1; })[0];
+  if (old) {
+    var who = home.members.filter(function (m) {
+      return (m.phone && m.phone === digits(old.row[COLS.phone])) ||
+        (m.email && m.email === String(old.row[COLS.email]).trim().toLowerCase());
+    })[0] || home.members[0];
+    old.row[COLS.name] = who.name;
+    old.row[COLS.people] = "";
+    sheet.getRange(old.index, 1, 1, old.row.length).setValues([old.row]);
+    shared = old.row;
+  }
+  home.members.forEach(function (m) {
+    var has = found.some(function (r) { return simple(r.row[COLS.name]) === simple(m.name); });
+    if (has) return;
+    var row = [phoneValue(m.phone), m.name, m.email || "", home.party ? "party" : "", "", new Date(),
+      "", "", "", "", "", "", home.key, ""];
+    if (shared) {
+      if (old) row[COLS.feeling] = shared[COLS.feeling];   // they used to answer together
+      for (var k = 0; k < ADDRESS.length; k++) row[COLS.address + k] = shared[COLS.address + k];
+    }
+    sheet.appendRow(row);
+    found.push({ index: sheet.getLastRow(), row: row });
+  });
+  return found;
 }
 
 // Save a phone or email the row doesn't have yet, so either signs in next time.
@@ -127,7 +163,7 @@ function lookup(id) {
 function describe(hit) {
   if (!hit) return null;
   var r = hit.row;
-  return {
+  var guest = {
     phone: digits(r[COLS.phone]),
     name: r[COLS.name],
     first: firstNames(r),
@@ -136,6 +172,38 @@ function describe(hit) {
     address: readAddress(r),
     privateEvents: privateEvents(r[COLS.group])
   };
+  // Everyone in the household, this guest first, so the site can ask each of them.
+  var family = sameHousehold(hit);
+  if (family.length > 1) {
+    family.sort(function (a, b) { return (b.index === hit.index) - (a.index === hit.index); });
+    guest.household = family.map(function (m) {
+      return {
+        name: String(m.row[COLS.name]),
+        email: String(m.row[COLS.email] || ""),
+        phone: digits(m.row[COLS.phone]),
+        feeling: m.row[COLS.feeling] || "",
+        me: m.index === hit.index
+      };
+    });
+    guest.first = joinFirst(guest.household.map(function (m) { return m.name; }));
+  }
+  return guest;
+}
+
+// The rows in Guests sharing this guest's Household (just theirs if none).
+function sameHousehold(hit) {
+  var key = hit.row[COLS.household];
+  if (!key) return [hit];
+  var rows = guests().getDataRange().getValues(), out = [];
+  for (var i = 1; i < rows.length; i++) {
+    if (rows[i][COLS.household] === key) out.push({ index: i + 1, row: rows[i] });
+  }
+  return out;
+}
+
+// The household row for one of its members, by name.
+function member(family, name) {
+  return family.filter(function (m) { return simple(m.row[COLS.name]) === simple(name); })[0];
 }
 
 function privateEvents(group) {
@@ -153,11 +221,17 @@ function register(id, req) {
   return lookup(id);
 }
 
-function reply(id, feeling) {
-  if (!FEELINGS[feeling]) return { error: "unknown feeling" };
+// One gut feeling, or { name, feeling } for each person in the household.
+function reply(id, req) {
   var hit = findRow(id);
   if (!hit) return { error: "not found" };
-  guests().getRange(hit.index, COLS.feeling + 1, 1, 2).setValues([[feeling, new Date()]]);
+  var answers = req.feelings || [{ feeling: req.feeling }];
+  var family = sameHousehold(hit), sheet = guests();
+  answers.forEach(function (a) {
+    if (!FEELINGS[a.feeling]) return;
+    var m = a.name ? member(family, a.name) : hit;
+    if (m) sheet.getRange(m.index, COLS.feeling + 1, 1, 2).setValues([[a.feeling, new Date()]]);
+  });
   return { ok: true };
 }
 
@@ -167,22 +241,35 @@ function readAddress(r) {
   return any ? a : null;
 }
 
-// The postcard: a mailing address, an email and a phone, any of them optional.
-function saveAddress(id, address, contact) {
-  contact = contact || {};
-  var email = String(contact.email || "").trim().toLowerCase().slice(0, 200);
-  var phone = digits(contact.phone);
-  if (!(address && address.line1) && !email && !phone) return { error: "nothing to save" };
+// The postcard: a mailing address for the household, and an email and a
+// phone for each person in it, any of them optional.
+function saveAddress(id, req) {
+  var address = req.address && req.address.line1 ? req.address : null;
+  var contacts = (req.contacts || [req.contact || {}]).map(function (c) {
+    return {
+      name: c.name,
+      email: String(c.email || "").trim().toLowerCase().slice(0, 200),
+      phone: digits(c.phone)
+    };
+  }).filter(function (c) { return c.email || c.phone; });
+  if (!address && !contacts.length) return { error: "nothing to save" };
   var hit = findRow(id);
   if (!hit) return { error: "not found" };
-  var sheet = guests();
-  if (address && address.line1) {
+  var sheet = guests(), family = sameHousehold(hit);
+  if (address) {
     var values = ADDRESS.map(function (k) { return String(address[k] || "").slice(0, 200); });
-    sheet.getRange(hit.index, COLS.address + 1, 1, ADDRESS.length).setValues([values]);
+    family.forEach(function (m) {
+      sheet.getRange(m.index, COLS.address + 1, 1, ADDRESS.length).setValues([values]);
+      sheet.getRange(m.index, COLS.updated + 1).setValue(new Date());
+    });
   }
-  if (email) sheet.getRange(hit.index, COLS.email + 1).setValue(email);
-  if (phone) sheet.getRange(hit.index, COLS.phone + 1).setValue(phoneValue(phone));
-  sheet.getRange(hit.index, COLS.updated + 1).setValue(new Date());
+  contacts.forEach(function (c) {
+    var m = c.name ? member(family, c.name) : hit;
+    if (!m) return;
+    if (c.email) sheet.getRange(m.index, COLS.email + 1).setValue(c.email);
+    if (c.phone) sheet.getRange(m.index, COLS.phone + 1).setValue(phoneValue(c.phone));
+    sheet.getRange(m.index, COLS.updated + 1).setValue(new Date());
+  });
   return { ok: true };
 }
 
@@ -234,7 +321,7 @@ function testGuestList() {
   var withPhone = list.people.filter(function (r) { return digits(r[list.c.phone]); });
   Logger.log("Columns found: " + JSON.stringify(list.c));
   Logger.log(list.people.length + " invited people, " + withPhone.length + " with a phone.");
-  if (withPhone.length) Logger.log("First phone signs in as: " + JSON.stringify(household({ phone: digits(withPhone[0][list.c.phone]) })));
+  if (withPhone.length) Logger.log("First phone's household: " + JSON.stringify(household({ phone: digits(withPhone[0][list.c.phone]) })));
 }
 
 // The household of the guest-list person with this phone, email or name.
@@ -250,11 +337,17 @@ function household(id, name) {
   if (!me) return null;
   var label = c.home >= 0 ? String(me[c.home]).trim() : "";
   var members = label ? people.filter(function (r) { return String(r[c.home]).trim() === label; }) : [me];
-  var names = members.map(function (r) { return String(r[c.person]).trim(); });
+  var person = function (r) {
+    return {
+      name: String(r[c.person]).trim(),
+      phone: digits(r[c.phone]),
+      email: c.email >= 0 ? String(r[c.email]).trim().toLowerCase() : ""
+    };
+  };
   return {
-    key: label || names[0],
-    name: joinNames(names),
-    size: members.length,
+    key: label || person(me).name,
+    me: person(me),
+    members: members.map(person),
     party: members.some(function (r) {
       return (c.title >= 0 && String(r[c.title]).trim()) || PARTY_RELATIONSHIPS.indexOf(r[c.rel]) >= 0;
     })
@@ -266,21 +359,17 @@ function simple(name) {
   return String(name || "").toLowerCase().replace(/[^a-z ]/g, "").replace(/\s+/g, " ").trim();
 }
 
-// ["Angi Queenan", "Kevin Queenan"] -> "Angi & Kevin Queenan"
-function joinNames(names) {
-  var last = names.map(function (n) { return n.split(" ").slice(1).join(" "); });
-  var same = names.length > 1 && last[0] && last.every(function (l) { return l === last[0]; });
-  var parts = same ? names.map(function (n) { return n.split(" ")[0]; }) : names;
-  var joined = parts.length > 1 ? parts.slice(0, -1).join(", ") + " & " + parts[parts.length - 1] : parts[0];
-  return same ? joined + " " + last[0] : joined;
+// ["Angi Queenan", "Kevin Queenan"] -> "Angi & Kevin", used to greet a
+// household on the site.
+function joinFirst(names) {
+  var parts = names.map(function (n) { return String(n).trim().split(" ")[0]; });
+  return parts.length > 1 ? parts.slice(0, -1).join(", ") + " & " + parts[parts.length - 1] : parts[0];
 }
 
-// "Angi & Kevin" for a household, used to greet them on the site.
+// The same for a row saved before people had their own rows.
 function firstNames(r) {
   var name = String(r[COLS.name]);
-  if (name.indexOf(" & ") < 0) return "";
-  var parts = name.split(/, | & /).map(function (n) { return n.trim().split(" ")[0]; });
-  return parts.slice(0, -1).join(", ") + " & " + parts[parts.length - 1];
+  return name.indexOf(" & ") < 0 ? "" : joinFirst(name.split(/, | & /));
 }
 
 // Digits only, with the US country code added to plain 10-digit numbers, so a
@@ -384,6 +473,13 @@ function phonesToNumbers(sheet, col) {
   }));
 }
 
+// How many households have a row matching the condition (a row without a
+// Household counts as its own).
+function households(condition) {
+  var key = "IF(Guests!M2:M<>\"\",Guests!M2:M,ROW(Guests!M2:M))";
+  return "IFERROR(COUNTUNIQUE(ARRAYFORMULA(FILTER(" + key + "," + condition + "))),0)";
+}
+
 function overview() {
   var book = SpreadsheetApp.getActive();
   var sheet = book.getSheetByName("Overview") || book.insertSheet("Overview", 0);
@@ -392,7 +488,8 @@ function overview() {
   book.setActiveSheet(sheet);
   book.moveActiveSheet(1);
 
-  // Households count each person in them (the People column).
+  // Each row is one person; rows saved before that count everyone in their
+  // household (the People column). Addresses count once per household.
   var people = "(1+(Guests!N2:N<>\"\")*(Guests!N2:N-1))";
   var signed = "SUMPRODUCT((LEN(Guests!A2:A&Guests!B2:B&Guests!C2:C)>0)*" + people + ")";
   var feeling = function (f) { return "=SUMPRODUCT((Guests!E2:E=\"" + f + "\")*" + people + ")"; };
@@ -408,8 +505,8 @@ function overview() {
     ["Total signed in", "=" + signed, ""],
     ["", "", ""],
     ["Mailing addresses", "Households", "Share"],
-    ["Address received", "=COUNTA(Guests!G2:G)", ""],
-    ["Still needed", "=SUMPRODUCT(--(LEN(Guests!A2:A&Guests!B2:B&Guests!C2:C)>0))-B12", ""],
+    ["Address received", "=" + households("Guests!G2:G<>\"\""), ""],
+    ["Still needed", "=" + households("LEN(Guests!A2:A&Guests!B2:B&Guests!C2:C)>0") + "-B12", ""],
     ["", "", ""],
     ["Notes for the couple", "Notes", "Share"]
   ];

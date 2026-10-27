@@ -124,8 +124,8 @@
     var guest = { phone: pendingId.phone || "", email: email, name: name.value.trim(), feeling: "" };
     var btn = document.getElementById("name-submit");
     busy(btn, true);
-    window.GuestAPI.register(guest).then(function () {
-      signedIn(guest);
+    window.GuestAPI.register(guest).then(function (saved) {
+      signedIn(saved);
     }).catch(function () {
       showError("We couldn't save your details. Please try again.");
     }).then(function () { busy(btn, false, "Continue"); });
@@ -208,59 +208,95 @@
   };
   var sendBtn = document.getElementById("feel-send");
   var statusEl = document.getElementById("feel-status");
-  var selected = "";
-  var saved = "";
+  var template = document.querySelector(".feel-options");
+  // One set of choices for a single guest; one per person for a household,
+  // each under that person's name. { name, saved, selected, el } each.
+  var people = [];
 
-  function mark(value) {
-    document.querySelectorAll(".feel").forEach(function (b) {
-      b.setAttribute("aria-checked", b.getAttribute("data-feeling") === value ? "true" : "false");
+  function mark(p) {
+    p.el.querySelectorAll(".feel").forEach(function (b) {
+      b.setAttribute("aria-checked", b.getAttribute("data-feeling") === p.selected ? "true" : "false");
     });
-    document.querySelector(".feel-options").classList.toggle("has-choice", !!value);
+    p.el.classList.toggle("has-choice", !!p.selected);
+  }
+
+  function changed() {
+    return people.filter(function (p) { return p.selected && p.selected !== p.saved; });
   }
 
   function refreshSend() {
-    if (!selected) {
-      sendBtn.disabled = true;
-      sendBtn.textContent = "Send my answer";
-    } else if (selected === saved) {
-      sendBtn.disabled = true;
-      sendBtn.textContent = "Answer sent";
-    } else {
-      sendBtn.disabled = false;
-      sendBtn.textContent = saved ? "Update my answer" : "Send my answer";
-    }
+    var our = people.length > 1;
+    var anySaved = people.some(function (p) { return p.saved; });
+    var anySelected = people.some(function (p) { return p.selected; });
+    sendBtn.disabled = !changed().length;
+    sendBtn.textContent =
+      !anySelected ? (our ? "Send our answers" : "Send my answer") :
+      !changed().length ? (our ? "Answers sent" : "Answer sent") :
+      anySaved ? (our ? "Update our answers" : "Update my answer") : (our ? "Send our answers" : "Send my answer");
+  }
+
+  // The thank-you under the button: the usual one when everyone gave the
+  // same answer, a general one when they differ.
+  function thanks() {
+    var given = people.map(function (p) { return p.saved; }).filter(Boolean);
+    if (!given.length) return "";
+    var same = given.every(function (f) { return f === given[0]; });
+    return same ? MESSAGES[given[0]] : "Grazie! We have everyone's answers. You can change them here whenever you like.";
   }
 
   function setupFeelings(guest) {
     var first = window.firstName(guest);
     document.getElementById("feel-hello").textContent = "Ciao, " + first + "!";
-    saved = selected = guest.feeling || "";
-    mark(selected);
-    statusEl.textContent = saved ? MESSAGES[saved] : "";
+    var panel = template.parentNode;
+    panel.querySelectorAll(".feel-person").forEach(function (el) { el.remove(); });
+    var home = window.householdOf(guest);
+    if (!home) {
+      template.hidden = false;
+      people = [{ name: guest.name, saved: guest.feeling || "", el: template }];
+    } else {
+      template.hidden = true;
+      people = home.map(function (m, i) {
+        var el = document.createElement("div");
+        el.className = "feel-person";
+        var label = String(m.name).split(" ")[0];
+        el.innerHTML = '<p class="feel-who" id="feel-who-' + i + '">' + window.esc(label) + "</p>";
+        var options = template.cloneNode(true);
+        options.hidden = false;
+        options.setAttribute("aria-labelledby", "feel-who-" + i);
+        options.removeAttribute("aria-label");
+        el.appendChild(options);
+        panel.insertBefore(el, sendBtn);
+        return { name: m.name, saved: m.feeling || "", el: options };
+      });
+    }
+    people.forEach(function (p) {
+      p.selected = p.saved;
+      mark(p);
+      p.el.querySelectorAll(".feel").forEach(function (btn) {
+        btn.onclick = function () {
+          p.selected = btn.getAttribute("data-feeling");
+          mark(p);
+          statusEl.textContent = "";
+          refreshSend();
+        };
+      });
+    });
+    statusEl.textContent = thanks();
     refreshSend();
   }
 
-  document.querySelectorAll(".feel").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      selected = btn.getAttribute("data-feeling");
-      mark(selected);
-      statusEl.textContent = "";
-      refreshSend();
-    });
-  });
-
   sendBtn.addEventListener("click", function () {
     var guest = window.Guest.current();
-    if (!guest || !selected) return;
-    var value = selected;
+    var answers = changed().map(function (p) { return { name: p.name, feeling: p.selected }; });
+    if (!guest || !answers.length) return;
     sendBtn.disabled = true;
     sendBtn.textContent = "Sending…";
-    window.GuestAPI.reply(guest, value).then(function () {
-      guest.feeling = value;
+    window.GuestAPI.reply(guest, answers).then(function () {
+      window.applyAnswers(guest, answers, "feeling");
       window.Guest.save(guest);
       window.renderHeader();   // the header pill now shows their answer
-      saved = value;
-      statusEl.textContent = MESSAGES[value];
+      changed().forEach(function (p) { p.saved = p.selected; });
+      statusEl.textContent = thanks();
       refreshSend();
     }).catch(function () {
       statusEl.textContent = "We couldn't send that. Please try again.";
@@ -280,6 +316,38 @@
   });
 
   phoneField(addressForm.elements.phone);
+  var emailField = document.getElementById("addr-email").parentNode;
+  var phoneFieldEl = document.getElementById("addr-phone").parentNode;
+  // [{ name, email, phone }] inputs, one for each person on the postcard
+  var contactInputs = [];
+
+  // A household gets an email and a mobile number line for each person,
+  // labelled with their first name; a single guest keeps the plain two.
+  function contactFields(guest) {
+    addressForm.querySelectorAll(".pc-person").forEach(function (el) { el.remove(); });
+    var home = window.householdOf(guest);
+    emailField.hidden = phoneFieldEl.hidden = !!home;
+    if (!home) {
+      contactInputs = [{ name: guest.name, email: addressForm.elements.email, phone: addressForm.elements.phone, me: guest }];
+      return;
+    }
+    contactInputs = home.map(function (m, i) {
+      var first = window.esc(String(m.name).split(" ")[0]);
+      var email = document.createElement("div");
+      email.className = "field span-2 pc-person" + (i ? " pc-next" : "");
+      email.innerHTML = '<label for="addr-email-' + i + '">' + first + "\u2019s email</label>" +
+        '<input type="email" id="addr-email-' + i + '" autocomplete="' + (m.me ? "email" : "off") + '" autocapitalize="none" spellcheck="false" placeholder="' + (i ? "them" : "you") + '@example.com">';
+      var phone = document.createElement("div");
+      phone.className = "field span-2 pc-person";
+      phone.innerHTML = '<label for="addr-phone-' + i + '">' + first + "\u2019s mobile number</label>" +
+        '<input type="tel" id="addr-phone-' + i + '" inputmode="tel" autocomplete="' + (m.me ? "tel-national" : "off") + '" placeholder="(555) 123-4567">';
+      phoneFieldEl.parentNode.appendChild(email);
+      phoneFieldEl.parentNode.appendChild(phone);
+      var row = { name: m.name, email: email.querySelector("input"), phone: phone.querySelector("input"), me: m };
+      phoneField(row.phone);
+      return row;
+    });
+  }
 
   function fillAddress(guest) {
     var a = guest.address || {};
@@ -287,8 +355,11 @@
       var el = addressForm.elements[k];
       if (a[k]) el.value = a[k];
     });
-    if (guest.email) addressForm.elements.email.value = guest.email;
-    if (guest.phone) addressForm.elements.phone.value = formatUS(usDigits(guest.phone));
+    contactFields(guest);
+    contactInputs.forEach(function (c) {
+      if (c.me.email) c.email.value = c.me.email;
+      if (c.me.phone) c.phone.value = formatUS(usDigits(c.me.phone));
+    });
     addressStatus.textContent = guest.address ? "We have your address. Update it here any time." : "";
   }
 
@@ -296,34 +367,38 @@
     e.preventDefault();
     var a = {};
     ADDRESS_FIELDS.forEach(function (k) { a[k] = addressForm.elements[k].value.trim(); });
-    var contact = {
-      email: addressForm.elements.email.value.trim().toLowerCase(),
-      phone: usDigits(addressForm.elements.phone.value)
-    };
+    var contacts = contactInputs.map(function (c) {
+      return { name: c.name, email: c.email.value.trim().toLowerCase(), phone: usDigits(c.phone.value), inputs: c };
+    });
     // The address can be left for later if they only want to leave an email or phone.
     var started = ["line1", "line2", "city", "state", "zip"].some(function (k) { return a[k]; });
     var missing = ["line1", "city", "country"].filter(function (k) { return !a[k]; })[0];
+    var badEmail = contacts.filter(function (c) { return c.email && !isEmail(c.email); })[0];
+    var badPhone = contacts.filter(function (c) { return c.phone && c.phone.length !== 10; })[0];
+    var any = contacts.some(function (c) { return c.email || c.phone; });
     var problem =
       started && missing ? missing :
-      contact.email && !isEmail(contact.email) ? "email" :
-      contact.phone && contact.phone.length !== 10 ? "phone" :
-      !started && !contact.email && !contact.phone ? "line1" : "";
+      badEmail ? "email" :
+      badPhone ? "phone" :
+      !started && !any ? "line1" : "";
     if (problem) {
       addressStatus.textContent = {
         line1: "Please add your street address.", city: "Please add your city.", country: "Please add your country.",
-        email: "Please check your email address.", phone: "Please enter a 10-digit phone number, area code first."
+        email: "Please check the email address.", phone: "Please enter a 10-digit phone number, area code first."
       }[problem];
-      addressForm.elements[problem].focus();
+      (problem === "email" ? badEmail.inputs.email : problem === "phone" ? badPhone.inputs.phone : addressForm.elements[problem]).focus();
       return;
     }
-    if (contact.phone) contact.phone = "1" + contact.phone;
+    contacts = contacts.map(function (c) {
+      return { name: c.name, email: c.email, phone: c.phone ? "1" + c.phone : "" };
+    });
     var guest = window.Guest.current();
     var btn = document.getElementById("address-send");
     busy(btn, true);
-    window.GuestAPI.address(guest, started ? a : null, contact).then(function () {
+    window.GuestAPI.address(guest, started ? a : null, contacts).then(function () {
       if (started) guest.address = a;
-      if (contact.email) guest.email = contact.email;
-      if (contact.phone) guest.phone = contact.phone;
+      window.applyAnswers(guest, contacts, "email");
+      window.applyAnswers(guest, contacts, "phone");
       window.Guest.save(guest);
       addressStatus.textContent = started ? "Grazie! Your invitation will be sent there." : "Grazie! We'll be in touch.";
     }).catch(function () {

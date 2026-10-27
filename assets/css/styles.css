@@ -613,6 +613,12 @@ html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(
 .feel[aria-checked="true"] .feel-icon { background: rgba(255, 255, 255, 0.9); color: var(--c-ink); }
 .has-choice .feel[aria-checked="false"] { opacity: 0.6; }
 .has-choice .feel[aria-checked="false"]:hover { opacity: 1; }
+/* a household: each person's name over their own choices */
+.feel-person + .feel-person { margin-top: 18px; }
+.feel-who { margin: 0 0 8px; font-weight: 500; font-size: 0.8125rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--cobalt); }
+.feel-person .feel-options { gap: 8px; }
+.feel-person .feel { min-height: 50px; gap: 12px; padding: 6px 16px 6px 8px; }
+.feel-person .feel-icon { width: 34px; height: 34px; }
 .send { margin-top: 10px; }
 .switch { text-align: center; }
 /* A better address for the invitation */
@@ -675,6 +681,7 @@ html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(
 .postcard input[type="text"]:focus, .postcard input[type="email"]:focus, .postcard input[type="tel"]:focus { box-shadow: none; border-bottom-color: var(--gold); background: rgba(245, 179, 36, 0.08); }
 .postcard .address-grid .span-2 { grid-column: 1 / -1; }
 .postcard .feel-status { text-align: center; }
+.postcard .pc-next { margin-top: 6px; }
 /* on phones it reads like the back of a real postcard: the stamp up in the
    corner, the note beneath it, then the address lines packed closer */
 @media (max-width: 760px) {
