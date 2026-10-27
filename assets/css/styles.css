@@ -624,10 +624,10 @@ html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(
   .pc-note .eyebrow, .pc-note h2 { padding-right: 78px; }
   .pc-note h2 { font-size: 2.1rem; line-height: 1.1; }
   .pc-to { position: static; border-left: 0; border-top: 2px dashed var(--line); margin-inline: 22px; padding: 18px 0 22px; gap: 10px; }
-  .pc-stamp { --r: 3px; top: 18px; right: 18px; width: 70px; height: 84px; gap: 3px; box-shadow: inset 0 0 0 7px #fffdf8, inset 0 0 0 9px var(--cobalt); }
+  .pc-stamp { --r: 3px; top: 8px; right: 12px; width: 70px; height: 84px; gap: 3px; box-shadow: inset 0 0 0 7px #fffdf8, inset 0 0 0 9px var(--cobalt); }
   .pc-stamp svg { width: 46px; height: 42px; }
   .pc-stamp span { font-size: 0.56rem; }
-  .pc-postmark { top: 64px; right: 30px; width: 104px; height: 62px; opacity: 0.8; }
+  .pc-postmark { top: 40px; right: 26px; width: 104px; height: 62px; opacity: 0.8; }
   .postcard .address-grid { gap: 14px 16px; margin-bottom: 4px; }
   .postcard .field { gap: 0; }
   .postcard input[type="text"] { min-height: 32px; }
