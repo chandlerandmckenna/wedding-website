@@ -4,7 +4,8 @@
  *
  * Sheet "Guests" (row 1 is headers):
  *   Phone | Name | Email | Group | Feeling | Updated | Street | Apt | City | State | ZIP | Country
- *   Phone is digits only with country code, e.g. 19259636950.
+ *   Phone is stored as a number with country code, e.g. 19259636950, and
+ *   shown as +1 (925) 963-6950.
  *   Guests can sign in with either their phone or their email.
  *   Group is optional, e.g. "party" for the wedding party and families.
  *
@@ -16,6 +17,7 @@
  *   Date must match the site's schedule, e.g. "September 30".
  *
  * The tabs are created automatically (run setup() once to make them now).
+ * Run styleSheet() once to format every tab and build the Overview tab.
  * Deploy: Extensions > Apps Script, paste this file, then
  * Deploy > New deployment > Web app, execute as "Me", access "Anyone".
  * Put the web app URL in WEDDING.apiEndpoint in assets/js/site.js.
@@ -62,7 +64,6 @@ function tab(name) {
     sheet.appendRow(HEADERS[name]);
     sheet.setFrozenRows(1);
     sheet.getRange(1, 1, 1, HEADERS[name].length).setFontWeight("bold");
-    sheet.getRange("A:A").setNumberFormat("@");   // keep phone numbers as text
   }
   return sheet;
 }
@@ -109,7 +110,7 @@ function privateEvents(group) {
 
 function register(id, req) {
   if (findRow(id)) return lookup(id);
-  guests().appendRow([id.phone, String(req.name || "").slice(0, 200), id.email || String(req.email || "").slice(0, 200), "", "", new Date()]);
+  guests().appendRow([phoneValue(id.phone), String(req.name || "").slice(0, 200), id.email || String(req.email || "").slice(0, 200), "", "", new Date()]);
   return lookup(id);
 }
 
@@ -143,12 +144,176 @@ function saveNote(id, req) {
   var hit = findRow(id);
   if (!hit) return { error: "not found" };
   tab("Notes").appendRow([
-    new Date(), String(hit.row[COLS.name] || req.name || ""), id.phone, id.email,
+    new Date(), String(hit.row[COLS.name] || req.name || ""), phoneValue(id.phone), id.email,
     String(req.kind || "").slice(0, 40), note
   ]);
   return { ok: true };
 }
 
+// Phones are stored as numbers so the sheet can show them formatted.
+function phoneValue(digits) {
+  return digits ? Number(digits) : "";
+}
+
 function json(data) {
   return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// ---- Looks ------------------------------------------------------------------
+// Run styleSheet() once from the Apps Script editor (or the Wedding menu).
+// It only changes how the sheet looks, never the answers in it, so it is safe
+// to run again any time.
+
+var COBALT = "#1f4e9c", CREAM = "#fbf6ea", GOLD = "#c9a24a", INK = "#2b2b2b";
+var PHONE_FORMAT = '"+"0" ("000") "000"-"0000';
+var DATE_FORMAT = "mmm d, yyyy h:mm am/pm";
+var FEEL_TEXT = { yes: "Count me in!", maybe: "Still thinking", no: "Likely not" };
+var NOTE_KINDS = ["Advice", "Well wishes", "Song request", "Italy tip", "Honeymoon rec", "Memory"];
+
+var WIDTHS = {
+  "Guests": [150, 170, 220, 90, 110, 160, 200, 80, 120, 70, 80, 110],
+  "Notes": [160, 160, 150, 210, 120, 460],
+  "Private events": [100, 130, 100, 220, 220]
+};
+
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu("Wedding")
+    .addItem("Style sheet & refresh Overview", "styleSheet")
+    .addToUi();
+}
+
+function styleSheet() {
+  setup();
+  Object.keys(HEADERS).forEach(function (name) { styleTab(tab(name), WIDTHS[name]); });
+
+  var g = tab("Guests"), n = tab("Notes");
+  phonesToNumbers(g, COLS.phone + 1);
+  phonesToNumbers(n, 3);
+  g.getRange("A2:A").setNumberFormat(PHONE_FORMAT).setHorizontalAlignment("left");
+  n.getRange("C2:C").setNumberFormat(PHONE_FORMAT).setHorizontalAlignment("left");
+  g.getRange("F2:F").setNumberFormat(DATE_FORMAT);
+  n.getRange("A2:A").setNumberFormat(DATE_FORMAT);
+  g.getRange("K2:K").setNumberFormat("@");          // keep ZIP leading zeros
+  g.getRange("E2:E").setHorizontalAlignment("center").setFontWeight("bold");
+  n.getRange("F2:F").setWrap(true).setVerticalAlignment("top");
+  n.getRange("A2:E").setVerticalAlignment("top");
+  g.setFrozenColumns(2);
+
+  // Colour the Feeling column. The site reads these codes back, so the cells
+  // keep yes / maybe / no and only the colours change.
+  var feel = g.getRange("E2:E");
+  g.setConditionalFormatRules([
+    rule(feel, "yes", "#dcefd9", "#1e6b34"),
+    rule(feel, "maybe", "#fdf0c8", "#8a6400"),
+    rule(feel, "no", "#e6e8ee", "#4a5266")
+  ]);
+  feel.setDataValidation(SpreadsheetApp.newDataValidation()
+    .requireValueInList(["yes", "maybe", "no"], true).setAllowInvalid(false).build());
+
+  overview();
+}
+
+function styleTab(sheet, widths) {
+  var cols = widths.length, rows = Math.max(sheet.getMaxRows(), 2);
+  sheet.getBandings().forEach(function (b) { b.remove(); });
+  var all = sheet.getRange(1, 1, rows, cols);
+  all.setFontFamily("Lato").setFontSize(10).setFontColor(INK).setVerticalAlignment("middle");
+  all.applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY, true, false)
+    .setHeaderRowColor(COBALT).setFirstRowColor("#ffffff").setSecondRowColor(CREAM);
+  sheet.getRange(1, 1, 1, cols).setFontColor("#ffffff").setFontWeight("bold")
+    .setFontSize(11).setHorizontalAlignment("left")
+    .setBorder(null, null, true, null, null, null, GOLD, SpreadsheetApp.BorderStyle.SOLID_THICK);
+  sheet.setRowHeight(1, 34);
+  sheet.setFrozenRows(1);
+  widths.forEach(function (w, i) { sheet.setColumnWidth(i + 1, w); });
+}
+
+function rule(range, text, bg, fg) {
+  return SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo(text)
+    .setBackground(bg).setFontColor(fg).setRanges([range]).build();
+}
+
+// Older rows saved phones as text; turn them into numbers so they format.
+function phonesToNumbers(sheet, col) {
+  var last = sheet.getLastRow();
+  if (last < 2) return;
+  var range = sheet.getRange(2, col, last - 1, 1);
+  range.setValues(range.getValues().map(function (r) {
+    var d = String(r[0]).replace(/\D/g, "");
+    return [d ? Number(d) : ""];
+  }));
+}
+
+function overview() {
+  var book = SpreadsheetApp.getActive();
+  var sheet = book.getSheetByName("Overview") || book.insertSheet("Overview", 0);
+  sheet.clear();
+  sheet.getCharts().forEach(function (c) { sheet.removeChart(c); });
+  book.setActiveSheet(sheet);
+  book.moveActiveSheet(1);
+
+  var signed = "SUMPRODUCT(--(LEN(Guests!A2:A&Guests!B2:B&Guests!C2:C)>0))";
+  var rows = [
+    ["McKenna & Chandler · Save the Date", "", ""],
+    ["Updates live as guests answer on the site.", "", ""],
+    ["", "", ""],
+    ["Gut feeling", "Guests", "Share"],
+    [FEEL_TEXT.yes, '=COUNTIF(Guests!E2:E,"yes")', ""],
+    [FEEL_TEXT.maybe, '=COUNTIF(Guests!E2:E,"maybe")', ""],
+    [FEEL_TEXT.no, '=COUNTIF(Guests!E2:E,"no")', ""],
+    ["No answer yet", "=" + signed + "-SUM(B5:B7)", ""],
+    ["Total signed in", "=" + signed, ""],
+    ["", "", ""],
+    ["Mailing addresses", "Guests", "Share"],
+    ["Address received", "=COUNTA(Guests!G2:G)", ""],
+    ["Still needed", "=B9-B12", ""],
+    ["", "", ""],
+    ["Notes for the couple", "Notes", "Share"]
+  ];
+  NOTE_KINDS.forEach(function (k) { rows.push([k, '=COUNTIF(Notes!E2:E,"' + k + '")', ""]); });
+  var notesTotal = rows.length + 1;
+  rows.push(["Total notes", "=COUNTA(Notes!F2:F)", ""]);
+  sheet.getRange(1, 1, rows.length, 3).setValues(rows);
+
+  // Shares
+  [5, 6, 7, 8].forEach(function (r) { sheet.getRange(r, 3).setFormula("=IFERROR(B" + r + "/$B$9,0)"); });
+  [12, 13].forEach(function (r) { sheet.getRange(r, 3).setFormula("=IFERROR(B" + r + "/$B$9,0)"); });
+  for (var r = 16; r < notesTotal; r++) sheet.getRange(r, 3).setFormula("=IFERROR(B" + r + "/$B$" + notesTotal + ",0)");
+  sheet.getRange(1, 3, rows.length, 1).setNumberFormat("0%");
+
+  // Looks
+  sheet.setHiddenGridlines(true);
+  sheet.getRange(1, 1, rows.length, 3).setFontFamily("Lato").setFontSize(11).setFontColor(INK)
+    .setVerticalAlignment("middle");
+  sheet.getRange("B:C").setHorizontalAlignment("right");
+  sheet.setColumnWidth(1, 240); sheet.setColumnWidth(2, 110); sheet.setColumnWidth(3, 90);
+  sheet.getRange("A1").setFontFamily("Playfair Display").setFontSize(20).setFontColor(COBALT);
+  sheet.getRange("A2").setFontColor("#7a7a7a").setFontStyle("italic").setFontSize(10);
+  sheet.setRowHeight(1, 44);
+  [4, 11, 15].forEach(function (r) {
+    sheet.getRange(r, 1, 1, 3).setBackground(COBALT).setFontColor("#ffffff").setFontWeight("bold")
+      .setBorder(null, null, true, null, null, null, GOLD, SpreadsheetApp.BorderStyle.SOLID_THICK);
+    sheet.setRowHeight(r, 30);
+  });
+  [[5, 9], [12, 13], [16, notesTotal]].forEach(function (b) {
+    for (var r = b[0]; r <= b[1]; r++) sheet.getRange(r, 1, 1, 3).setBackground((r - b[0]) % 2 ? CREAM : "#ffffff");
+  });
+  [9, notesTotal].forEach(function (r) {
+    sheet.getRange(r, 1, 1, 3).setFontWeight("bold")
+      .setBorder(true, null, null, null, null, null, GOLD, SpreadsheetApp.BorderStyle.SOLID);
+  });
+  sheet.getRange("A5").setFontColor("#1e6b34");
+  sheet.getRange("A6").setFontColor("#8a6400");
+  sheet.getRange("A7").setFontColor("#4a5266");
+
+  // Pie chart of gut feelings
+  sheet.insertChart(sheet.newChart().asPieChart()
+    .addRange(sheet.getRange("A5:B8"))
+    .setOption("title", "Gut feelings")
+    .setOption("pieHole", 0.45)
+    .setOption("colors", ["#3f8f55", "#e0b03a", "#8a93a8", "#d9dce3"])
+    .setOption("legend", { position: "right" })
+    .setPosition(4, 5, 10, 0)
+    .setOption("width", 420).setOption("height", 280)
+    .build());
 }
