@@ -429,8 +429,10 @@ html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25
 .gallery {
   --gw: min(96vw, calc((100svh - var(--head, 96px) - 330px) * 2.25 + 32px), 1200px);   /* photos fit under the heading on one screen */
   display: grid;
+  --gg: 34px;                /* room for each photo's gold frame */
+  --frame: 8px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: var(--gg);
   width: var(--gw);
   margin-inline: calc(50% - var(--gw) / 2);
 }
@@ -438,14 +440,16 @@ html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25
 .gallery figure { position: relative; min-width: 0; }
 .gallery .g-main { z-index: 1; }
 .gallery img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; display: block; }
+/* a square gold frame set a little off each photo, like the one around ours */
+.gallery figure { outline: 2px solid var(--gold); outline-offset: var(--frame); background: var(--ivory-2); }
 /* the middle photo settles first, then the outer two fan out slowly from behind it */
 html.paged .gallery .g-main { transition: transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s, opacity 1.2s ease 0.3s; }
 html.paged .page-venue:not(.shown) .gallery .g-main { transform: scale(0.92); opacity: 0; }
 /* the side photos fan out once the whole gallery is on screen (site.js adds
    .fanned) and tuck back behind the middle one when it leaves */
 html.paged .gallery figure:not(.g-main) { transition: transform 3s cubic-bezier(0.22, 0.61, 0.18, 1) 0.5s, opacity 2.2s ease 0.5s; }
-html.paged .gallery:not(.fanned) figure:first-child { transform: translateX(calc(100% + 16px)) rotate(4deg) scale(0.9); opacity: 0; transition-delay: 0s; transition-duration: 0.6s; }
-html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(-100% - 16px)) rotate(-4deg) scale(0.9); opacity: 0; transition-delay: 0s; transition-duration: 0.6s; }
+html.paged .gallery:not(.fanned) figure:first-child { transform: translateX(calc(100% + var(--gg))) rotate(4deg) scale(0.9); opacity: 0; transition-delay: 0s; transition-duration: 0.6s; }
+html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(-100% - var(--gg))) rotate(-4deg) scale(0.9); opacity: 0; transition-delay: 0s; transition-duration: 0.6s; }
 /* on wide screens the photo sits beside the story and the venue photos line
    up in one row, so each section fits on one screen */
 @media (min-width: 900px) {
@@ -818,7 +822,8 @@ html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
   .hero-bg { object-position: 62% 50%; }
   .page-hero { padding-top: clamp(120px, 20vh, 170px); }
   /* on phones the three portraits stay in a row, a little closer together */
-  .gallery { gap: 6px; width: calc(100% + 24px); margin-inline: -12px; }
+  .gallery { --gg: 14px; --frame: 4px; width: calc(100% - 8px); margin-inline: 4px; }
+  .gallery figure { outline-width: 1.5px; }
   /* phone screens are tall: the venue sits snugly instead of floating in a full screen */
   html.paged .page-venue { min-height: 0; }
   .page-venue .section-head { margin-bottom: 28px; gap: 8px; }

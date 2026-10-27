@@ -322,7 +322,7 @@ window.PAGES = [
           if (!t || !el.classList.contains("fanned")) { f.style.transform = f.style.opacity = f.style.transition = ""; return; }
           var dir = i ? -1 : 1;
           f.style.transition = "transform 0.25s ease-out, opacity 0.25s ease-out";
-          f.style.transform = "translateX(calc((100% + 16px) * " + (dir * t).toFixed(3) + ")) rotate(" + (dir * 4 * t).toFixed(2) + "deg) scale(" + (1 - 0.1 * t).toFixed(3) + ")";
+          f.style.transform = "translateX(calc((100% + var(--gg)) * " + (dir * t).toFixed(3) + ")) rotate(" + (dir * 4 * t).toFixed(2) + "deg) scale(" + (1 - 0.1 * t).toFixed(3) + ")";
           f.style.opacity = (1 - t).toFixed(3);
         });
       }
