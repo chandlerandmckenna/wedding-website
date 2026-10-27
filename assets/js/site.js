@@ -40,7 +40,7 @@ window.WEDDING = {
   // Google Apps Script web app URL (see backend/apps-script.gs). It looks up
   // guests by phone number and saves their answers to a Google Sheet.
   // Leave empty for preview mode: sign-ins and answers stay in this browser.
-  apiEndpoint: "",
+  apiEndpoint: "https://script.google.com/macros/s/AKfycbw89GGyUV6FwVLychrs_3ZxH8vONSvbC4A1LqT-xWkLtjlIgROk9hDHnwAx0DQgOhZD/exec",
   // Turn on when you're ready to share the schedule.
   showSchedule: false
 };
