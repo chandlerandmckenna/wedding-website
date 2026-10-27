@@ -48,7 +48,7 @@ function doPost(e) {
     if (req.action === "lookup") return json(lookup(id));
     if (req.action === "register") return json(register(id, req));
     if (req.action === "reply") return json(reply(id, req.feeling));
-    if (req.action === "address") return json(saveAddress(id, req.address));
+    if (req.action === "address") return json(saveAddress(id, req.address, req.contact));
     if (req.action === "note") return json(saveNote(id, req));
     return json({ error: "unknown action" });
   } finally {
@@ -167,13 +167,22 @@ function readAddress(r) {
   return any ? a : null;
 }
 
-function saveAddress(id, address) {
-  if (!address || !address.line1) return { error: "address required" };
+// The postcard: a mailing address, an email and a phone, any of them optional.
+function saveAddress(id, address, contact) {
+  contact = contact || {};
+  var email = String(contact.email || "").trim().toLowerCase().slice(0, 200);
+  var phone = digits(contact.phone);
+  if (!(address && address.line1) && !email && !phone) return { error: "nothing to save" };
   var hit = findRow(id);
   if (!hit) return { error: "not found" };
-  var values = ADDRESS.map(function (k) { return String(address[k] || "").slice(0, 200); });
-  guests().getRange(hit.index, COLS.address + 1, 1, ADDRESS.length).setValues([values]);
-  guests().getRange(hit.index, COLS.updated + 1).setValue(new Date());
+  var sheet = guests();
+  if (address && address.line1) {
+    var values = ADDRESS.map(function (k) { return String(address[k] || "").slice(0, 200); });
+    sheet.getRange(hit.index, COLS.address + 1, 1, ADDRESS.length).setValues([values]);
+  }
+  if (email) sheet.getRange(hit.index, COLS.email + 1).setValue(email);
+  if (phone) sheet.getRange(hit.index, COLS.phone + 1).setValue(phoneValue(phone));
+  sheet.getRange(hit.index, COLS.updated + 1).setValue(new Date());
   return { ok: true };
 }
 

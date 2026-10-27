@@ -45,28 +45,31 @@
     return "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6);
   }
 
-  var lastDigits = "";
-  phoneInput.addEventListener("input", function (e) {
-    var el = phoneInput;
-    var caret = el.selectionStart == null ? el.value.length : el.selectionStart;
-    var before = el.value.slice(0, caret).replace(/\D/g, "").length;
-    var d = usDigits(el.value);
-    // Backspacing over "(", ")", " " or "-" removes the digit before it.
-    if (e.inputType === "deleteContentBackward" && d === lastDigits && before > 0) {
-      d = d.slice(0, before - 1) + d.slice(before);
-      before -= 1;
-    }
-    lastDigits = d;
-    el.value = formatUS(d);
-    // Put the caret back after the same number of digits.
-    var pos = 0, seen = 0;
-    while (pos < el.value.length && seen < before) {
-      if (/\d/.test(el.value.charAt(pos))) seen++;
-      pos++;
-    }
-    if (seen === d.length && pos < el.value.length && !/\d/.test(el.value.charAt(pos))) pos = el.value.length;
-    try { el.setSelectionRange(pos, pos); } catch (err) { /* not focused */ }
-  });
+  // Formats a phone field as it's typed, keeping the caret in place.
+  function phoneField(el) {
+    var lastDigits = "";
+    el.addEventListener("input", function (e) {
+      var caret = el.selectionStart == null ? el.value.length : el.selectionStart;
+      var before = el.value.slice(0, caret).replace(/\D/g, "").length;
+      var d = usDigits(el.value);
+      // Backspacing over "(", ")", " " or "-" removes the digit before it.
+      if (e.inputType === "deleteContentBackward" && d === lastDigits && before > 0) {
+        d = d.slice(0, before - 1) + d.slice(before);
+        before -= 1;
+      }
+      lastDigits = d;
+      el.value = formatUS(d);
+      // Put the caret back after the same number of digits.
+      var pos = 0, seen = 0;
+      while (pos < el.value.length && seen < before) {
+        if (/\d/.test(el.value.charAt(pos))) seen++;
+        pos++;
+      }
+      if (seen === d.length && pos < el.value.length && !/\d/.test(el.value.charAt(pos))) pos = el.value.length;
+      try { el.setSelectionRange(pos, pos); } catch (err) { /* not focused */ }
+    });
+  }
+  phoneField(phoneInput);
 
   /* ---------- Phone or email ---------- */
   function setMode(next) {
@@ -354,12 +357,16 @@
     if (v !== this.value) this.value = v;
   });
 
+  phoneField(addressForm.elements.phone);
+
   function fillAddress(guest) {
     var a = guest.address || {};
     ADDRESS_FIELDS.forEach(function (k) {
       var el = addressForm.elements[k];
       if (a[k]) el.value = a[k];
     });
+    if (guest.email) addressForm.elements.email.value = guest.email;
+    if (guest.phone) addressForm.elements.phone.value = formatUS(usDigits(guest.phone));
     addressStatus.textContent = guest.address ? "We have your address. Update it here any time." : "";
   }
 
@@ -367,22 +374,39 @@
     e.preventDefault();
     var a = {};
     ADDRESS_FIELDS.forEach(function (k) { a[k] = addressForm.elements[k].value.trim(); });
+    var contact = {
+      email: addressForm.elements.email.value.trim().toLowerCase(),
+      phone: usDigits(addressForm.elements.phone.value)
+    };
+    // The address can be left for later if they only want to leave an email or phone.
+    var started = ["line1", "line2", "city", "state", "zip"].some(function (k) { return a[k]; });
     var missing = ["line1", "city", "country"].filter(function (k) { return !a[k]; })[0];
-    if (missing) {
-      addressStatus.textContent = "Please add your " + { line1: "street address", city: "city", country: "country" }[missing] + ".";
-      addressForm.elements[missing].focus();
+    var problem =
+      started && missing ? missing :
+      contact.email && !isEmail(contact.email) ? "email" :
+      contact.phone && contact.phone.length !== 10 ? "phone" :
+      !started && !contact.email && !contact.phone ? "line1" : "";
+    if (problem) {
+      addressStatus.textContent = {
+        line1: "Please add your street address.", city: "Please add your city.", country: "Please add your country.",
+        email: "Please check your email address.", phone: "Please enter a 10-digit phone number, area code first."
+      }[problem];
+      addressForm.elements[problem].focus();
       return;
     }
+    if (contact.phone) contact.phone = "1" + contact.phone;
     var guest = window.Guest.current();
     var btn = document.getElementById("address-send");
     busy(btn, true);
-    window.GuestAPI.address(guest, a).then(function () {
-      guest.address = a;
+    window.GuestAPI.address(guest, started ? a : null, contact).then(function () {
+      if (started) guest.address = a;
+      if (contact.email) guest.email = contact.email;
+      if (contact.phone) guest.phone = contact.phone;
       window.Guest.save(guest);
-      addressStatus.textContent = "Grazie! Your invitation will be sent there.";
+      addressStatus.textContent = started ? "Grazie! Your invitation will be sent there." : "Grazie! We'll be in touch.";
     }).catch(function () {
       addressStatus.textContent = "We couldn't save that. Please try again.";
-    }).then(function () { busy(btn, false, "Save my address"); });
+    }).then(function () { busy(btn, false, "Save my details"); });
   });
 
   /* ---------- Notes for the couple ---------- */

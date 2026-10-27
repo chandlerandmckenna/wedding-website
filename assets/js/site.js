@@ -45,6 +45,10 @@ window.WEDDING = {
   showSchedule: false
 };
 
+// The developer site (dev--….netlify.app, built from the dev branch) runs in
+// preview mode so testing there never touches the real guest Sheet.
+if (/^dev--/.test(location.hostname)) window.WEDDING.apiEndpoint = "";
+
 // Events every guest sees. Private events (rehearsal, rehearsal dinner) are
 // not listed here: they live in the guest list backend and are sent only to
 // the guests invited to them, as guest.privateEvents.
@@ -155,11 +159,16 @@ window.PAGES = [
       return Promise.resolve({ ok: true });
     },
     // address is { line1, line2, city, state, zip, country }
-    address: function (guest, address) {
-      var p = call("address", { phone: guest.phone, email: guest.email, address: address });
+    address: function (guest, address, contact) {
+      var p = call("address", { phone: guest.phone, email: guest.email, address: address, contact: contact });
       if (p) return p;
       var g = demo.find(guest);
-      if (g) { g.address = address; demo.put(g); }
+      if (g) {
+        if (address) g.address = address;
+        if (contact && contact.email) g.email = contact.email;
+        if (contact && contact.phone) g.phone = contact.phone;
+        demo.put(g);
+      }
       return Promise.resolve({ ok: true });
     },
     // a note for the couple; kind is "Advice", "Song request" and so on, or ""
