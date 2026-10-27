@@ -367,7 +367,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   color: var(--cobalt);
 }
 .hero-date .swash { width: 88%; height: 20px; left: 6%; margin-left: 0; bottom: 0; }
-.hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.45rem, 4.4vw, 1.9rem); color: var(--gold); -webkit-text-stroke: 2.5px var(--cobalt); paint-order: stroke fill; text-shadow: 0 1px 4px rgba(255, 250, 240, 0.8); font-variant-numeric: lining-nums; }
+.hero-note { font-family: var(--italic); font-style: italic; font-size: clamp(1.45rem, 4.4vw, 1.9rem); color: var(--gold); text-shadow: 0 1px 3px rgba(255, 250, 240, 0.9); font-variant-numeric: lining-nums; }
 .hero-place .dot { color: var(--gold); font-weight: 700; }
 .hero-family {
   margin-top: 14px;
