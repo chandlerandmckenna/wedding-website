@@ -25,7 +25,17 @@
     window.pageZoom = z;
   }
   fit();
-  window.addEventListener("resize", fit);
+  // On phones the browser's address bar shrinks and grows as you scroll,
+  // changing the window height each time; keep the first height so the
+  // title page doesn't jump, and only refit when the width changes (turning
+  // the phone).
+  var touch = window.matchMedia && matchMedia("(pointer: coarse)").matches;
+  var lastW = window.innerWidth;
+  window.addEventListener("resize", function () {
+    if (touch && window.innerWidth === lastW) return;
+    lastW = window.innerWidth;
+    fit();
+  });
 })();
 
 window.WEDDING = {
@@ -470,11 +480,14 @@ window.PAGES = [
     var art = hero && hero.querySelector(".intro-bg");
     if (!text) return;
     var ticking = false;
+    // On phones the text scrolls with the page and just fades: holding it
+    // back against a flick scroll lags a frame behind and looks jumpy.
+    var drift = window.matchMedia && matchMedia("(pointer: coarse)").matches ? 0 : 0.85;
     function update() {
       ticking = false;
       var y = Math.max(0, -hero.getBoundingClientRect().top);
       var t = Math.min(1, y / (hero.offsetHeight * 0.55));
-      text.style.transform = y ? "translate3d(0," + (y * 0.85).toFixed(1) + "px,0)" : "";
+      text.style.transform = y && drift ? "translate3d(0," + (y * drift).toFixed(1) + "px,0)" : "";
       text.style.opacity = (1 - t).toFixed(3);
       if (art) art.style.opacity = (1 - Math.min(1, y / (hero.offsetHeight * 0.8))).toFixed(3);
     }
