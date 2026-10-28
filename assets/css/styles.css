@@ -341,7 +341,7 @@ html.paged .fade.shown { opacity: 1; transform: none; }
   object-position: 55% 26%;   /* a little more of the olive branches at the top */
   -webkit-mask-image: linear-gradient(to bottom, #000 80%, transparent);
   mask-image: linear-gradient(to bottom, #000 80%, transparent);
-  transform-origin: 55% 40%;
+  transform-origin: 55% 100%;   /* zoom from the bottom so the soft fade stays at the bottom edge */
   will-change: transform;
 }
 .hero-text {
