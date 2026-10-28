@@ -478,6 +478,7 @@ window.PAGES = [
     var hero = (root || document).querySelector(".page-hero, .page-intro");
     var text = hero && hero.querySelector(".hero-text, .intro-card");
     var art = hero && hero.querySelector(".intro-bg");
+    var painting = hero && hero.querySelector(".hero-bg");
     if (!text) return;
     var ticking = false;
     // On phones the text scrolls with the page and just fades: holding it
@@ -490,6 +491,8 @@ window.PAGES = [
       text.style.transform = y && drift ? "translate3d(0," + (y * drift).toFixed(1) + "px,0)" : "";
       text.style.opacity = (1 - t).toFixed(3);
       if (art) art.style.opacity = (1 - Math.min(1, y / (hero.offsetHeight * 0.8))).toFixed(3);
+      // the painting slowly zooms in as you scroll past it
+      if (painting) painting.style.transform = y ? "scale(" + (1 + 0.15 * Math.min(1, y / (hero.offsetHeight * 0.6))).toFixed(4) + ")" : "";
     }
     window.addEventListener("scroll", function () {
       if (!ticking) { ticking = true; requestAnimationFrame(update); }
