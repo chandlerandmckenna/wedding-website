@@ -478,7 +478,7 @@ window.PAGES = [
     var hero = (root || document).querySelector(".page-hero, .page-intro");
     var text = hero && hero.querySelector(".hero-text, .intro-card");
     var art = hero && hero.querySelector(".intro-bg");
-    var painting = hero && hero.querySelector(".hero-bg");
+    var painting = hero && hero.querySelector(".hero-bg, .intro-bg");
     if (!text) return;
     var ticking = false;
     // On phones the text scrolls with the page and just fades: holding it

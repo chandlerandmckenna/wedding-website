@@ -758,6 +758,7 @@ td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-weight: 5
   object-fit: cover; object-position: 30% 42%;
   -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent);
   mask-image: linear-gradient(to bottom, #000 82%, transparent);
+  transform-origin: 30% 100%;   /* zooms from the bottom as you scroll, keeping the soft fade */
   animation: intro-bloom 3.2s cubic-bezier(0.2, 0.6, 0.2, 1) both;
 }
 @keyframes intro-bloom { from { opacity: 0; transform: scale(1.1); filter: blur(8px) saturate(0.5); } 40% { opacity: 1; } }
