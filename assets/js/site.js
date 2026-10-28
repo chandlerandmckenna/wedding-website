@@ -255,10 +255,11 @@ window.PAGES = [
 
   function homeHref() { return window.PAGES[0].href; }
 
+  // Some hosts (the Cloudflare test site) serve travel.html as /travel.
   function currentPage() {
     var file = location.pathname.split("/").pop() || homeHref();
-    var hit = window.PAGES.some(function (p) { return p.href === file; });
-    return hit ? file : homeHref();
+    var hit = window.PAGES.filter(function (p) { return p.href === file || p.href === file + ".html"; })[0];
+    return hit ? hit.href : homeHref();
   }
 
   function esc(s) {
