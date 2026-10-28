@@ -361,7 +361,22 @@
       if (c.me.phone) c.phone.value = formatUS(usDigits(c.me.phone));
     });
     addressStatus.textContent = guest.address ? "We have your address. Update it here any time." : "";
+    savedForm = guest.address ? formState() : null;
+    refreshSave();
   }
+
+  // Once saved, the button rests as "Details saved" until something is changed.
+  var saveBtn = document.getElementById("address-send");
+  var savedForm = null;
+  function formState() {
+    return Array.prototype.map.call(addressForm.querySelectorAll("input"), function (el) { return el.value.trim(); }).join("\n");
+  }
+  function refreshSave() {
+    var same = savedForm !== null && formState() === savedForm;
+    saveBtn.disabled = same;
+    saveBtn.textContent = same ? "Details saved" : "Save my details";
+  }
+  addressForm.addEventListener("input", refreshSave);
 
   addressForm.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -401,9 +416,10 @@
       window.applyAnswers(guest, contacts, "phone");
       window.Guest.save(guest);
       addressStatus.textContent = started ? "Grazie! Your invitation will be sent there." : "Grazie! We'll be in touch.";
+      savedForm = formState();
     }).catch(function () {
       addressStatus.textContent = "We couldn't save that. Please try again.";
-    }).then(function () { busy(btn, false, "Save my details"); });
+    }).then(function () { busy(btn, false, "Save my details"); refreshSave(); });
   });
 
   /* ---------- Notes for the couple ---------- */
@@ -427,7 +443,11 @@
     if (!text) { noteStatus.textContent = "Write a little something first."; noteText.focus(); return; }
     var btn = document.getElementById("note-send");
     busy(btn, true);
-    window.GuestAPI.note(window.Guest.current(), noteKind, text).then(function () {
+    window.GuestAPI.note(window.Guest.current(), noteKind, text).then(function (res) {
+      if (res && res.error === "too many notes") {
+        noteStatus.textContent = "That's plenty of notes for today. Grazie! Come back tomorrow for more.";
+        return;
+      }
       noteText.value = "";
       noteStatus.textContent = "Grazie mille! We can't wait to read it. Leave another any time.";
     }).catch(function () {

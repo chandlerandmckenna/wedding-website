@@ -49,7 +49,7 @@
     '<path d="M112 36C124 30 136 42 148 36S172 30 196 36M112 52C124 46 136 58 148 52S172 46 196 52M112 68C124 62 136 74 148 68S172 62 196 68M112 84C124 78 136 90 148 84S172 78 196 84"/></g>' +
     '<g fill="' + COBALT + '" opacity=".8" font-family="Jost, sans-serif" font-weight="500" text-anchor="middle">' +
     '<text font-size="11" letter-spacing="2"><textPath href="#pm-arc" startOffset="50%">SORRENTO</textPath></text>' +
-    '<text x="60" y="64" font-size="12">1·10·27</text><text x="60" y="94" font-size="9" letter-spacing="2">ITALIA</text></g></symbol>';
+    '<text x="60" y="64" font-size="12">10·1·27</text><text x="60" y="94" font-size="9" letter-spacing="2">ITALIA</text></g></symbol>';
 
   // a watercolor treatment: wobbly edges, uneven pigment and a darker rim
   // where the wash dries, so the little pieces sit with the painted car

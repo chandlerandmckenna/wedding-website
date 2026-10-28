@@ -289,11 +289,22 @@ function saveAddress(id, req) {
   return { ok: true };
 }
 
+// Each guest can leave this many notes a day, so nobody can flood the sheet.
+var NOTES_PER_DAY = 10;
+function notesToday(id) {
+  var since = Date.now() - 24 * 60 * 60 * 1000;
+  return tab("Notes").getDataRange().getValues().slice(1).filter(function (r) {
+    return new Date(r[0]).getTime() > since &&
+      ((id.phone && digits(r[2]) === id.phone) || (id.email && String(r[3]).trim().toLowerCase() === id.email));
+  }).length;
+}
+
 function saveNote(id, req) {
   var note = String(req.note || "").trim().slice(0, 1500);
   if (!note) return { error: "note required" };
   var hit = findRow(id);
   if (!hit) return { error: "not found" };
+  if (notesToday(id) >= NOTES_PER_DAY) return { error: "too many notes" };
   tab("Notes").appendRow([
     new Date(), String(hit.row[COLS.name] || req.name || ""), phoneValue(id.phone), id.email,
     String(req.kind || "").slice(0, 40), note
