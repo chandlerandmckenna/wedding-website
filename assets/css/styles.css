@@ -973,3 +973,47 @@ html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
   .postcard .address-grid .span-2 { grid-column: auto; }
   .pc-to { padding-top: 132px; }
 }
+
+/* ---------- Our story: a timeline of moments, each with a photo ----------
+   Phones: one moment after another, joined by a dashed gold line.
+   Wide screens: the photos alternate sides along the line. */
+.page-ourstory .section-head { margin-bottom: 40px; }
+.page-ourstory h2.script { font-size: clamp(2.6rem, calc(7 * var(--vw, 1vw)), 4rem); line-height: 1.05; color: var(--cobalt); }
+.timeline { list-style: none; margin: 0 auto; padding: 0; max-width: 980px; display: grid; gap: 56px; position: relative; }
+/* phones: a short dashed gold line leads from one moment to the next */
+.moment:not(:last-child)::before {
+  content: ""; position: absolute; left: 50%; bottom: -46px; height: 36px; width: 0;
+  border-left: 2px dashed var(--gold); opacity: 0.7; transform: translateX(-1px);
+}
+.moment { position: relative; display: grid; justify-items: center; gap: 22px; text-align: center; }
+.moment-photo {
+  position: relative; z-index: 1; margin: 0; width: min(78%, 320px);
+  outline: 2px solid var(--gold); outline-offset: 5px; background: var(--ivory-2);
+  transform: rotate(-2deg);
+}
+.moment:nth-child(even) .moment-photo { transform: rotate(2deg); }
+.moment-photo img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; cursor: zoom-in; }
+.moment-text { position: relative; z-index: 1; padding: 0 6px; max-width: 30rem; }
+.moment-when { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--cobalt); margin: 0 0 4px; }
+.moment h3 { font-size: clamp(1.9rem, calc(5 * var(--vw, 1vw)), 2.5rem); line-height: 1.1; color: var(--cobalt); margin: 0 0 8px; font-weight: 400; }
+.moment-text p:last-child { color: var(--ink-soft); margin: 0; }
+@media (min-width: 760px) {
+  .timeline { gap: 72px; }
+  /* wide screens: one dashed line runs down the middle */
+  .moment:not(:last-child)::before { display: none; }
+  .timeline::before {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 0;
+    border-left: 2px dashed var(--gold); opacity: 0.7; transform: translateX(-1px);
+  }
+  .moment { grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; text-align: left; justify-items: stretch; }
+  .moment-photo { width: min(100%, 340px); justify-self: end; }
+  .moment-text { justify-self: start; padding: 10px 0; }
+  .moment:nth-child(even) .moment-photo { grid-column: 2; grid-row: 1; justify-self: start; }
+  .moment:nth-child(even) .moment-text { grid-column: 1; grid-row: 1; justify-self: end; text-align: right; }
+  /* a gold dot on the line beside each moment */
+  .moment::after {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--gold); box-shadow: 0 0 0 5px var(--ivory); transform: translate(-50%, -50%);
+  }
+}
+html.paged .page-ourstory { align-content: start; }

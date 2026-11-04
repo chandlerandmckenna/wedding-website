@@ -459,7 +459,7 @@
   // it fresh instead so the title page plays its opening again.
   /* ---------- Venue photos: tap one to see it big, tap again to close ---------- */
   (function () {
-    var photos = Array.prototype.slice.call(document.querySelectorAll(".gallery img"));
+    var photos = Array.prototype.slice.call(document.querySelectorAll(".gallery img, .moment-photo img"));
     if (!photos.length) return;
     var box = document.createElement("div");
     box.className = "lightbox";
