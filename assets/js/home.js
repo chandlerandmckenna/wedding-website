@@ -458,8 +458,21 @@
   // Coming back with the browser's Back button restores a frozen page; load
   // it fresh instead so the title page plays its opening again.
   /* ---------- Venue photos: tap one to see it big, tap again to close ---------- */
+  /* ---------- Photo reel: repeat the photos so the loop never shows a gap ---------- */
   (function () {
-    var photos = Array.prototype.slice.call(document.querySelectorAll(".gallery img, .moment-photo img"));
+    var track = document.querySelector(".reel-track");
+    if (!track) return;
+    var items = Array.prototype.slice.call(track.children);
+    items.forEach(function (li) {
+      var copy = li.cloneNode(true);
+      copy.setAttribute("aria-hidden", "true");
+      track.appendChild(copy);
+    });
+    track.style.setProperty("--reel-time", (items.length * 9) + "s");   // about the same pace however many photos
+  })();
+
+  (function () {
+    var photos = Array.prototype.slice.call(document.querySelectorAll(".gallery img, .moment-photo img, .reel img"));
     if (!photos.length) return;
     var box = document.createElement("div");
     box.className = "lightbox";
@@ -515,6 +528,14 @@
     box.addEventListener("click", close);
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
   })();
+
+  /* ---------- Our story: each moment fades in and away as it passes ---------- */
+  if ("IntersectionObserver" in window) {
+    var momentIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { en.target.classList.toggle("seen", en.isIntersecting); });
+    }, { rootMargin: "-12% 0px -12% 0px" });
+    document.querySelectorAll(".moment").forEach(function (el) { momentIO.observe(el); });
+  }
 
   window.addEventListener("pageshow", function (e) { if (e.persisted) location.reload(); });
 
