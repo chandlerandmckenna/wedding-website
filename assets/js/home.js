@@ -468,7 +468,13 @@
       copy.setAttribute("aria-hidden", "true");
       track.appendChild(copy);
     });
-    track.style.setProperty("--reel-time", (items.length * 9) + "s");   // about the same pace however many photos
+    // Same pace however many photos: wide photos count for more time than tall ones.
+    var span = items.reduce(function (sum, li) {
+      var img = li.querySelector("img");
+      var w = img && +img.getAttribute("width"), h = img && +img.getAttribute("height");
+      return sum + (w && h ? w / h : 0.67);
+    }, 0);
+    track.style.setProperty("--reel-time", Math.round(span * 13.5) + "s");
   })();
 
   (function () {
