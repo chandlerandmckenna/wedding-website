@@ -458,23 +458,63 @@
   // Coming back with the browser's Back button restores a frozen page; load
   // it fresh instead so the title page plays its opening again.
   /* ---------- Venue photos: tap one to see it big, tap again to close ---------- */
-  /* ---------- Photo reel: repeat the photos so the loop never shows a gap ---------- */
+  /* ---------- Photo reel: photos drift sideways in a loop; arrows skip ahead or back ---------- */
   (function () {
     var track = document.querySelector(".reel-track");
     if (!track) return;
+    var reel = track.parentNode;
     var items = Array.prototype.slice.call(track.children);
-    items.forEach(function (li) {
+    items.forEach(function (li) {           // a second copy so the loop never shows a gap
       var copy = li.cloneNode(true);
       copy.setAttribute("aria-hidden", "true");
       track.appendChild(copy);
     });
-    // Same pace however many photos: wide photos count for more time than tall ones.
-    var span = items.reduce(function (sum, li) {
-      var img = li.querySelector("img");
-      var w = img && +img.getAttribute("width"), h = img && +img.getAttribute("height");
-      return sum + (w && h ? w / h : 0.67);
-    }, 0);
-    track.style.setProperty("--reel-time", Math.round(span * 13.5) + "s");
+
+    var wrap = document.createElement("div");
+    wrap.className = "reel-wrap";
+    reel.parentNode.insertBefore(wrap, reel);
+    wrap.appendChild(reel);
+    function arrow(dir, label) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "reel-btn reel-" + (dir < 0 ? "prev" : "next");
+      b.setAttribute("aria-label", label);
+      b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' +
+        (dir < 0 ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7") + '"/></svg>';
+      b.addEventListener("click", function () { skip(dir); });
+      wrap.appendChild(b);
+    }
+    arrow(-1, "Previous photo");
+    arrow(1, "Next photo");
+
+    var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var SPEED = still ? 0 : 30;              // pixels per second
+    var x = 0, extra = 0, paused = false, last = 0;
+    function loopWidth() { return items.length ? track.children[items.length].offsetLeft - items[0].offsetLeft : 0; }
+    function skip(dir) {
+      var li = items[0], w = li ? li.offsetWidth + 22 : 280;
+      extra += dir * w;
+    }
+    // Pause while a mouse rests on the photos (not on phones, where a tap would leave it stuck).
+    if (window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      reel.addEventListener("mouseenter", function () { paused = true; });
+      reel.addEventListener("mouseleave", function () { paused = false; });
+    }
+    function frame(t) {
+      var dt = last ? Math.min(0.1, (t - last) / 1000) : 0;
+      last = t;
+      if (!paused) x += SPEED * dt;
+      if (extra) {                           // glide through a skip quickly, then settle
+        var step = extra * (1 - Math.exp(-dt * 7));
+        if (Math.abs(extra - step) < 0.5) step = extra;
+        x += step; extra -= step;
+      }
+      var loop = loopWidth();
+      if (loop) x = ((x % loop) + loop) % loop;
+      track.style.transform = "translateX(" + (-x) + "px)";
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
   })();
 
   (function () {
