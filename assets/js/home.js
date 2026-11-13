@@ -552,11 +552,14 @@
       big.src = img.currentSrc || img.src;
       big.alt = img.alt;
       count.textContent = group.length > 1 ? (at + 1) + " / " + group.length : "";
+      [1, -1].forEach(function (d) {
+        var n = group[(at + d + group.length) % group.length];
+        if (n) (new Image()).src = n.currentSrc || n.src;
+      });
     }
     function step(dir) {
       if (group.length < 2) return;
-      big.classList.add("swap");
-      setTimeout(function () { show(at + dir); big.classList.remove("swap"); }, 160);
+      show(at + dir);
     }
     function open(img) {
       opener = img;

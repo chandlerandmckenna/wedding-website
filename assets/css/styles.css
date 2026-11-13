@@ -498,9 +498,7 @@ html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25
 }
 html.lightbox-open, html.lightbox-open body { overflow: hidden; }
 .reel-btn, .lightbox-step, .lightbox-close, .lightbox { -webkit-tap-highlight-color: transparent; }
-.lightbox-frame img { transition: opacity .16s ease; }
-.lightbox-frame img.swap { opacity: 0; }
-.lightbox-step { position: absolute; top: 50%; transform: translateY(-50%);
+.lightbox-step { position: absolute; top: calc(50% - 23px);
   width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--gold); background: var(--ivory);
   color: var(--cobalt); display: grid; place-items: center; cursor: pointer; padding: 0;
   box-shadow: 0 4px 14px rgba(0, 0, 0, .25); }
@@ -1051,7 +1049,7 @@ html.paged .page-reel { min-height: 0; padding-inline: 0; }
 .reel-track { list-style: none; margin: 0; padding: 0; display: flex; gap: 22px; width: max-content;
   will-change: transform; }
 .reel-wrap { position: relative; }
-.reel-btn { position: absolute; top: 50%; transform: translateY(-50%); z-index: 2;
+.reel-btn { position: absolute; top: calc(50% - 23px); z-index: 2;
   width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--gold); background: var(--ivory);
   color: var(--cobalt); display: grid; place-items: center; cursor: pointer; padding: 0;
   box-shadow: 0 4px 14px rgba(22, 48, 154, .18); transition: background .2s, color .2s; }
@@ -1059,7 +1057,7 @@ html.paged .page-reel { min-height: 0; padding-inline: 0; }
 @media (hover: hover) { .reel-btn:hover { background: var(--cobalt); color: var(--ivory); } }
 .reel-btn:focus-visible { background: var(--cobalt); color: var(--ivory); }
 .reel-prev { left: 10px; } .reel-next { right: 10px; }
-@media (min-width: 760px) { .reel-prev { left: 24px; } .reel-next { right: 24px; } .reel-btn { width: 52px; height: 52px; } }
+@media (min-width: 760px) { .reel-prev { left: 24px; } .reel-next { right: 24px; } .reel-btn { width: 52px; height: 52px; top: calc(50% - 26px); } }
 .reel-track li { flex: none; height: clamp(240px, calc(34 * var(--vh, 1vh)), 380px); outline: 2px solid var(--gold); outline-offset: 4px; background: var(--ivory-2); }
 .reel-track li:nth-child(odd) { transform: rotate(-1.5deg); }
 .reel-track li:nth-child(even) { transform: rotate(1.5deg); }
