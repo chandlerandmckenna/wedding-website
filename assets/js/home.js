@@ -481,7 +481,7 @@
       b.setAttribute("aria-label", label);
       b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' +
         (dir < 0 ? "M15 5l-7 7 7 7" : "M9 5l7 7-7 7") + '"/></svg>';
-      b.addEventListener("click", function () { skip(dir); });
+      b.addEventListener("click", function (e) { skip(dir); if (e.detail) b.blur(); });
       wrap.appendChild(b);
     }
     arrow(-1, "Previous photo");
@@ -580,8 +580,8 @@
       setTimeout(function () { box.hidden = true; }, 250);
       if (opener) opener.focus({ preventScroll: true });
     }
-    box.querySelector(".lightbox-prev").addEventListener("click", function (e) { e.stopPropagation(); step(-1); });
-    box.querySelector(".lightbox-next").addEventListener("click", function (e) { e.stopPropagation(); step(1); });
+    box.querySelector(".lightbox-prev").addEventListener("click", function (e) { e.stopPropagation(); step(-1); if (e.detail) this.blur(); });
+    box.querySelector(".lightbox-next").addEventListener("click", function (e) { e.stopPropagation(); step(1); if (e.detail) this.blur(); });
     // Swipe left or right on a phone to flip; a plain tap still closes.
     var swipe = null;
     box.addEventListener("touchstart", function (e) {

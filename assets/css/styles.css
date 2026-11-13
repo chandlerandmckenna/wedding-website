@@ -497,6 +497,7 @@ html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25
   font: 300 30px/44px var(--body); cursor: pointer;
 }
 html.lightbox-open, html.lightbox-open body { overflow: hidden; }
+.reel-btn, .lightbox-step, .lightbox-close, .lightbox { -webkit-tap-highlight-color: transparent; }
 .lightbox-frame img { transition: opacity .16s ease; }
 .lightbox-frame img.swap { opacity: 0; }
 .lightbox-step { position: absolute; top: 50%; transform: translateY(-50%);
@@ -504,7 +505,8 @@ html.lightbox-open, html.lightbox-open body { overflow: hidden; }
   color: var(--cobalt); display: grid; place-items: center; cursor: pointer; padding: 0;
   box-shadow: 0 4px 14px rgba(0, 0, 0, .25); }
 .lightbox-step svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.lightbox-step:hover, .lightbox-step:focus-visible { background: var(--cobalt); color: var(--ivory); }
+@media (hover: hover) { .lightbox-step:hover { background: var(--cobalt); color: var(--ivory); } }
+.lightbox-step:focus-visible { background: var(--cobalt); color: var(--ivory); }
 .lightbox-prev { left: 8px; } .lightbox-next { right: 8px; }
 .lightbox-count { position: absolute; bottom: max(14px, env(safe-area-inset-bottom)); left: 0; right: 0; margin: 0;
   text-align: center; color: #fff; font: 500 .8rem/1 var(--body); letter-spacing: .25em; }
@@ -1054,7 +1056,8 @@ html.paged .page-reel { min-height: 0; padding-inline: 0; }
   color: var(--cobalt); display: grid; place-items: center; cursor: pointer; padding: 0;
   box-shadow: 0 4px 14px rgba(22, 48, 154, .18); transition: background .2s, color .2s; }
 .reel-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.reel-btn:hover, .reel-btn:focus-visible { background: var(--cobalt); color: var(--ivory); }
+@media (hover: hover) { .reel-btn:hover { background: var(--cobalt); color: var(--ivory); } }
+.reel-btn:focus-visible { background: var(--cobalt); color: var(--ivory); }
 .reel-prev { left: 10px; } .reel-next { right: 10px; }
 @media (min-width: 760px) { .reel-prev { left: 24px; } .reel-next { right: 24px; } .reel-btn { width: 52px; height: 52px; } }
 .reel-track li { flex: none; height: clamp(240px, calc(34 * var(--vh, 1vh)), 380px); outline: 2px solid var(--gold); outline-offset: 4px; background: var(--ivory-2); }
