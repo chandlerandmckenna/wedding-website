@@ -497,6 +497,19 @@ html.paged .story-car.go { animation: drive-in 4.2s cubic-bezier(0.25, 0.7, 0.25
   font: 300 30px/44px var(--body); cursor: pointer;
 }
 html.lightbox-open, html.lightbox-open body { overflow: hidden; }
+.lightbox-frame img { transition: opacity .16s ease; }
+.lightbox-frame img.swap { opacity: 0; }
+.lightbox-step { position: absolute; top: 50%; transform: translateY(-50%);
+  width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--gold); background: var(--ivory);
+  color: var(--cobalt); display: grid; place-items: center; cursor: pointer; padding: 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .25); }
+.lightbox-step svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.lightbox-step:hover, .lightbox-step:focus-visible { background: var(--cobalt); color: var(--ivory); }
+.lightbox-prev { left: 8px; } .lightbox-next { right: 8px; }
+.lightbox-count { position: absolute; bottom: max(14px, env(safe-area-inset-bottom)); left: 0; right: 0; margin: 0;
+  text-align: center; color: #fff; font: 500 .8rem/1 var(--body); letter-spacing: .25em; }
+.lightbox.single .lightbox-step { display: none; }
+@media (min-width: 760px) { .lightbox-prev { left: 24px; } .lightbox-next { right: 24px; } }
 /* a square gold frame set a little off each photo, like the one around ours */
 .gallery figure { outline: 2px solid var(--gold); outline-offset: var(--frame); background: var(--ivory-2); }
 /* the middle photo settles first, then the outer two fan out slowly from behind it */

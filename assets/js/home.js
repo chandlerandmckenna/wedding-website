@@ -526,16 +526,48 @@
     box.setAttribute("role", "dialog");
     box.setAttribute("aria-modal", "true");
     box.setAttribute("aria-label", "Photo");
+    var chev = function (d) { return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '"/></svg>'; };
     box.innerHTML = '<figure class="lightbox-frame"><img alt=""></figure>' +
-      '<button type="button" class="lightbox-close" aria-label="Close">&times;</button>';
+      '<button type="button" class="lightbox-close" aria-label="Close">&times;</button>' +
+      '<button type="button" class="lightbox-step lightbox-prev" aria-label="Previous photo">' + chev("M15 5l-7 7 7 7") + '</button>' +
+      '<button type="button" class="lightbox-step lightbox-next" aria-label="Next photo">' + chev("M9 5l7 7-7 7") + '</button>' +
+      '<p class="lightbox-count" aria-live="polite"></p>';
     document.body.appendChild(box);
     var big = box.querySelector("img");
-    var opener = null;
+    var opener = null, group = [], at = 0;
+    var count = box.querySelector(".lightbox-count");
 
-    function open(img) {
-      opener = img;
+    // The photos you can flip through together: the venue trio, the story
+    // moments, or the photo strip (its looping copies are left out).
+    function groupOf(img) {
+      var home = img.closest(".gallery, .timeline, .reel-track");
+      if (!home) return [img];
+      return Array.prototype.slice.call(home.querySelectorAll("img")).filter(function (p) {
+        return !p.closest("[aria-hidden='true']");
+      });
+    }
+    function show(i) {
+      at = (i + group.length) % group.length;
+      var img = group[at];
       big.src = img.currentSrc || img.src;
       big.alt = img.alt;
+      count.textContent = group.length > 1 ? (at + 1) + " / " + group.length : "";
+    }
+    function step(dir) {
+      if (group.length < 2) return;
+      big.classList.add("swap");
+      setTimeout(function () { show(at + dir); big.classList.remove("swap"); }, 160);
+    }
+    function open(img) {
+      opener = img;
+      group = groupOf(img);
+      var i = group.indexOf(img);
+      if (i < 0) {                              // a looping copy: find its original
+        var src = img.getAttribute("src");
+        i = group.map(function (p) { return p.getAttribute("src"); }).indexOf(src);
+      }
+      show(Math.max(0, i));
+      box.classList.toggle("single", group.length < 2);
       box.hidden = false;
       document.documentElement.classList.add("lightbox-open");
       requestAnimationFrame(function () { box.classList.add("shown"); });
@@ -548,6 +580,23 @@
       setTimeout(function () { box.hidden = true; }, 250);
       if (opener) opener.focus({ preventScroll: true });
     }
+    box.querySelector(".lightbox-prev").addEventListener("click", function (e) { e.stopPropagation(); step(-1); });
+    box.querySelector(".lightbox-next").addEventListener("click", function (e) { e.stopPropagation(); step(1); });
+    // Swipe left or right on a phone to flip; a plain tap still closes.
+    var swipe = null;
+    box.addEventListener("touchstart", function (e) {
+      var t = e.touches[0];
+      swipe = e.touches.length === 1 ? { x: t.clientX, y: t.clientY } : null;
+    }, { passive: true });
+    box.addEventListener("touchend", function (e) {
+      if (!swipe) return;
+      var t = e.changedTouches[0], dx = t.clientX - swipe.x, dy = t.clientY - swipe.y;
+      swipe = null;
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+        e.preventDefault();                     // no click, so the photo stays open
+        step(dx < 0 ? 1 : -1);
+      }
+    });
 
     photos.forEach(function (img) {
       img.tabIndex = 0;
@@ -572,7 +621,12 @@
       });
     });
     box.addEventListener("click", close);
-    document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+    document.addEventListener("keydown", function (e) {
+      if (box.hidden) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight") step(1);
+      else if (e.key === "ArrowLeft") step(-1);
+    });
   })();
 
   /* ---------- Our story: each moment fades in and away as it passes ---------- */
