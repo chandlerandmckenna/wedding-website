@@ -32,8 +32,7 @@
     margin: 0; min-height: 100vh; min-height: 100dvh;
     display: flex; align-items: center; justify-content: center;
     padding: max(28px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
-    background: var(--cobalt);
-    background-image: repeating-linear-gradient(90deg, var(--cobalt) 0 26px, #fff 26px 52px);
+    background: #7d9be6 url("../assets/img/stripes.jpg") repeat 0 0 / 120px 240px;
     font: 400 1.0625rem/1.5 var(--body); color: var(--ink);
   }
   .card {
@@ -72,7 +71,7 @@
 <main class="card">
   <div id="ask">
     <p class="eyebrow">McKenna &amp; Chandler</p>
-    <h1 id="hello">Ciao!</h1>
+    <h1 id="hello">Hello!</h1>
     <hr class="rule">
     <p class="note">Something special is headed your way in the mail. Where should we send it?</p>
     <form id="form" novalidate>
@@ -142,7 +141,7 @@
   var known = false;
   function greet(first) {
     known = !!first;
-    $("hello").textContent = first ? "Ciao, " + first + "!" : "Ciao!";
+    $("hello").textContent = first ? "Hello, " + first + "!" : "Hello!";
     $("name-field").hidden = known;
   }
   if (code) {
