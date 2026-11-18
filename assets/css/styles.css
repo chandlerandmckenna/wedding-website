@@ -1038,7 +1038,7 @@ html.paged .ferry-boat.go { animation: rock 4.5s ease-in-out infinite; }
 html.paged .page-ourstory { align-content: start; }
 /* landscape photos keep their own shape, a little wider */
 .moment-photo.wide { width: min(92%, 420px); }
-.moment-photo.wide img { aspect-ratio: auto; }
+.moment-photo.wide img { aspect-ratio: 687 / 462; }   /* the Switzerland photo; keeps its space before it loads */
 @media (min-width: 760px) { .moment-photo.wide { width: min(100%, 440px); } }
 
 /* Our story moments fade in as they come up and fade away as you scroll past */

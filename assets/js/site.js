@@ -356,7 +356,7 @@ window.PAGES = [
     if (feel) feel.addEventListener("click", function (e) {
       if (!document.getElementById("reply")) return;   // on Travel: follow the link home
       e.preventDefault();
-      window.goToFeeling(true);
+      window.goToFeeling(false);   // straight there, like the menu links: a long glide showed faded sections on the way
     });
     var out = document.getElementById("sign-out");
     if (out) out.addEventListener("click", function () {
