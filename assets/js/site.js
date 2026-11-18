@@ -170,6 +170,17 @@ window.PAGES = [
   // Preview mode: a name typed as "Angi & Kevin Queenan" signs in as a
   // household of two, so the household version can be tried without the Sheet.
   function demoHousehold(guest) {
+    // "Ethan Hewett +1": Ethan and a plus one with no name yet.
+    var plus = String(guest.name || "").match(/^(.*?)\s*\+\s*1$/);
+    if (plus && plus[1]) {
+      guest.name = plus[1];
+      guest.household = [
+        { name: plus[1], email: guest.email || "", phone: guest.phone || "", feeling: "", me: true },
+        { name: plus[1].split(" ")[0] + " +1", email: "", phone: "", feeling: "", me: false, plusOne: true, named: false }
+      ];
+      guest.first = plus[1].split(" ")[0];
+      return guest;
+    }
     var parts = String(guest.name || "").split(/\s*(?:,|&| and )\s*/i).filter(Boolean);
     if (parts.length < 2) return guest;
     var last = parts[parts.length - 1].split(" ").slice(1).join(" ");
@@ -195,12 +206,19 @@ window.PAGES = [
   }
 
   // Copies one field from [{ name, ... }] onto the guest and their household.
+  // A plus one's typed-in name comes as { name, rename } and is applied too.
   function apply(g, list, field) {
     (list || []).forEach(function (a) {
-      if (!a[field]) return;
       var m = (g.household || []).filter(function (h) { return h.name === a.name; })[0];
-      if (m) m[field] = a[field];
-      if (!m || m.me) g[field] = a[field];
+      if (a[field]) {
+        if (m) m[field] = a[field];
+        if (!m || m.me) g[field] = a[field];
+      }
+      if (m && m.plusOne && typeof a.rename === "string") {
+        if (!m.named) m.placeholder = m.name;
+        m.name = a.rename || m.placeholder || m.name;
+        m.named = !!a.rename;
+      }
     });
   }
   window.applyAnswers = apply;

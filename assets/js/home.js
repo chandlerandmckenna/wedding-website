@@ -220,8 +220,10 @@
     p.el.classList.toggle("has-choice", !!p.selected);
   }
 
+  function typedName(p) { return p.nameInput ? p.nameInput.value.replace(/\s+/g, " ").trim() : ""; }
+  function renamed(p) { return p.nameInput && typedName(p) !== p.savedName; }
   function changed() {
-    return people.filter(function (p) { return p.selected && p.selected !== p.saved; });
+    return people.filter(function (p) { return (p.selected && p.selected !== p.saved) || renamed(p); });
   }
 
   function refreshSend() {
@@ -258,15 +260,28 @@
       people = home.map(function (m, i) {
         var el = document.createElement("div");
         el.className = "feel-person";
-        var label = String(m.name).split(" ")[0];
+        // A plus one is "Your plus one" until the guest gives their name.
+        var label = m.plusOne && !m.named ? "Your plus one" : String(m.name).split(" ")[0];
         el.innerHTML = '<p class="feel-who" id="feel-who-' + i + '">' + window.esc(label) + "</p>";
+        var nameInput = null;
+        if (m.plusOne) {
+          var field = document.createElement("div");
+          field.className = "field feel-name";
+          field.innerHTML = '<label for="feel-name-' + i + '">Their name <span class="opt">(if you know it)</span></label>' +
+            '<input type="text" id="feel-name-' + i + '" autocomplete="off" autocapitalize="words" maxlength="80" placeholder="First and last name">';
+          nameInput = field.querySelector("input");
+          nameInput.value = m.named ? m.name : "";
+          el.appendChild(field);
+        }
         var options = template.cloneNode(true);
         options.hidden = false;
         options.setAttribute("aria-labelledby", "feel-who-" + i);
         options.removeAttribute("aria-label");
         el.appendChild(options);
         panel.insertBefore(el, sendBtn);
-        return { name: m.name, saved: m.feeling || "", el: options };
+        var person = { name: m.name, saved: m.feeling || "", el: options, nameInput: nameInput, savedName: m.named ? m.name : "" };
+        if (nameInput) nameInput.addEventListener("input", function () { statusEl.textContent = ""; refreshSend(); });
+        return person;
       });
     }
     people.forEach(function (p) {
@@ -287,7 +302,11 @@
 
   sendBtn.addEventListener("click", function () {
     var guest = window.Guest.current();
-    var answers = changed().map(function (p) { return { name: p.name, feeling: p.selected }; });
+    var answers = changed().map(function (p) {
+      var a = { name: p.name, feeling: p.selected };
+      if (renamed(p)) a.rename = typedName(p);
+      return a;
+    });
     if (!guest || !answers.length) return;
     sendBtn.disabled = true;
     sendBtn.textContent = "Sending…";
@@ -296,6 +315,11 @@
       window.Guest.save(guest);
       window.renderHeader();   // the header pill now shows their answer
       changed().forEach(function (p) { p.saved = p.selected; });
+      // A plus one who was just named shows their name from now on.
+      if (answers.some(function (a) { return typeof a.rename === "string"; })) {
+        setupFeelings(guest);
+        fillAddress(guest);
+      }
       statusEl.textContent = thanks();
       refreshSend();
     }).catch(function () {
@@ -332,7 +356,7 @@
       return;
     }
     contactInputs = home.map(function (m, i) {
-      var first = window.esc(String(m.name).split(" ")[0]);
+      var first = window.esc(m.plusOne && !m.named ? "Your plus one" : String(m.name).split(" ")[0]);
       var email = document.createElement("div");
       email.className = "field span-2 pc-person" + (i ? " pc-next" : "");
       email.innerHTML = '<label for="addr-email-' + i + '">' + first + "\u2019s email</label>" +

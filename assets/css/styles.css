@@ -634,6 +634,12 @@ html.paged .gallery:not(.fanned) figure:last-child { transform: translateX(calc(
 .feel-person .feel-options { gap: 8px; }
 .feel-person .feel { min-height: 50px; gap: 12px; padding: 6px 16px 6px 8px; }
 .feel-person .feel-icon { width: 34px; height: 34px; }
+.feel-name { margin: 0 0 12px; text-align: left; }
+.feel-name label { display: block; margin-bottom: 6px; font-size: 0.8125rem; color: var(--ink-soft, #4a5170); }
+.feel-name .opt { font-style: italic; }
+.feel-name input { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1.5px solid var(--gold); border-radius: 12px;
+  background: #fff; font: inherit; font-size: 1rem; color: var(--ink, #1c2340); }
+.feel-name input:focus { outline: 2px solid var(--cobalt); outline-offset: 1px; }
 .send { margin-top: 10px; }
 .switch { text-align: center; }
 /* A better address for the invitation */

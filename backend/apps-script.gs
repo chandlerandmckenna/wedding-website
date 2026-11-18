@@ -3,7 +3,7 @@
  * bound to a Google Sheet.
  *
  * Sheet "Guests" (row 1 is headers):
- *   Phone | Name | Email | Group | Feeling | Updated | Street | Apt | City | State | ZIP | Country | Household | People
+ *   Phone | Name | Email | Group | Feeling | Updated | Street | Apt | City | State | ZIP | Country | Household | People | Plus One
  *   Phone is stored as a number with country code, e.g. 19259636950, and
  *   shown as +1 (925) 963-6950.
  *   Guests can sign in with either their phone or their email.
@@ -11,6 +11,9 @@
  *   Household is filled in for guests found on the guest list; everyone in a
  *   household gets their own row with the same Household value. People is
  *   only used by rows saved before that (one row for a whole household).
+ *   Plus One holds the guest list's placeholder (e.g. "Ethan +1") on a plus
+ *   one's row; Name starts as that placeholder and becomes their real name
+ *   once the guest types it in on the site.
  *
  * Guest list (GUEST_LIST below, a separate spreadsheet Chandler keeps):
  *   Anyone whose phone is on it is recognised when they sign in, without
@@ -19,6 +22,9 @@
  *   the gut feeling and leave an email and phone for each person. Each
  *   person has their own row in Guests; the mailing address is shared.
  *   Columns are found by their header names.
+ *   A plus one whose name isn't known yet is a row in the household with a
+ *   Person like "Ethan +1" or "Ethan Plus One". They aren't greeted by name;
+ *   the guest answers for them and can type in their name.
  *
  * Sheet "Notes" (row 1 is headers), one row per note left on the site:
  *   Sent | Name | Phone | Email | Kind | Note
@@ -34,7 +40,7 @@
  * Put the web app URL in WEDDING.apiEndpoint in assets/js/site.js.
  */
 
-var COLS = { phone: 0, name: 1, email: 2, group: 3, feeling: 4, updated: 5, address: 6, household: 12, people: 13 };
+var COLS = { phone: 0, name: 1, email: 2, group: 3, feeling: 4, updated: 5, address: 6, household: 12, people: 13, plusOne: 14 };
 var ADDRESS = ["line1", "line2", "city", "state", "zip", "country"];
 var FEELINGS = { yes: true, maybe: true, no: true };
 
@@ -63,7 +69,7 @@ function doPost(e) {
 // Each tab is created with its header row the first time it's needed, so a
 // brand new, empty Google Sheet is all the setup this script needs.
 var HEADERS = {
-  "Guests": ["Phone", "Name", "Email", "Group", "Feeling", "Updated", "Street", "Apt", "City", "State", "ZIP", "Country", "Household", "People"],
+  "Guests": ["Phone", "Name", "Email", "Group", "Feeling", "Updated", "Street", "Apt", "City", "State", "ZIP", "Country", "Household", "People", "Plus One"],
   "Notes": ["Sent", "Name", "Phone", "Email", "Kind", "Note"],
   "Private events": ["Group", "Date", "Time", "Title", "Place"]
 };
@@ -86,7 +92,18 @@ function setup() {
 }
 
 function guests() {
-  return tab("Guests");
+  var sheet = tab("Guests");
+  // Sheets made before the Plus One column get its header the first time.
+  var head = sheet.getRange(1, COLS.plusOne + 1);
+  if (!head.getValue()) head.setValue("Plus One").setFontWeight("bold");
+  return sheet;
+}
+
+// "Ethan +1", "Ethan Plus One", "Ethan's plus-one", "Guest": a plus one the
+// guest list has no name for yet.
+function isPlusOne(name) {
+  var n = String(name || "").trim();
+  return /\+\s*1\b|\bplus[\s-]*(one|1)\b/i.test(n) || /^guest$/i.test(n);
 }
 
 // The guest's row in Guests. Someone on the guest list (by phone, by email if
@@ -145,10 +162,12 @@ function householdRows(sheet, home) {
     shared = old.row;
   }
   home.members.forEach(function (m) {
-    var has = found.some(function (r) { return simple(r.row[COLS.name]) === simple(m.name); });
+    var has = found.some(function (r) {
+      return simple(r.row[COLS.name]) === simple(m.name) || (m.plusOne && r.row[COLS.plusOne] === m.name);
+    });
     if (has) return;
     var row = [phoneValue(m.phone), m.name, m.email || "", home.party ? "party" : "", "", new Date(),
-      "", "", "", "", "", "", home.key, ""];
+      "", "", "", "", "", "", home.key, "", m.plusOne ? m.name : ""];
     if (shared) {
       if (old) row[COLS.feeling] = shared[COLS.feeling];   // they used to answer together
       for (var k = 0; k < ADDRESS.length; k++) row[COLS.address + k] = shared[COLS.address + k];
@@ -198,10 +217,14 @@ function describe(hit) {
         email: String(m.row[COLS.email] || ""),
         phone: digits(m.row[COLS.phone]),
         feeling: m.row[COLS.feeling] || "",
-        me: m.index === hit.index
+        me: m.index === hit.index,
+        plusOne: !!m.row[COLS.plusOne],
+        named: !!m.row[COLS.plusOne] && String(m.row[COLS.name]) !== String(m.row[COLS.plusOne])
       };
     });
-    guest.first = joinFirst(guest.household.map(function (m) { return m.name; }));
+    // Greet the people the guest list names, not a plus one ("Ciao, Ethan").
+    var greet = guest.household.filter(function (m) { return !m.plusOne || m.me; });
+    guest.first = joinFirst((greet.length ? greet : guest.household).map(function (m) { return m.name; }));
   }
   return guest;
 }
@@ -248,7 +271,22 @@ function reply(id, req) {
     var m = a.name ? member(family, a.name) : hit;
     if (m) sheet.getRange(m.index, COLS.feeling + 1, 1, 2).setValues([[a.feeling, new Date()]]);
   });
+  renamePlusOnes(sheet, family, answers);
   return { ok: true };
+}
+
+// A plus one's real name, typed in by the guest: [{ name, rename }].
+// Only a plus one's row can be renamed; an empty name puts the placeholder back.
+function renamePlusOnes(sheet, family, entries) {
+  entries.forEach(function (a) {
+    if (typeof a.rename !== "string" || !a.name) return;
+    var m = member(family, a.name);
+    if (!m || !m.row[COLS.plusOne]) return;
+    var name = a.rename.replace(/\s+/g, " ").trim().slice(0, 200) || String(m.row[COLS.plusOne]);
+    sheet.getRange(m.index, COLS.name + 1).setValue(name);
+    sheet.getRange(m.index, COLS.updated + 1).setValue(new Date());
+    m.row[COLS.name] = name;
+  });
 }
 
 function readAddress(r) {
@@ -360,7 +398,7 @@ function household(id, name, label) {
   var me = people.filter(function (r) {
     return (id.phone && digits(r[c.phone]) === id.phone) ||
       (id.email && c.email >= 0 && String(r[c.email]).trim().toLowerCase() === id.email) ||
-      (name && simple(r[c.person]) === simple(name));
+      (name && !isPlusOne(r[c.person]) && simple(r[c.person]) === simple(name));
   })[0] || (label && c.home >= 0 && people.filter(function (r) { return String(r[c.home]).trim() === label; })[0]);
   if (!me) return null;
   label = c.home >= 0 ? String(me[c.home]).trim() : "";
@@ -368,6 +406,7 @@ function household(id, name, label) {
   var person = function (r) {
     return {
       name: String(r[c.person]).trim(),
+      plusOne: isPlusOne(r[c.person]),
       phone: digits(r[c.phone]),
       email: c.email >= 0 ? String(r[c.email]).trim().toLowerCase() : ""
     };
@@ -428,7 +467,7 @@ var FEEL_TEXT = { yes: "Count me in!", maybe: "Still thinking", no: "Likely not"
 var NOTE_KINDS = ["Advice", "Well wishes", "Song request", "Italy tip", "Honeymoon rec", "Memory"];
 
 var WIDTHS = {
-  "Guests": [150, 200, 220, 90, 110, 160, 200, 80, 120, 70, 80, 110, 150, 70],
+  "Guests": [150, 200, 220, 90, 110, 160, 200, 80, 120, 70, 80, 110, 150, 70, 130],
   "Notes": [160, 160, 150, 210, 120, 460],
   "Private events": [100, 130, 100, 220, 220]
 };
