@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>McKenna &amp; Chandler</title>
+<!-- The page guests reach from the "what's your address?" text. It stands on
+     its own: no links to the rest of the site, so the save the dates in the
+     mail are the first they see of it. Each text carries ?c=<code>, which
+     tells the Apps Script backend which household this is. -->
+<meta property="og:title" content="McKenna &amp; Chandler">
+<meta property="og:description" content="Where should we send your mail?">
+<meta property="og:image" content="https://thequeenans2027.com/assets/img/monogram-192.png">
+<meta name="theme-color" content="#1d3fbd">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/img/monogram-32.png">
+<link rel="apple-touch-icon" href="../assets/img/monogram-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&family=Norican&display=swap">
+<style>
+  :root {
+    --ivory: #fbf5ea; --card: #fcefdf; --ink: #17245a; --ink-soft: #46507a; --line: #e3cfae;
+    --cobalt: #1d3fbd; --cobalt-deep: #16309a; --gold: #eeaa22;
+    --script: "Norican", "Brush Script MT", cursive;
+    --body: "Jost", "Futura", "Avenir Next", system-ui, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh; min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+    padding: max(28px, env(safe-area-inset-top)) 18px max(28px, env(safe-area-inset-bottom));
+    background: var(--cobalt);
+    background-image: repeating-linear-gradient(90deg, var(--cobalt) 0 26px, #fff 26px 52px);
+    font: 400 1.0625rem/1.5 var(--body); color: var(--ink);
+  }
+  .card {
+    width: 100%; max-width: 440px; padding: 34px 26px 30px;
+    background: var(--card); border-radius: 6px;
+    box-shadow: 0 0 0 6px var(--card), 0 0 0 7px var(--gold), 0 18px 40px rgba(10, 25, 80, .35);
+    text-align: center;
+  }
+  .eyebrow { margin: 0; font-weight: 500; font-size: .78rem; letter-spacing: .28em; text-transform: uppercase; color: var(--cobalt); }
+  h1 { margin: 6px 0 4px; font: 400 2.6rem/1.15 var(--script); color: var(--cobalt); }
+  .note { margin: 0 auto 22px; max-width: 30ch; color: var(--ink-soft); }
+  .rule { width: 60px; height: 1px; margin: 14px auto 18px; background: var(--gold); border: 0; }
+  form { text-align: left; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  .row.three { grid-template-columns: 1.6fr .7fr 1fr; }
+  .field { margin-bottom: 14px; }
+  label { display: block; margin-bottom: 4px; font-weight: 500; font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft); }
+  input {
+    width: 100%; padding: 6px 2px; border: 0; border-bottom: 1.5px solid var(--line); border-radius: 0;
+    background: transparent; font: inherit; font-size: 1.0625rem; color: var(--ink);
+  }
+  input:focus { outline: none; border-bottom-color: var(--cobalt); }
+  input::placeholder { color: #a9a08e; }
+  .optional { text-transform: none; letter-spacing: 0; font-weight: 400; }
+  button {
+    display: block; width: 100%; margin-top: 10px; padding: 14px 18px; border: 0; border-radius: 999px;
+    background: var(--cobalt); color: #fff; font: 500 .95rem var(--body); letter-spacing: .2em; text-transform: uppercase;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  button:disabled { opacity: .6; }
+  .status { min-height: 1.5em; margin: 12px 0 0; text-align: center; font-size: .95rem; color: #9b2c1f; }
+  .done h1 { margin-top: 2px; }
+</style>
+</head>
+<body>
+<main class="card">
+  <div id="ask">
+    <p class="eyebrow">McKenna &amp; Chandler</p>
+    <h1 id="hello">Ciao!</h1>
+    <hr class="rule">
+    <p class="note">Something special is headed your way in the mail. Where should we send it?</p>
+    <form id="form" novalidate>
+      <div class="field" id="name-field" hidden>
+        <label for="names">Your name</label>
+        <input id="names" name="names" autocomplete="name" placeholder="First and last name">
+      </div>
+      <div class="field">
+        <label for="line1">Street address</label>
+        <input id="line1" name="line1" autocomplete="address-line1" required>
+      </div>
+      <div class="field">
+        <label for="line2">Apt or unit <span class="optional">(optional)</span></label>
+        <input id="line2" name="line2" autocomplete="address-line2">
+      </div>
+      <div class="row three">
+        <div class="field">
+          <label for="city">City</label>
+          <input id="city" name="city" autocomplete="address-level2" required>
+        </div>
+        <div class="field">
+          <label for="state">State</label>
+          <input id="state" name="state" autocomplete="address-level1" maxlength="20" autocapitalize="characters" spellcheck="false" placeholder="CA">
+        </div>
+        <div class="field">
+          <label for="zip">ZIP</label>
+          <input id="zip" name="zip" autocomplete="postal-code" inputmode="numeric" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="country">Country</label>
+        <input id="country" name="country" autocomplete="country-name" value="United States">
+      </div>
+      <button type="submit" id="send">Send</button>
+      <p class="status" id="status" role="status"></p>
+    </form>
+  </div>
+  <div id="done" class="done" hidden>
+    <p class="eyebrow">McKenna &amp; Chandler</p>
+    <h1>Grazie!</h1>
+    <hr class="rule">
+    <p class="note" id="done-note">We've got your address. Keep an eye on your mailbox!</p>
+  </div>
+</main>
+<script>
+(function () {
+  // Same backend as the main site. The test site (….workers.dev) never
+  // writes to the real sheet, so there it shows a made-up guest instead.
+  var API = "https://script.google.com/macros/s/AKfycbw89GGyUV6FwVLychrs_3ZxH8vONSvbC4A1LqT-xWkLtjlIgROk9hDHnwAx0DQgOhZD/exec";
+  var preview = /^dev(--|\.)|\.workers\.dev$|^localhost$|^127\./.test(location.hostname);
+  var code = (new URLSearchParams(location.search).get("c") || "").replace(/[^a-z0-9]/gi, "").slice(0, 20);
+  var $ = function (id) { return document.getElementById(id); };
+
+  function call(action, payload) {
+    if (preview) {
+      return new Promise(function (ok) {
+        setTimeout(function () { ok(action === "who" ? (code ? { first: "Angi & Kevin" } : { error: "not found" }) : { ok: true }); }, 400);
+      });
+    }
+    return fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(Object.assign({ action: action }, payload))
+    }).then(function (r) { return r.json(); });
+  }
+
+  var known = false;
+  function greet(first) {
+    known = !!first;
+    $("hello").textContent = first ? "Ciao, " + first + "!" : "Ciao!";
+    $("name-field").hidden = known;
+  }
+  if (code) {
+    call("who", { code: code }).then(function (r) { greet(r && r.first); }, function () { greet(""); });
+  } else {
+    greet("");
+  }
+
+  $("form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = e.target, status = $("status");
+    var address = {};
+    ["line1", "line2", "city", "state", "zip", "country"].forEach(function (k) { address[k] = f[k].value.trim(); });
+    var names = f.names.value.trim();
+    if (!known && !names) { status.textContent = "Please add your name."; return f.names.focus(); }
+    if (!address.line1 || !address.city || !address.zip) {
+      status.textContent = "Please fill in your street, city and ZIP.";
+      return (!address.line1 ? f.line1 : !address.city ? f.city : f.zip).focus();
+    }
+    status.textContent = "";
+    $("send").disabled = true;
+    $("send").textContent = "Sending…";
+    call("mailing", { code: known ? code : "", names: names, address: address }).then(function (r) {
+      if (!r || r.error) throw new Error(r && r.error);
+      $("ask").hidden = true;
+      $("done").hidden = false;
+      window.scrollTo(0, 0);
+    }).catch(function () {
+      $("send").disabled = false;
+      $("send").textContent = "Send";
+      status.textContent = "That didn't go through. Please try again in a moment.";
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -33,6 +33,10 @@
  *   Group | Date | Time | Title | Place
  *   Date must match the site's schedule, e.g. "September 30".
  *
+ * Sheet "Addresses" (row 1 is headers), one row per household, filled in
+ * from the standalone address page that the address texts link to:
+ *   Household | Names | Street | Apt | City | State | ZIP | Country | Sent | Code
+ *
  * The tabs are created automatically (run setup() once to make them now).
  * Run styleSheet() once to format every tab and build the Overview tab.
  * Deploy: Extensions > Apps Script, paste this file, then
@@ -46,6 +50,14 @@ var FEELINGS = { yes: true, maybe: true, no: true };
 
 function doPost(e) {
   var req = JSON.parse(e.postData.contents || "{}");
+  // The standalone address page (address/index.html) knows guests only by
+  // the code in their text's link, not by phone or email.
+  if (req.action === "who") return json(whoIs(req.code));
+  if (req.action === "mailing") {
+    var mailLock = LockService.getScriptLock();
+    mailLock.waitLock(10000);
+    try { return json(saveMailing(req)); } finally { mailLock.releaseLock(); }
+  }
   var id = {
     phone: digits(req.phone),
     email: String(req.email || "").trim().toLowerCase()
@@ -71,7 +83,8 @@ function doPost(e) {
 var HEADERS = {
   "Guests": ["Phone", "Name", "Email", "Group", "Feeling", "Updated", "Street", "Apt", "City", "State", "ZIP", "Country", "Household", "People", "Plus One"],
   "Notes": ["Sent", "Name", "Phone", "Email", "Kind", "Note"],
-  "Private events": ["Group", "Date", "Time", "Title", "Place"]
+  "Private events": ["Group", "Date", "Time", "Title", "Place"],
+  "Addresses": ["Household", "Names", "Street", "Apt", "City", "State", "ZIP", "Country", "Sent", "Code"]
 };
 function tab(name) {
   var book = SpreadsheetApp.getActive();
@@ -371,7 +384,8 @@ function guestList() {
   if (h === values.length) return null;
   var col = function (name) { return head.indexOf(name); };
   var c = { person: col("Person"), title: col("Title (if Applicable)"), rel: col("Relationship"),
-    invite: col("Italy Invite?"), phone: col("Phone"), email: col("Email"), home: col("Household") };
+    invite: col("Italy Invite?"), phone: col("Phone"), email: col("Email"), home: col("Household"),
+    text: head.map(function (v) { return simple(v); }).indexOf(simple(TEXTS.column)) };
   var people = values.slice(h + 1).filter(function (r) {
     return String(r[c.person]).trim() && (c.invite < 0 || String(r[c.invite]).trim() !== GUEST_LIST.skip);
   });
@@ -451,6 +465,109 @@ function phoneValue(digits) {
   return digits ? Number(digits) : "";
 }
 
+// ---- Address texts ---------------------------------------------------------
+// Tick the "Text for address" checkbox on someone's row in the guest list,
+// and the iPhone Shortcut texts them a link to the address page. Their
+// answer lands in the Addresses tab, and once their household has answered
+// they drop off the list, so running the Shortcut again won't text them twice.
+
+var TEXTS = {
+  column: "Text for address",
+  page: "https://thequeenans2027.com/address/?c=",
+  message: "Hi {first}! It's McKenna & Chandler. We have something coming your way in the mail and want to make sure it finds you. Could you pop your address in here? {link}"
+};
+
+// A short code for a household, used in its link instead of its name.
+function mailCode(key) {
+  var h = 5381, s = simple(key);
+  for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+  return (h >>> 0).toString(36);
+}
+
+// Every household on the guest list, by code: { key, names, first }.
+function mailHouseholds(list) {
+  list = list || guestList();
+  var c = list.c, out = {};
+  list.people.forEach(function (r) {
+    var name = String(r[c.person]).trim();
+    var key = (c.home >= 0 && String(r[c.home]).trim()) || name;
+    var code = mailCode(key);
+    (out[code] = out[code] || { key: key, names: [] }).names.push(name);
+  });
+  Object.keys(out).forEach(function (k) {
+    var real = out[k].names.filter(function (n) { return !isPlusOne(n); });
+    out[k].first = joinFirst(real.length ? real : out[k].names);
+  });
+  return out;
+}
+
+function whoIs(code) {
+  var hh = code && mailHouseholds()[String(code)];
+  return hh ? { first: hh.first } : { error: "not found" };
+}
+
+function saveMailing(req) {
+  var a = req.address || {};
+  if (!String(a.line1 || "").trim()) return { error: "address required" };
+  var code = String(req.code || "").slice(0, 20);
+  var hh = code && mailHouseholds()[code];
+  var names = hh ? hh.names.join(", ") : String(req.names || "").trim().slice(0, 200);
+  if (!names) return { error: "name required" };
+  if (!hh) code = "";
+  var row = [hh ? hh.key : "Not on list", names]
+    .concat(ADDRESS.map(function (k) { return String(a[k] || "").trim().slice(0, 200); }))
+    .concat([new Date(), code]);
+  var sheet = tab("Addresses"), rows = sheet.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    var same = code ? String(rows[i][9]) === code : !rows[i][9] && simple(rows[i][1]) === simple(names);
+    if (same) { sheet.getRange(i + 1, 1, 1, row.length).setValues([row]); return { ok: true }; }
+  }
+  sheet.appendRow(row);
+  return { ok: true };
+}
+
+// The texts still to send: everyone ticked on the guest list whose household
+// hasn't given an address yet. The iPhone Shortcut fetches this with the
+// secret key from textingLink().
+function textsToSend() {
+  var list = guestList();
+  if (!list || list.c.text < 0) return { texts: [], error: "No '" + TEXTS.column + "' column in the guest list." };
+  var c = list.c, answered = {};
+  tab("Addresses").getDataRange().getValues().slice(1).forEach(function (r) { if (r[9]) answered[r[9]] = true; });
+  var texts = [];
+  list.people.forEach(function (r) {
+    var ticked = r[c.text] === true || /^(true|yes|x)$/i.test(String(r[c.text]).trim());
+    var phone = digits(r[c.phone]), name = String(r[c.person]).trim();
+    if (!ticked || !phone || isPlusOne(name)) return;
+    var code = mailCode((c.home >= 0 && String(r[c.home]).trim()) || name);
+    if (answered[code]) return;
+    texts.push({
+      name: name,
+      phone: "+" + phone,
+      message: TEXTS.message.replace("{first}", name.split(" ")[0]).replace("{link}", TEXTS.page + code)
+    });
+  });
+  return { count: texts.length, texts: texts };
+}
+
+function doGet(e) {
+  var p = (e && e.parameter) || {};
+  var key = PropertiesService.getScriptProperties().getProperty("TEXT_KEY");
+  if (p.action === "texts" && key && p.key === key) return json(textsToSend());
+  return json({ error: "not found" });
+}
+
+// Wedding menu > Get the address texting link: shows the link to paste into
+// the iPhone Shortcut. It holds a secret key, so only the Shortcut can see
+// the phone numbers.
+function textingLink() {
+  var props = PropertiesService.getScriptProperties();
+  var key = props.getProperty("TEXT_KEY");
+  if (!key) { key = Utilities.getUuid().replace(/-/g, ""); props.setProperty("TEXT_KEY", key); }
+  var url = ScriptApp.getService().getUrl() + "?action=texts&key=" + key;
+  SpreadsheetApp.getUi().alert("Paste this into the Shortcut's \"Get contents of URL\" step:\n\n" + url);
+}
+
 function json(data) {
   return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -469,12 +586,14 @@ var NOTE_KINDS = ["Advice", "Well wishes", "Song request", "Italy tip", "Honeymo
 var WIDTHS = {
   "Guests": [150, 200, 220, 90, 110, 160, 200, 80, 120, 70, 80, 110, 150, 70, 130],
   "Notes": [160, 160, 150, 210, 120, 460],
-  "Private events": [100, 130, 100, 220, 220]
+  "Private events": [100, 130, 100, 220, 220],
+  "Addresses": [160, 240, 220, 80, 130, 70, 80, 120, 160, 90]
 };
 
 function onOpen() {
   SpreadsheetApp.getUi().createMenu("Wedding")
     .addItem("Style sheet & refresh Overview", "styleSheet")
+    .addItem("Get the address texting link", "textingLink")
     .addToUi();
 }
 
