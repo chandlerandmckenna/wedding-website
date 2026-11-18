@@ -99,7 +99,7 @@
         </div>
         <div class="field">
           <label for="zip">ZIP</label>
-          <input id="zip" name="zip" autocomplete="postal-code" inputmode="numeric" required>
+          <input id="zip" name="zip" autocomplete="postal-code">
         </div>
       </div>
       <div class="field">
@@ -159,8 +159,11 @@
     ["line1", "line2", "city", "state", "zip", "country"].forEach(function (k) { address[k] = f[k].value.trim(); });
     var names = f.names.value.trim();
     if (!known && !names) { status.textContent = "Please add your name."; return f.names.focus(); }
-    if (!address.line1 || !address.city || !address.zip) {
-      status.textContent = "Please fill in your street, city and ZIP.";
+    // Only street and city are a must. ZIP is too for US addresses; guests
+    // abroad can leave ZIP and State blank and put their country below.
+    var us = !address.country || /^(us|usa|u\.s\.a?\.?|united states( of america)?|america)$/i.test(address.country);
+    if (!address.line1 || !address.city || (us && !address.zip)) {
+      status.textContent = us ? "Please fill in your street, city and ZIP." : "Please fill in your street and city.";
       return (!address.line1 ? f.line1 : !address.city ? f.city : f.zip).focus();
     }
     status.textContent = "";
