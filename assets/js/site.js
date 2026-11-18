@@ -315,23 +315,37 @@ window.PAGES = [
     function target() {
       return Math.max(0, el.getBoundingClientRect().top + window.scrollY - (head ? head.getBoundingClientRect().height : 0));
     }
-    // Photos higher up the page that load during the glide (and iPhone's
-    // toolbar tucking away) move the section, which left the glide stopping
-    // short at the venue photos. Once it settles, check and finish the trip.
-    var tries = 0;
-    function settle() {
-      window.removeEventListener("scrollend", settle);
-      clearTimeout(settle.timer);
-      var off = target() - window.scrollY;
-      if (Math.abs(off) < 4 || tries++ > 3) return;
-      go(Math.abs(off) > 200);
+    if (!smooth || (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+      window.scrollTo(0, target());
+      return;
     }
-    function go(glide) {
-      window.addEventListener("scrollend", settle);
-      settle.timer = setTimeout(settle, glide ? 1400 : 200);
-      window.scrollTo({ top: target(), behavior: glide ? "smooth" : "auto" });
+    // Our own glide instead of the browser's: it aims at where the section is
+    // on every frame, so photos loading higher up (or iPhone's toolbar tucking
+    // away) can't leave it stopping short. Sections it passes are shown in
+    // full, so the trip down shows the page rather than faded blanks.
+    document.querySelectorAll(".fade").forEach(function (f) {
+      if (f.getBoundingClientRect().top < target() - window.scrollY + window.innerHeight) f.classList.add("shown");
+    });
+    var from = window.scrollY, start = null;
+    var span = Math.abs(target() - from);
+    var time = Math.min(1400, Math.max(600, span * 0.25));   // about a second for the trip down
+    var stop = function () { cancelled = true; };
+    var cancelled = false;
+    window.addEventListener("touchstart", stop, { once: true, passive: true });
+    window.addEventListener("wheel", stop, { once: true, passive: true });
+    function frame(t) {
+      if (cancelled) return;
+      if (start === null) start = t;
+      var k = Math.min(1, (t - start) / time);
+      var ease = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      window.scrollTo(0, from + (target() - from) * ease);
+      if (k < 1) requestAnimationFrame(frame);
+      else {
+        window.removeEventListener("touchstart", stop);
+        window.removeEventListener("wheel", stop);
+      }
     }
-    go(!!smooth);
+    requestAnimationFrame(frame);
   };
 
   window.renderHeader = function () {
@@ -356,7 +370,7 @@ window.PAGES = [
     if (feel) feel.addEventListener("click", function (e) {
       if (!document.getElementById("reply")) return;   // on Travel: follow the link home
       e.preventDefault();
-      window.goToFeeling(false);   // straight there, like the menu links: a long glide showed faded sections on the way
+      window.goToFeeling(true);
     });
     var out = document.getElementById("sign-out");
     if (out) out.addEventListener("click", function () {
