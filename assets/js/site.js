@@ -128,6 +128,8 @@ window.PAGES = [
   function sample(id) {
     var h = 5381;
     String(id.phone || "").split("").forEach(function (c) { h = (h * 33 + c.charCodeAt(0)) >>> 0; });
+    // Ethan's number signs in as Ethan Hewett with a plus one, to try plus ones.
+    if (h === 4225079079) return demo.put(demoHousehold({ phone: id.phone, email: "", name: "Ethan Hewett +1", feeling: "" }));
     if (h !== 1491194378 && h !== 313861232) return null;
     return demo.put(demoHousehold({ phone: id.phone, email: "", name: "Angi & Kevin Queenan", feeling: "" }));
   }
