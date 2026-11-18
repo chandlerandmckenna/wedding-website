@@ -310,10 +310,28 @@ window.PAGES = [
     // show the section at once so its fade-in nudge doesn't throw off where it is
     el.style.transition = "none";
     el.classList.add("shown");
-    var y = el.getBoundingClientRect().top + window.scrollY - (head ? head.getBoundingClientRect().height : 0);
     el.offsetHeight;   // apply before the transition comes back
     el.style.transition = "";
-    window.scrollTo({ top: Math.max(0, y), behavior: smooth ? "smooth" : "auto" });
+    function target() {
+      return Math.max(0, el.getBoundingClientRect().top + window.scrollY - (head ? head.getBoundingClientRect().height : 0));
+    }
+    // Photos higher up the page that load during the glide (and iPhone's
+    // toolbar tucking away) move the section, which left the glide stopping
+    // short at the venue photos. Once it settles, check and finish the trip.
+    var tries = 0;
+    function settle() {
+      window.removeEventListener("scrollend", settle);
+      clearTimeout(settle.timer);
+      var off = target() - window.scrollY;
+      if (Math.abs(off) < 4 || tries++ > 3) return;
+      go(Math.abs(off) > 200);
+    }
+    function go(glide) {
+      window.addEventListener("scrollend", settle);
+      settle.timer = setTimeout(settle, glide ? 1400 : 200);
+      window.scrollTo({ top: target(), behavior: glide ? "smooth" : "auto" });
+    }
+    go(!!smooth);
   };
 
   window.renderHeader = function () {

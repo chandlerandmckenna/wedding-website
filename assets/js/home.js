@@ -267,7 +267,7 @@
         if (m.plusOne) {
           var field = document.createElement("div");
           field.className = "field feel-name";
-          field.innerHTML = '<label for="feel-name-' + i + '">Their name <span class="opt">(if you know it)</span></label>' +
+          field.innerHTML = '<label for="feel-name-' + i + '">Their name</label>' +
             '<input type="text" id="feel-name-' + i + '" autocomplete="off" autocapitalize="words" maxlength="80" placeholder="First and last name">';
           nameInput = field.querySelector("input");
           nameInput.value = m.named ? m.name : "";
