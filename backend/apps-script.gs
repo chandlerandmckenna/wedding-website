@@ -583,7 +583,7 @@ function textingLink() {
 var TWILIO_STOP = " Reply STOP to opt out.";
 // Sent back automatically when a guest texts the Twilio number, so nobody
 // waits on an answer there.
-var TWILIO_AUTO_REPLY = "Thanks! This number only collects addresses and can't answer messages. More details are coming in the mail!";
+var TWILIO_AUTO_REPLY = "Thanks! This number only collects addresses for McKenna & Chandler's wedding and can't answer messages. More details are coming in the mail! Reply STOP to opt out.";
 
 function setUpTwilio() {
   var ui = SpreadsheetApp.getUi(), props = PropertiesService.getScriptProperties();
