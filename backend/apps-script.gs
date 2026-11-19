@@ -49,6 +49,8 @@ var ADDRESS = ["line1", "line2", "city", "state", "zip", "country"];
 var FEELINGS = { yes: true, maybe: true, no: true };
 
 function doPost(e) {
+  // A text back to the Twilio number arrives as a form post from Twilio.
+  if (e.parameter && e.parameter.MessageSid) return twilioReply(e.parameter);
   var req = JSON.parse(e.postData.contents || "{}");
   // The standalone address page (address/index.html) knows guests only by
   // the code in their text's link, not by phone or email.
@@ -84,7 +86,8 @@ var HEADERS = {
   "Guests": ["Phone", "Name", "Email", "Group", "Feeling", "Updated", "Street", "Apt", "City", "State", "ZIP", "Country", "Household", "People", "Plus One"],
   "Notes": ["Sent", "Name", "Phone", "Email", "Kind", "Note"],
   "Private events": ["Group", "Date", "Time", "Title", "Place"],
-  "Addresses": ["Household", "Names", "Street", "Apt", "City", "State", "ZIP", "Country", "Sent", "Code"]
+  "Addresses": ["Household", "Names", "Street", "Apt", "City", "State", "ZIP", "Country", "Sent", "Code"],
+  "Texts": ["When", "Way", "Name", "Phone", "Text", "Status"]
 };
 function tab(name) {
   var book = SpreadsheetApp.getActive();
@@ -564,8 +567,107 @@ function textingLink() {
   var props = PropertiesService.getScriptProperties();
   var key = props.getProperty("TEXT_KEY");
   if (!key) { key = Utilities.getUuid().replace(/-/g, ""); props.setProperty("TEXT_KEY", key); }
-  var url = ScriptApp.getService().getUrl() + "?action=texts&key=" + key;
+  var url = WEB_APP_URL + "?action=texts&key=" + key;
   SpreadsheetApp.getUi().alert("Paste this into the Shortcut's \"Get contents of URL\" step:\n\n" + url);
+}
+
+// ---- Address texts through Twilio -------------------------------------------
+// Wedding menu > Set up Twilio: paste the Account SID, Auth Token and the
+// Twilio number once. They're kept in this script's private settings, never
+// in the code (which is public on GitHub).
+// Wedding menu > Send address texts: texts everyone ticked on the guest list
+// whose household hasn't answered and who hasn't been texted yet. Every text
+// sent or received is logged in the Texts tab; delete someone's "Sent" row
+// there to let them be texted again.
+
+var TWILIO_STOP = " Reply STOP to opt out.";
+
+function setUpTwilio() {
+  var ui = SpreadsheetApp.getUi(), props = PropertiesService.getScriptProperties();
+  var ask = [
+    ["TWILIO_SID", "Twilio Account SID (starts with AC)"],
+    ["TWILIO_TOKEN", "Twilio Auth Token"],
+    ["TWILIO_FROM", "Your Twilio phone number, e.g. (925) 555-0123"],
+    ["FORWARD_TO", "Your own cell number, to get guests' replies (leave blank to skip)"]
+  ];
+  for (var i = 0; i < ask.length; i++) {
+    var has = props.getProperty(ask[i][0]);
+    var r = ui.prompt("Set up Twilio (" + (i + 1) + " of " + ask.length + ")",
+      ask[i][1] + (has ? "\n\nAlready saved. Leave blank to keep it." : ""), ui.ButtonSet.OK_CANCEL);
+    if (r.getSelectedButton() !== ui.Button.OK) return;
+    var v = r.getResponseText().trim();
+    if (!v) continue;
+    if (ask[i][0] === "TWILIO_FROM" || ask[i][0] === "FORWARD_TO") v = "+" + digits(v);
+    props.setProperty(ask[i][0], v);
+  }
+  ui.alert("Saved. Last step: in Twilio, open your number's settings and set \"A message comes in\" to Webhook, HTTP POST, with this URL:\n\n" + WEB_APP_URL);
+}
+
+// The site's web app address (the same one in assets/js/site.js).
+var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw89GGyUV6FwVLychrs_3ZxH8vONSvbC4A1LqT-xWkLtjlIgROk9hDHnwAx0DQgOhZD/exec";
+
+function twilio() {
+  var p = PropertiesService.getScriptProperties();
+  var t = { sid: p.getProperty("TWILIO_SID"), token: p.getProperty("TWILIO_TOKEN"), from: p.getProperty("TWILIO_FROM"), forward: p.getProperty("FORWARD_TO") };
+  return t.sid && t.token && t.from ? t : null;
+}
+
+function sendSms(t, to, body) {
+  var res = UrlFetchApp.fetch("https://api.twilio.com/2010-04-01/Accounts/" + t.sid + "/Messages.json", {
+    method: "post",
+    payload: { To: to, From: t.from, Body: body },
+    headers: { Authorization: "Basic " + Utilities.base64Encode(t.sid + ":" + t.token) },
+    muteHttpExceptions: true
+  });
+  var data = {};
+  try { data = JSON.parse(res.getContentText()); } catch (err) {}
+  return res.getResponseCode() < 300 ? "Sent" : "Failed: " + (data.message || res.getResponseCode());
+}
+
+function logText(way, name, phone, text, status) {
+  tab("Texts").appendRow([new Date(), way, name, phoneValue(digits(phone)), text, status]);
+}
+
+function sendAddressTexts() {
+  var ui = SpreadsheetApp.getUi(), t = twilio();
+  if (!t) return ui.alert("Twilio isn't set up yet. Use Wedding > Set up Twilio first.");
+  var list = textsToSend();
+  if (list.error) return ui.alert(list.error);
+  var already = {};
+  tab("Texts").getDataRange().getValues().slice(1).forEach(function (r) {
+    if (r[1] === "Sent" && r[5] === "Sent") already[digits(r[3])] = true;
+  });
+  var todo = list.texts.filter(function (x) { return !already[digits(x.phone)]; });
+  if (!todo.length) return ui.alert("Nobody to text: everyone ticked has answered or was already texted.");
+  var names = todo.map(function (x) { return x.name; });
+  var ok = ui.alert("Send " + todo.length + " text" + (todo.length > 1 ? "s" : "") + "?",
+    names.slice(0, 30).join(", ") + (names.length > 30 ? " and " + (names.length - 30) + " more" : ""), ui.ButtonSet.YES_NO);
+  if (ok !== ui.Button.YES) return;
+  var failed = 0;
+  todo.forEach(function (x) {
+    var body = x.message + TWILIO_STOP;
+    var status = sendSms(t, x.phone, body);
+    if (status !== "Sent") failed++;
+    logText("Sent", x.name, x.phone, body, status);
+    Utilities.sleep(250);
+  });
+  ui.alert((todo.length - failed) + " sent" + (failed ? ", " + failed + " failed (see the Texts tab)." : ". They're logged in the Texts tab."));
+}
+
+// A guest texted the Twilio number back: log it and pass it on to Chandler.
+function twilioReply(p) {
+  var t = twilio();
+  if (t && p.AccountSid === t.sid) {
+    var from = digits(p.From), name = "";
+    var list = guestList();
+    if (list) list.people.forEach(function (r) { if (!name && digits(r[list.c.phone]) === from) name = String(r[list.c.person]).trim(); });
+    var body = String(p.Body || "").slice(0, 1000);
+    logText("Reply", name, from, body, "");
+    if (t.forward && !/^\s*(stop|start|unstop|help|cancel|end|quit|unsubscribe)\s*$/i.test(body)) {
+      sendSms(t, t.forward, "Reply from " + (name || "+" + from) + ": " + body);
+    }
+  }
+  return ContentService.createTextOutput("<Response></Response>").setMimeType(ContentService.MimeType.XML);
 }
 
 function json(data) {
@@ -587,13 +689,16 @@ var WIDTHS = {
   "Guests": [150, 200, 220, 90, 110, 160, 200, 80, 120, 70, 80, 110, 150, 70, 130],
   "Notes": [160, 160, 150, 210, 120, 460],
   "Private events": [100, 130, 100, 220, 220],
-  "Addresses": [160, 240, 220, 80, 130, 70, 80, 120, 160, 90]
+  "Addresses": [160, 240, 220, 80, 130, 70, 80, 120, 160, 90],
+  "Texts": [160, 70, 180, 150, 520, 120]
 };
 
 function onOpen() {
   SpreadsheetApp.getUi().createMenu("Wedding")
     .addItem("Style sheet & refresh Overview", "styleSheet")
-    .addItem("Get the address texting link", "textingLink")
+    .addItem("Send address texts", "sendAddressTexts")
+    .addItem("Set up Twilio", "setUpTwilio")
+    .addItem("Get the address texting link (iPhone Shortcut)", "textingLink")
     .addToUi();
 }
 
