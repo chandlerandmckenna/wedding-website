@@ -477,7 +477,7 @@ function phoneValue(digits) {
 var TEXTS = {
   column: "Text for address",
   page: "https://thequeenans2027.com/address/?c=",
-  message: "Hi {first}! It's McKenna & Chandler. We have something coming your way in the mail and want to make sure it finds you. Could you pop your address in here? {link}"
+  message: "Hi {first}! McKenna & Chandler have something coming your way in the mail. Please add your address here: {link} This is an automated number and replies aren't read."
 };
 
 // A short code for a household, used in its link instead of its name.
@@ -581,6 +581,9 @@ function textingLink() {
 // there to let them be texted again.
 
 var TWILIO_STOP = " Reply STOP to opt out.";
+// Sent back automatically when a guest texts the Twilio number, so nobody
+// waits on an answer there.
+var TWILIO_AUTO_REPLY = "Thanks! This number only collects addresses and can't answer messages. More details are coming in the mail!";
 
 function setUpTwilio() {
   var ui = SpreadsheetApp.getUi(), props = PropertiesService.getScriptProperties();
@@ -588,7 +591,7 @@ function setUpTwilio() {
     ["TWILIO_SID", "Twilio Account SID (starts with AC)"],
     ["TWILIO_TOKEN", "Twilio Auth Token"],
     ["TWILIO_FROM", "Your Twilio phone number, e.g. (925) 555-0123"],
-    ["FORWARD_TO", "Your own cell number, to get guests' replies (leave blank to skip)"]
+    ["FORWARD_TO", "Your own cell number, if you want guests' replies forwarded to you. Leave blank to only keep them in the Texts tab."]
   ];
   for (var i = 0; i < ask.length; i++) {
     var has = props.getProperty(ask[i][0]);
@@ -662,9 +665,13 @@ function twilioReply(p) {
     var list = guestList();
     if (list) list.people.forEach(function (r) { if (!name && digits(r[list.c.phone]) === from) name = String(r[list.c.person]).trim(); });
     var body = String(p.Body || "").slice(0, 1000);
+    var keyword = /^\s*(stop|start|unstop|help|info|cancel|end|quit|unsubscribe|stopall)\s*$/i.test(body);
     logText("Reply", name, from, body, "");
-    if (t.forward && !/^\s*(stop|start|unstop|help|cancel|end|quit|unsubscribe)\s*$/i.test(body)) {
-      sendSms(t, t.forward, "Reply from " + (name || "+" + from) + ": " + body);
+    if (t.forward && !keyword) sendSms(t, t.forward, "Reply from " + (name || "+" + from) + ": " + body);
+    // Twilio answers STOP/HELP itself; anything else gets the auto-reply.
+    if (!keyword) {
+      return ContentService.createTextOutput("<Response><Message>" + TWILIO_AUTO_REPLY.replace(/&/g, "&amp;").replace(/</g, "&lt;") +
+        "</Message></Response>").setMimeType(ContentService.MimeType.XML);
     }
   }
   return ContentService.createTextOutput("<Response></Response>").setMimeType(ContentService.MimeType.XML);
